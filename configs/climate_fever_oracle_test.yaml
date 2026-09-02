@@ -1,0 +1,29 @@
+# CLIMATE-FEVER 真实测试集上的 D-S 链路验收配置。
+# 关系输入来自人工证据投票分布（annotation oracle），不是模型预测；
+# 因此本配置的输出不能报告为 RAGChecker、RAGAS 或 LLM 的模型性能。
+paths:
+  manifest: ../data/processed/climate_fever_v1/manifest.json
+  samples: ../data/processed/climate_fever_v1/test.jsonl
+  relation_predictions: ../data/processed/climate_fever_v1/test_relations.jsonl
+  output_jsonl: ../outputs/predictions/climate_fever_oracle_test.jsonl
+  output_csv: ../outputs/predictions/climate_fever_oracle_test.csv
+
+data:
+  split: test
+  relation_predictions_kind: annotation_oracle
+
+# theta 与 K_doc 来自 validation 的 5×5 网格搜索；K_eval=0.4 是固定告警阈值。
+diagnostics:
+  theta_threshold: 0.3
+  document_conflict_threshold: 0.6
+  evaluator_conflict_threshold: 0.4
+  tie_tolerance: 0.000001
+
+# baseline 阈值尚未单独校准，结果仅用于链路检查。
+baseline:
+  decision_threshold: 0.5
+  tie_tolerance: 0.000001
+  single_evaluator: climate_fever_human_vote_distribution
+
+output:
+  overwrite: false

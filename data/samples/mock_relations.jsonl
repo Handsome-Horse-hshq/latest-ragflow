@@ -1,0 +1,8 @@
+{"sample_id": "demo-001", "claim_id": "demo-001-c1", "doc_id": "demo-001-d1", "evaluator": "mock_evaluator", "p_support": 0.9, "p_refute": 0.05, "p_unknown": 0.05, "evaluator_reliability": 1.0}
+{"sample_id": "demo-001", "claim_id": "demo-001-c1", "doc_id": "demo-001-d2", "evaluator": "mock_evaluator", "p_support": 0.05, "p_refute": 0.05, "p_unknown": 0.9, "evaluator_reliability": 1.0}
+{"sample_id": "demo-001", "claim_id": "demo-001-c2", "doc_id": "demo-001-d1", "evaluator": "mock_evaluator", "p_support": 0.9, "p_refute": 0.05, "p_unknown": 0.05, "evaluator_reliability": 1.0}
+{"sample_id": "demo-001", "claim_id": "demo-001-c2", "doc_id": "demo-001-d2", "evaluator": "mock_evaluator", "p_support": 0.9, "p_refute": 0.05, "p_unknown": 0.05, "evaluator_reliability": 1.0}
+{"sample_id": "demo-002", "claim_id": "demo-002-c1", "doc_id": "demo-002-d1", "evaluator": "mock_evaluator", "p_support": 0.05, "p_refute": 0.9, "p_unknown": 0.05, "evaluator_reliability": 1.0}
+{"sample_id": "demo-003", "claim_id": "demo-003-c1", "doc_id": "demo-003-d1", "evaluator": "mock_evaluator", "p_support": 0.05, "p_refute": 0.05, "p_unknown": 0.9, "evaluator_reliability": 1.0}
+{"sample_id": "demo-004", "claim_id": "demo-004-c1", "doc_id": "demo-004-d1", "evaluator": "mock_evaluator", "p_support": 0.9, "p_refute": 0.05, "p_unknown": 0.05, "evaluator_reliability": 1.0}
+{"sample_id": "demo-004", "claim_id": "demo-004-c1", "doc_id": "demo-004-d2", "evaluator": "mock_evaluator", "p_support": 0.05, "p_refute": 0.9, "p_unknown": 0.05, "evaluator_reliability": 1.0}

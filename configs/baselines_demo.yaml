@@ -1,0 +1,17 @@
+# 三个对照 baseline 的 demo 配置。
+# 路径以本文件所在目录（configs/）为基准解析，与终端当前目录无关。
+paths:
+  samples: ../data/samples/demo.jsonl
+  relation_predictions: ../data/samples/mock_relations.jsonl
+  output_jsonl: ../outputs/predictions/demo_baselines.jsonl
+  output_csv: ../outputs/predictions/demo_baselines.csv
+
+# 注意：以下阈值仅为调试默认值，不是通过数据选出的正式取值。
+# 正式实验必须在验证集上选择，测试集不得参与选择。
+baseline:
+  decision_threshold: 0.5
+  tie_tolerance: 0.000001
+  single_evaluator: mock_evaluator
+
+output:
+  overwrite: false

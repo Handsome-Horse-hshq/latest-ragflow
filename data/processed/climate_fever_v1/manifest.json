@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0",
+  "dataset_name": "rag-ds-climate-fever-balanced-v1",
+  "source": {
+    "name": "CLIMATE-FEVER",
+    "homepage": "https://github.com/tdiggelm/climate-fever-dataset",
+    "download_url": "https://raw.githubusercontent.com/tdiggelm/climate-fever-dataset/main/dataset/climate-fever.jsonl",
+    "paper_url": "https://arxiv.org/abs/2012.00614",
+    "citation": "Diggelmann et al. (2020), CLIMATE-FEVER: A Dataset for Verification of Real-World Climate Claims, arXiv:2012.00614",
+    "license_note": "The official repository does not include an explicit dataset license. Use for research with the paper citation and comply with the licensing and attribution terms of the underlying English Wikipedia evidence.",
+    "raw_file": "climate-fever.jsonl",
+    "raw_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
+    "raw_records": 1535
+  },
+  "random_seed": 42,
+  "per_class": 100,
+  "split_per_class": {
+    "train": 60,
+    "validation": 20,
+    "test": 20
+  },
+  "label_mapping": {
+    "SUPPORTS": "supported",
+    "REFUTES": "refuted",
+    "NOT_ENOUGH_INFO": "insufficient",
+    "DISPUTED": "conflicting"
+  },
+  "relation_predictions_kind": "annotation_oracle",
+  "relation_predictions_warning": "These relation predictions are derived from CLIMATE-FEVER human evidence votes. They are annotation-oracle inputs for pipeline validation only and must not be reported as model predictions or model performance.",
+  "splits": {
+    "train": {
+      "samples": {
+        "path": "train.jsonl",
+        "sha256": "2fdb4241101e483205eaf526b5f073b010a82ef2ad10e7b5611178d5c2d3fcdc",
+        "records": 240
+      },
+      "relation_predictions": {
+        "path": "train_relations.jsonl",
+        "sha256": "51d79e0bde279f2acb5b07cb058237342bcccf6111b51c39f5b935f729b73709",
+        "records": 1200
+      },
+      "provenance": {
+        "path": "train_provenance.jsonl",
+        "sha256": "aab48ce02f51613fb010bc1ebc573b1c52b50192a7f1632b34fe581965c036a1",
+        "records": 240
+      },
+      "label_counts": {
+        "refuted": 60,
+        "supported": 60,
+        "insufficient": 60,
+        "conflicting": 60
+      }
+    },
+    "validation": {
+      "samples": {
+        "path": "validation.jsonl",
+        "sha256": "54bee139fcd1cadad8544964950b54612377d43ee73b84a247a5b2cf649f6699",
+        "records": 80
+      },
+      "relation_predictions": {
+        "path": "validation_relations.jsonl",
+        "sha256": "a035b47fd4005e578d271242704528ce9786454d3720fe604f0b68ca8d773443",
+        "records": 400
+      },
+      "provenance": {
+        "path": "validation_provenance.jsonl",
+        "sha256": "64053466cacc58b44920b358192d651e7dec24d32ae5c4be729b459fc4e8b306",
+        "records": 80
+      },
+      "label_counts": {
+        "supported": 20,
+        "insufficient": 20,
+        "conflicting": 20,
+        "refuted": 20
+      }
+    },
+    "test": {
+      "samples": {
+        "path": "test.jsonl",
+        "sha256": "02dd9ed6f6ec95bb9aba25b0a0f5e674858b85c5f7be0e30de3248c77ab38355",
+        "records": 80
+      },
+      "relation_predictions": {
+        "path": "test_relations.jsonl",
+        "sha256": "9b0c6f100208964e8757f2db6b058e1d68fdaee07fb8b7a75b69c71b619c865e",
+        "records": 400
+      },
+      "provenance": {
+        "path": "test_provenance.jsonl",
+        "sha256": "5e5fa59a257574e91a352a4908a6e0686e71fe9e33066e387c9d485ec9ac1fc8",
+        "records": 80
+      },
+      "label_counts": {
+        "refuted": 20,
+        "supported": 20,
+        "conflicting": 20,
+        "insufficient": 20
+      }
+    }
+  }
+}

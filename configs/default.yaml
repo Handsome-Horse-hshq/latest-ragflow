@@ -1,0 +1,18 @@
+project:
+  name: rag-ds-evaluator
+  random_seed: 42
+
+paths:
+  raw_data: data/raw
+  processed_data: data/processed
+  sample_data: data/samples
+  outputs: outputs
+
+# 二维门控阈值。
+# 注意：以下取值仅为调试默认值，不是通过数据选出的正式阈值。
+# 正式实验必须在验证集上选择阈值，测试集不得参与选择。
+diagnostics:
+  theta_threshold: 0.5
+  document_conflict_threshold: 0.4
+  evaluator_conflict_threshold: 0.4
+  tie_tolerance: 0.000001

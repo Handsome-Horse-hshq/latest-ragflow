@@ -1,0 +1,25 @@
+# 对比实验配置。
+# 路径以本文件所在目录（configs/）为基准解析，与终端当前目录无关。
+paths:
+  samples: ../data/samples/demo.jsonl
+  relation_predictions: ../data/samples/mock_relations.jsonl
+  output_jsonl: ../outputs/predictions/experiment_predictions.jsonl
+  output_csv: ../outputs/predictions/experiment_predictions.csv
+
+# 二维门控阈值。
+# 警告：以下取值仍是调试默认值。正式实验必须先用 scripts/tune_thresholds.py
+# 在验证集上搜索，把结果填回这里并锁定，再跑测试集。
+diagnostics:
+  theta_threshold: 0.5
+  document_conflict_threshold: 0.4
+  evaluator_conflict_threshold: 0.4
+  tie_tolerance: 0.000001
+
+# baseline 判定阈值，同样是调试值。
+baseline:
+  decision_threshold: 0.5
+  tie_tolerance: 0.000001
+  single_evaluator: mock_evaluator
+
+output:
+  overwrite: false

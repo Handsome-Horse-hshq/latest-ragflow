@@ -1,0 +1,32 @@
+# 虚拟环境
+.venv/
+venv/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# 测试与类型检查缓存
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 数据与实验产物（保留目录结构，忽略内容）
+data/raw/*
+data/processed/*
+!data/raw/climate-fever.jsonl
+!data/processed/climate_fever_v1/
+!data/processed/climate_fever_v1/**
+outputs/predictions/*
+outputs/metrics/*
+outputs/figures/*
+!outputs/metrics/climate_fever_threshold_search.json
+!**/.gitkeep
+
+# 编辑器
+.vscode/
+.idea/
+.DS_Store
