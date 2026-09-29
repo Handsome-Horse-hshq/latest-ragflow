@@ -1,0 +1,266 @@
+{
+  "split": "validation",
+  "best": {
+    "thresholds": {
+      "theta_threshold": 0.3,
+      "document_conflict_threshold": 0.6,
+      "evaluator_conflict_threshold": 0.4,
+      "tie_tolerance": 1e-06
+    },
+    "macro_f1": 0.30549581839904416,
+    "accuracy": 0.35
+  },
+  "candidates": [
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.30549581839904416,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.30549581839904416,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.30549581839904416,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.30549581839904416,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.30549581839904416,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    }
+  ],
+  "claim_count": 80
+}

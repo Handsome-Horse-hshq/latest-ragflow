@@ -1,0 +1,17 @@
+﻿setting,risk_definition,reference,rival,delta_auroc,auroc_ci_low,auroc_ci_high,auroc_p,delta_aurc,aurc_ci_low,aurc_ci_high,aurc_p,auroc_significant,aurc_significant,n_resamples
+single-eval (refchecker_nli),max_signal,ds,conflict_aware,0.0007,-0.0342,0.0367,0.956,-0.0153,-0.0702,0.042,0.619,False,False,2000
+single-eval (refchecker_nli),max_signal,ds,weighted_average,-0.017,-0.0542,0.0208,0.355,-0.0323,-0.0889,0.0264,0.315,False,False,2000
+single-eval (refchecker_nli),max_signal,ds,majority_vote,-0.0052,-0.0479,0.0372,0.771,-0.0286,-0.0904,0.02,0.179,False,False,2000
+single-eval (refchecker_nli),max_signal,ds,single_evaluator,-0.017,-0.053,0.0189,0.326,-0.0323,-0.0883,0.0221,0.263,False,False,2000
+single-eval (refchecker_nli),class_conditional,ds,conflict_aware,0.1077,0.0459,0.17,0.0,-0.0365,-0.077,0.0056,0.079,True,False,2000
+single-eval (refchecker_nli),class_conditional,ds,weighted_average,0.0978,0.0329,0.1619,0.002,-0.0544,-0.0978,-0.0135,0.009,True,True,2000
+single-eval (refchecker_nli),class_conditional,ds,majority_vote,0.0849,0.0211,0.1454,0.006,-0.0478,-0.0945,-0.0104,0.012,True,True,2000
+single-eval (refchecker_nli),class_conditional,ds,single_evaluator,0.0978,0.0315,0.1641,0.002,-0.0544,-0.0963,-0.0123,0.012,True,True,2000
+two-eval (+deberta),max_signal,ds,conflict_aware,-0.0646,-0.1076,-0.0214,0.001,-0.0047,-0.0585,0.0481,0.879,True,False,2000
+two-eval (+deberta),max_signal,ds,weighted_average,-0.0412,-0.0788,-0.0027,0.038,0.0035,-0.0495,0.0592,0.894,True,False,2000
+two-eval (+deberta),max_signal,ds,majority_vote,-0.0269,-0.0695,0.0174,0.226,-0.0058,-0.0644,0.0435,0.72,False,False,2000
+two-eval (+deberta),max_signal,ds,single_evaluator,-0.0264,-0.0667,0.0146,0.222,-0.0048,-0.0578,0.0495,0.87,False,False,2000
+two-eval (+deberta),class_conditional,ds,conflict_aware,0.0521,-0.0143,0.1169,0.127,-0.0249,-0.0718,0.0203,0.311,False,False,2000
+two-eval (+deberta),class_conditional,ds,weighted_average,0.0935,0.021,0.1641,0.013,-0.0226,-0.0699,0.0232,0.313,True,False,2000
+two-eval (+deberta),class_conditional,ds,majority_vote,0.0773,0.006,0.1458,0.034,-0.0219,-0.0731,0.0198,0.279,True,False,2000
+two-eval (+deberta),class_conditional,ds,single_evaluator,0.0884,0.0149,0.1649,0.021,-0.0273,-0.079,0.0201,0.282,True,False,2000

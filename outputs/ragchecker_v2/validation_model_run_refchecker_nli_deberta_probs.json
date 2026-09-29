@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "dataset_name": "rag-ds-climate-fever-balanced-v2",
+  "split": "validation",
+  "relation_predictions_kind": "model_prediction",
+  "evaluator": "refchecker_nli_deberta",
+  "producer": "refchecker-nli",
+  "producer_version": "refchecker 0.2.17",
+  "extractor_name": null,
+  "checker_name": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+  "samples": {
+    "path": "validation.jsonl",
+    "sha256": "1709d2b9d746b701c23084f659541de895b1ec359e0c2c9ca12f77f2eee6384f",
+    "records": 124
+  },
+  "relation_predictions": {
+    "path": "validation_relations_refchecker_nli_deberta_probs.jsonl",
+    "sha256": "dcd3f53fa510f11b692269b8863b0e39606b00af6f9217141d114e531d3cca2e",
+    "records": 620
+  },
+  "source_output": {
+    "path": "outputs/ragchecker_v2/validation_checking_outputs_deberta_probs.json",
+    "sha256": "b170805162e320e15290803760c4ea9a2214da4b045b9e6dfcdabb8e594cb4c4"
+  },
+  "label_mapping": {
+    "entailment": [
+      0.9,
+      0.05,
+      0.05
+    ],
+    "contradiction": [
+      0.05,
+      0.9,
+      0.05
+    ],
+    "neutral": [
+      0.05,
+      0.05,
+      0.9
+    ]
+  },
+  "label_mapping_source": "continuous_probabilities",
+  "calibration_path": null,
+  "multi_claim_policy": "mixture",
+  "evaluator_reliability": 1.0,
+  "created_at": "2026-09-20T13:02:48+00:00"
+}

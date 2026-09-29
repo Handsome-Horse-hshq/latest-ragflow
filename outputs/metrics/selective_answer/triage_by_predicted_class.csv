@@ -1,0 +1,11 @@
+setting,method,acc_overall,acc_when_decisive,coverage_decisive,acc_when_cautious
+single-eval,ds,0.375,0.3804,0.5633,0.368
+single-eval,conflict_aware,0.3653,0.6863,0.1656,0.3016
+single-eval,weighted_average,0.3442,0.6863,0.1656,0.2763
+single-eval,majority_vote,0.3425,0.6832,0.164,0.2757
+single-eval,single_evaluator,0.3442,0.6863,0.1656,0.2763
+two-eval,ds,0.3523,0.3905,0.5114,0.3123
+two-eval,conflict_aware,0.3312,0.6303,0.1932,0.2596
+two-eval,weighted_average,0.3474,0.6303,0.1932,0.2797
+two-eval,majority_vote,0.3377,0.6415,0.1721,0.2745
+two-eval,single_evaluator,0.3442,0.6731,0.1688,0.2773

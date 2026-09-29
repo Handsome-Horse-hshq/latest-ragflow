@@ -1,0 +1,436 @@
+{
+  "split": "validation",
+  "best": {
+    "thresholds": {
+      "theta_threshold": 0.037344,
+      "document_conflict_threshold": 0.65282,
+      "evaluator_conflict_threshold": 0.4,
+      "tie_tolerance": 1e-06
+    },
+    "macro_f1": 0.4057023775693852,
+    "accuracy": 0.425
+  },
+  "candidates": [
+    {
+      "thresholds": {
+        "theta_threshold": 0.037344,
+        "document_conflict_threshold": 0.65282,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.4057023775693852,
+      "accuracy": 0.425
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.044504,
+        "document_conflict_threshold": 0.65282,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.4057023775693852,
+      "accuracy": 0.425
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.037344,
+        "document_conflict_threshold": 0.647259,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.3866324391446081,
+      "accuracy": 0.4125
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.044504,
+        "document_conflict_threshold": 0.647259,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.3866324391446081,
+      "accuracy": 0.4125
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.020662,
+        "document_conflict_threshold": 0.65282,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.3814217443249701,
+      "accuracy": 0.4
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.037344,
+        "document_conflict_threshold": 0.759486,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.3678015233992463,
+      "accuracy": 0.4125
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.020662,
+        "document_conflict_threshold": 0.647259,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.36235180590019295,
+      "accuracy": 0.3875
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.044504,
+        "document_conflict_threshold": 0.759486,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.3519103617280336,
+      "accuracy": 0.4
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.020662,
+        "document_conflict_threshold": 0.759486,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.34387655355397284,
+      "accuracy": 0.3875
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.018848,
+        "document_conflict_threshold": 0.65282,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.32750234411626816,
+      "accuracy": 0.3625
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.048119,
+        "document_conflict_threshold": 0.65282,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.32094943240454077,
+      "accuracy": 0.375
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.048119,
+        "document_conflict_threshold": 0.647259,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.31299810246679316,
+      "accuracy": 0.3625
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.018848,
+        "document_conflict_threshold": 0.647259,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.30843240569149105,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.048119,
+        "document_conflict_threshold": 0.598053,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.30549581839904416,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.048119,
+        "document_conflict_threshold": 0.641292,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.30549581839904416,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.018848,
+        "document_conflict_threshold": 0.759486,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.29022657450076805,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.020662,
+        "document_conflict_threshold": 0.598053,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.287314000217226,
+      "accuracy": 0.325
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.020662,
+        "document_conflict_threshold": 0.641292,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.287314000217226,
+      "accuracy": 0.325
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.037344,
+        "document_conflict_threshold": 0.598053,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.287314000217226,
+      "accuracy": 0.325
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.037344,
+        "document_conflict_threshold": 0.641292,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.287314000217226,
+      "accuracy": 0.325
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.044504,
+        "document_conflict_threshold": 0.598053,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.287314000217226,
+      "accuracy": 0.325
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.044504,
+        "document_conflict_threshold": 0.641292,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.287314000217226,
+      "accuracy": 0.325
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.048119,
+        "document_conflict_threshold": 0.759486,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.2516941391941392,
+      "accuracy": 0.35
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.018848,
+        "document_conflict_threshold": 0.598053,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.23573775388291515,
+      "accuracy": 0.2875
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.018848,
+        "document_conflict_threshold": 0.641292,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.23573775388291515,
+      "accuracy": 0.2875
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.002363,
+        "document_conflict_threshold": 0.65282,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.213884430176565,
+      "accuracy": 0.3125
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.002363,
+        "document_conflict_threshold": 0.647259,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.18738673432403044,
+      "accuracy": 0.3
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.002363,
+        "document_conflict_threshold": 0.598053,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.17592592592592593,
+      "accuracy": 0.2625
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.002363,
+        "document_conflict_threshold": 0.641292,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.17592592592592593,
+      "accuracy": 0.2625
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.018848,
+        "document_conflict_threshold": 0.596613,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.16666666666666669,
+      "accuracy": 0.2875
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.020662,
+        "document_conflict_threshold": 0.596613,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.16666666666666669,
+      "accuracy": 0.2875
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.037344,
+        "document_conflict_threshold": 0.596613,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.16666666666666669,
+      "accuracy": 0.2875
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.044504,
+        "document_conflict_threshold": 0.596613,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.16666666666666669,
+      "accuracy": 0.2875
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.048119,
+        "document_conflict_threshold": 0.596613,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.16666666666666669,
+      "accuracy": 0.2875
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.002363,
+        "document_conflict_threshold": 0.759486,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.14965986394557823,
+      "accuracy": 0.275
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.002363,
+        "document_conflict_threshold": 0.596613,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.125,
+      "accuracy": 0.2625
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.002363,
+        "document_conflict_threshold": 0.528043,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.018848,
+        "document_conflict_threshold": 0.528043,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.020662,
+        "document_conflict_threshold": 0.528043,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.037344,
+        "document_conflict_threshold": 0.528043,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.044504,
+        "document_conflict_threshold": 0.528043,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.048119,
+        "document_conflict_threshold": 0.528043,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 0.1,
+      "accuracy": 0.25
+    }
+  ],
+  "claim_count": 80
+}

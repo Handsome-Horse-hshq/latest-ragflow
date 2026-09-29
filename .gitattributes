@@ -2,3 +2,7 @@
 # manifest.json 记录了这些文件的 SHA256；Windows 上 core.autocrlf=true
 # 会把 LF 改写成 CRLF，导致完整性校验失败。
 data/** -text
+
+# outputs/ 同理：outputs/ragchecker*/*_model_run*.json 记录了关系文件的 SHA-256，
+# 换行被改写后 verify_model_run_artifacts 会失败。
+outputs/** -text

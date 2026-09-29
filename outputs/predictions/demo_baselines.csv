@@ -1,0 +1,16 @@
+﻿sample_id,claim_id,method,evaluator,score_support,score_refute,score_unknown,predicted_state,reason,input_count,gold_state
+demo-001,demo-001-c1,weighted_average,,0.48648648648648646,0.049999999999999996,0.4635135135135135,insufficient,below_threshold,2,supported
+demo-001,demo-001-c1,majority_vote,,0.5,0.0,0.5,insufficient,score_tie,2,supported
+demo-001,demo-001-c1,single_evaluator,mock_evaluator,0.48648648648648646,0.049999999999999996,0.4635135135135135,insufficient,below_threshold,2,supported
+demo-001,demo-001-c2,weighted_average,,0.9,0.049999999999999996,0.049999999999999996,supported,decided,2,supported
+demo-001,demo-001-c2,majority_vote,,1.0,0.0,0.0,supported,decided,2,supported
+demo-001,demo-001-c2,single_evaluator,mock_evaluator,0.9,0.049999999999999996,0.049999999999999996,supported,decided,2,supported
+demo-002,demo-002-c1,weighted_average,,0.05,0.9,0.05,refuted,decided,1,refuted
+demo-002,demo-002-c1,majority_vote,,0.0,1.0,0.0,refuted,decided,1,refuted
+demo-002,demo-002-c1,single_evaluator,mock_evaluator,0.05,0.9,0.05,refuted,decided,1,refuted
+demo-003,demo-003-c1,weighted_average,,0.05,0.05,0.9,insufficient,unknown_highest,1,insufficient
+demo-003,demo-003-c1,majority_vote,,0.0,0.0,1.0,insufficient,unknown_highest,1,insufficient
+demo-003,demo-003-c1,single_evaluator,mock_evaluator,0.05,0.05,0.9,insufficient,unknown_highest,1,insufficient
+demo-004,demo-004-c1,weighted_average,,0.4632596685082873,0.48674033149171275,0.05,insufficient,below_threshold,2,conflicting
+demo-004,demo-004-c1,majority_vote,,0.5,0.5,0.0,insufficient,score_tie,2,conflicting
+demo-004,demo-004-c1,single_evaluator,mock_evaluator,0.4632596685082873,0.48674033149171275,0.05,insufficient,below_threshold,2,conflicting

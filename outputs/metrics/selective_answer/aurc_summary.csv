@@ -1,0 +1,21 @@
+﻿setting,risk_definition,method,aurc,acc_100,acc_80,acc_60
+single-eval (refchecker_nli),max_signal,ds,0.6115,0.375,0.3773,0.4
+single-eval (refchecker_nli),max_signal,conflict_aware,0.6269,0.3653,0.3773,0.3757
+single-eval (refchecker_nli),max_signal,weighted_average,0.6438,0.3442,0.355,0.3676
+single-eval (refchecker_nli),max_signal,majority_vote,0.6402,0.3425,0.3611,0.3676
+single-eval (refchecker_nli),max_signal,single_evaluator,0.6438,0.3442,0.355,0.3676
+single-eval (refchecker_nli),class_conditional,ds,0.5924,0.375,0.3996,0.4243
+single-eval (refchecker_nli),class_conditional,conflict_aware,0.6289,0.3653,0.3712,0.3757
+single-eval (refchecker_nli),class_conditional,weighted_average,0.6468,0.3442,0.3448,0.3568
+single-eval (refchecker_nli),class_conditional,majority_vote,0.6402,0.3425,0.355,0.3757
+single-eval (refchecker_nli),class_conditional,single_evaluator,0.6468,0.3442,0.3448,0.3568
+two-eval (+deberta),max_signal,ds,0.6391,0.3523,0.3529,0.3784
+two-eval (+deberta),max_signal,conflict_aware,0.6438,0.3312,0.3469,0.373
+two-eval (+deberta),max_signal,weighted_average,0.6355,0.3474,0.357,0.3703
+two-eval (+deberta),max_signal,majority_vote,0.6449,0.3377,0.357,0.3595
+two-eval (+deberta),max_signal,single_evaluator,0.6438,0.3442,0.355,0.3676
+two-eval (+deberta),class_conditional,ds,0.6195,0.3523,0.3671,0.3946
+two-eval (+deberta),class_conditional,conflict_aware,0.6444,0.3312,0.357,0.3649
+two-eval (+deberta),class_conditional,weighted_average,0.6421,0.3474,0.3529,0.3649
+two-eval (+deberta),class_conditional,majority_vote,0.6414,0.3377,0.3529,0.3784
+two-eval (+deberta),class_conditional,single_evaluator,0.6468,0.3442,0.3448,0.3568

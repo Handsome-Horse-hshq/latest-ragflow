@@ -1,0 +1,21 @@
+﻿setting,risk_definition,method,auroc_incorrectness
+single-eval (refchecker_nli),max_signal,ds,0.5761
+single-eval (refchecker_nli),max_signal,conflict_aware,0.5754
+single-eval (refchecker_nli),max_signal,weighted_average,0.593
+single-eval (refchecker_nli),max_signal,majority_vote,0.5812
+single-eval (refchecker_nli),max_signal,single_evaluator,0.593
+single-eval (refchecker_nli),class_conditional,ds,0.6212
+single-eval (refchecker_nli),class_conditional,conflict_aware,0.5135
+single-eval (refchecker_nli),class_conditional,weighted_average,0.5235
+single-eval (refchecker_nli),class_conditional,majority_vote,0.5363
+single-eval (refchecker_nli),class_conditional,single_evaluator,0.5235
+two-eval (+deberta),max_signal,ds,0.5666
+two-eval (+deberta),max_signal,conflict_aware,0.6312
+two-eval (+deberta),max_signal,weighted_average,0.6078
+two-eval (+deberta),max_signal,majority_vote,0.5935
+two-eval (+deberta),max_signal,single_evaluator,0.593
+two-eval (+deberta),class_conditional,ds,0.6118
+two-eval (+deberta),class_conditional,conflict_aware,0.5598
+two-eval (+deberta),class_conditional,weighted_average,0.5184
+two-eval (+deberta),class_conditional,majority_vote,0.5345
+two-eval (+deberta),class_conditional,single_evaluator,0.5235

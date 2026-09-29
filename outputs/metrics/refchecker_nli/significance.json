@@ -1,0 +1,97 @@
+{
+  "metric": "macro_f1",
+  "reference": "ds",
+  "claim_count": 80,
+  "macro_labels": [
+    "supported",
+    "refuted",
+    "insufficient",
+    "conflicting"
+  ],
+  "intervals": [
+    {
+      "method": "ds",
+      "metric": "macro_f1",
+      "observed": 0.32115335381464416,
+      "ci_low": 0.22878353115081954,
+      "ci_high": 0.40588235294117647,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 80
+    },
+    {
+      "method": "majority_vote",
+      "metric": "macro_f1",
+      "observed": 0.24857954545454547,
+      "ci_low": 0.17745098039215684,
+      "ci_high": 0.308338720103426,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 80
+    },
+    {
+      "method": "single_evaluator",
+      "metric": "macro_f1",
+      "observed": 0.26401515151515154,
+      "ci_low": 0.1793478260869565,
+      "ci_high": 0.34123972169512967,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 80
+    },
+    {
+      "method": "weighted_average",
+      "metric": "macro_f1",
+      "observed": 0.26401515151515154,
+      "ci_low": 0.1793478260869565,
+      "ci_high": 0.34123972169512967,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 80
+    }
+  ],
+  "comparisons": [
+    {
+      "method_a": "ds",
+      "method_b": "majority_vote",
+      "metric": "macro_f1",
+      "observed_a": 0.32115335381464416,
+      "observed_b": 0.24857954545454547,
+      "observed_delta": 0.07257380836009869,
+      "ci_low": 0.004879879879879867,
+      "ci_high": 0.13878347692513193,
+      "p_value": 0.034,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 80
+    },
+    {
+      "method_a": "ds",
+      "method_b": "single_evaluator",
+      "metric": "macro_f1",
+      "observed_a": 0.32115335381464416,
+      "observed_b": 0.26401515151515154,
+      "observed_delta": 0.057138202299492624,
+      "ci_low": -0.02592818402628011,
+      "ci_high": 0.14194986170568857,
+      "p_value": 0.188,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 80
+    },
+    {
+      "method_a": "ds",
+      "method_b": "weighted_average",
+      "metric": "macro_f1",
+      "observed_a": 0.32115335381464416,
+      "observed_b": 0.26401515151515154,
+      "observed_delta": 0.057138202299492624,
+      "ci_low": -0.02592818402628011,
+      "ci_high": 0.14194986170568857,
+      "p_value": 0.188,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 80
+    }
+  ]
+}

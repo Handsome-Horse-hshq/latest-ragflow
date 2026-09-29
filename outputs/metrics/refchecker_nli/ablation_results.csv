@@ -1,0 +1,6 @@
+﻿variant,accuracy,macro_f1,macro_f1_delta,is_vacuous,theta_threshold,document_conflict_threshold,evaluator_conflict_threshold,sample_count
+full,0.35,0.321153,0.0,False,0.037344,0.65282,0.4,80
+no_reliability,0.35,0.321153,0.0,True,0.037344,0.65282,0.4,80
+no_theta_gate,0.4125,0.352497,0.031344,False,1.0,0.65282,0.4,80
+no_doc_conflict_gate,0.3375,0.263514,-0.057639,False,0.037344,1.0,0.4,80
+no_two_dimensional_gate,0.375,0.252747,-0.068406,False,1.0,1.0,0.4,80

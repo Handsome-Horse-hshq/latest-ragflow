@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "dataset_name": "rag-ds-climate-fever-balanced-v1",
+  "split": "validation",
+  "relation_predictions_kind": "model_prediction",
+  "evaluator": "refchecker_nli",
+  "producer": "refchecker-nli",
+  "producer_version": "refchecker 0.2.17",
+  "extractor_name": null,
+  "checker_name": "ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli",
+  "samples": {
+    "path": "validation.jsonl",
+    "sha256": "54bee139fcd1cadad8544964950b54612377d43ee73b84a247a5b2cf649f6699",
+    "records": 80
+  },
+  "relation_predictions": {
+    "path": "validation_relations_refchecker_nli.jsonl",
+    "sha256": "276740faaaa275e16c85bc66266509289040a6b5435ed4f472fa4ee2e1db131b",
+    "records": 400
+  },
+  "source_output": {
+    "path": "outputs/ragchecker/validation_checking_outputs.json",
+    "sha256": "dfb62213321c9aedf71765cbf4159d66edd15d6913da3cdb9ae4fef40b089169"
+  },
+  "label_mapping": {
+    "entailment": [
+      0.6625,
+      0.17916666666666667,
+      0.15833333333333333
+    ],
+    "contradiction": [
+      0.1509803921568628,
+      0.4813725490196077,
+      0.36764705882352955
+    ],
+    "neutral": [
+      0.31802259887005646,
+      0.2274011299435028,
+      0.4545762711864407
+    ]
+  },
+  "label_mapping_source": "calibrated_on_validation",
+  "calibration_path": "outputs/metrics/refchecker_nli_label_calibration.json",
+  "multi_claim_policy": "mixture",
+  "evaluator_reliability": 1.0,
+  "created_at": "2026-09-20T09:46:55+00:00"
+}

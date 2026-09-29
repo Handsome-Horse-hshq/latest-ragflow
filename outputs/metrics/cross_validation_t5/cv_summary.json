@@ -1,0 +1,664 @@
+{
+  "dataset_name": "rag-ds-climate-fever-balanced-v2",
+  "evaluators": [
+    "flan_t5_mnli"
+  ],
+  "n_folds": 5,
+  "fold_seed": 42,
+  "claim_count": 616,
+  "macro_labels": [
+    "supported",
+    "refuted",
+    "insufficient",
+    "conflicting"
+  ],
+  "folds": [
+    {
+      "fold": 0,
+      "test_size": 124,
+      "inner_size": 492,
+      "ds_thresholds": {
+        "theta_threshold": 0.278998,
+        "document_conflict_threshold": 0.450277,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.4,
+      "baseline_conflict_threshold": 0.02,
+      "inner_macro_f1": 0.31682053677340405
+    },
+    {
+      "fold": 1,
+      "test_size": 124,
+      "inner_size": 492,
+      "ds_thresholds": {
+        "theta_threshold": 0.284133,
+        "document_conflict_threshold": 0.504998,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.4,
+      "baseline_conflict_threshold": 0.02,
+      "inner_macro_f1": 0.3447660664974246
+    },
+    {
+      "fold": 2,
+      "test_size": 124,
+      "inner_size": 492,
+      "ds_thresholds": {
+        "theta_threshold": 0.272635,
+        "document_conflict_threshold": 0.480953,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.4,
+      "baseline_conflict_threshold": 0.04,
+      "inner_macro_f1": 0.3430985580877895
+    },
+    {
+      "fold": 3,
+      "test_size": 124,
+      "inner_size": 492,
+      "ds_thresholds": {
+        "theta_threshold": 0.483809,
+        "document_conflict_threshold": 0.447513,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.4,
+      "baseline_conflict_threshold": 0.02,
+      "inner_macro_f1": 0.34601769536817256
+    },
+    {
+      "fold": 4,
+      "test_size": 120,
+      "inner_size": 496,
+      "ds_thresholds": {
+        "theta_threshold": 0.278998,
+        "document_conflict_threshold": 0.481835,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.4,
+      "baseline_conflict_threshold": 0.005,
+      "inner_macro_f1": 0.3189967234391585
+    }
+  ],
+  "reports": {
+    "ds": {
+      "method": "ds",
+      "accuracy": 0.3538961038961039,
+      "macro_f1": 0.32452474150343336,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.7027027027027027,
+          "recall": 0.16883116883116883,
+          "f1": 0.27225130890052357,
+          "support": 154
+        },
+        {
+          "label": "refuted",
+          "precision": 0.3269230769230769,
+          "recall": 0.7727272727272727,
+          "f1": 0.4594594594594595,
+          "support": 154
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.26277372262773724,
+          "recall": 0.23376623376623376,
+          "f1": 0.24742268041237114,
+          "support": 154
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.47435897435897434,
+          "recall": 0.24025974025974026,
+          "f1": 0.31896551724137934,
+          "support": 154
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          26,
+          62,
+          49,
+          17,
+          0
+        ],
+        [
+          2,
+          119,
+          17,
+          16,
+          0
+        ],
+        [
+          3,
+          107,
+          36,
+          8,
+          0
+        ],
+        [
+          6,
+          76,
+          35,
+          37,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 616
+    },
+    "weighted_average": {
+      "method": "weighted_average",
+      "accuracy": 0.3198051948051948,
+      "macro_f1": 0.23283946123375426,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.3333333333333333,
+          "recall": 0.032467532467532464,
+          "f1": 0.05917159763313609,
+          "support": 154
+        },
+        {
+          "label": "refuted",
+          "precision": 0.44502617801047123,
+          "recall": 0.551948051948052,
+          "f1": 0.4927536231884058,
+          "support": 154
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.26097560975609757,
+          "recall": 0.6948051948051948,
+          "f1": 0.37943262411347517,
+          "support": 154
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 154
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          5,
+          14,
+          135,
+          0,
+          0
+        ],
+        [
+          2,
+          85,
+          67,
+          0,
+          0
+        ],
+        [
+          1,
+          46,
+          107,
+          0,
+          0
+        ],
+        [
+          7,
+          46,
+          101,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 616
+    },
+    "majority_vote": {
+      "method": "majority_vote",
+      "accuracy": 0.33116883116883117,
+      "macro_f1": 0.24348422428169442,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.5,
+          "recall": 0.03896103896103896,
+          "f1": 0.07228915662650602,
+          "support": 154
+        },
+        {
+          "label": "refuted",
+          "precision": 0.47513812154696133,
+          "recall": 0.5584415584415584,
+          "f1": 0.5134328358208955,
+          "support": 154
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.2647754137115839,
+          "recall": 0.7272727272727273,
+          "f1": 0.3882149046793761,
+          "support": 154
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 154
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          6,
+          13,
+          135,
+          0,
+          0
+        ],
+        [
+          0,
+          86,
+          68,
+          0,
+          0
+        ],
+        [
+          1,
+          41,
+          112,
+          0,
+          0
+        ],
+        [
+          5,
+          41,
+          108,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 616
+    },
+    "single_evaluator": {
+      "method": "single_evaluator",
+      "accuracy": 0.3198051948051948,
+      "macro_f1": 0.23283946123375426,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.3333333333333333,
+          "recall": 0.032467532467532464,
+          "f1": 0.05917159763313609,
+          "support": 154
+        },
+        {
+          "label": "refuted",
+          "precision": 0.44502617801047123,
+          "recall": 0.551948051948052,
+          "f1": 0.4927536231884058,
+          "support": 154
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.26097560975609757,
+          "recall": 0.6948051948051948,
+          "f1": 0.37943262411347517,
+          "support": 154
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 154
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          5,
+          14,
+          135,
+          0,
+          0
+        ],
+        [
+          2,
+          85,
+          67,
+          0,
+          0
+        ],
+        [
+          1,
+          46,
+          107,
+          0,
+          0
+        ],
+        [
+          7,
+          46,
+          101,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 616
+    },
+    "conflict_aware": {
+      "method": "conflict_aware",
+      "accuracy": 0.3425324675324675,
+      "macro_f1": 0.30011095143764155,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.38461538461538464,
+          "recall": 0.032467532467532464,
+          "f1": 0.059880239520958084,
+          "support": 154
+        },
+        {
+          "label": "refuted",
+          "precision": 0.4421052631578947,
+          "recall": 0.5454545454545454,
+          "f1": 0.4883720930232558,
+          "support": 154
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.29473684210526313,
+          "recall": 0.5454545454545454,
+          "f1": 0.3826879271070615,
+          "support": 154
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.296875,
+          "recall": 0.24675324675324675,
+          "f1": 0.2695035460992908,
+          "support": 154
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          5,
+          14,
+          81,
+          54,
+          0
+        ],
+        [
+          1,
+          84,
+          56,
+          13,
+          0
+        ],
+        [
+          1,
+          46,
+          84,
+          23,
+          0
+        ],
+        [
+          6,
+          46,
+          64,
+          38,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 616
+    }
+  },
+  "intervals": {
+    "ds": {
+      "method": "ds",
+      "metric": "macro_f1",
+      "observed": 0.32452474150343336,
+      "ci_low": 0.28631033397593847,
+      "ci_high": 0.36391265215210056,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    "weighted_average": {
+      "method": "weighted_average",
+      "metric": "macro_f1",
+      "observed": 0.23283946123375426,
+      "ci_low": 0.20761374619392625,
+      "ci_high": 0.2575198411554289,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    "majority_vote": {
+      "method": "majority_vote",
+      "metric": "macro_f1",
+      "observed": 0.24348422428169442,
+      "ci_low": 0.21691177098208453,
+      "ci_high": 0.26948582810257105,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    "single_evaluator": {
+      "method": "single_evaluator",
+      "metric": "macro_f1",
+      "observed": 0.23283946123375426,
+      "ci_low": 0.20761374619392625,
+      "ci_high": 0.2575198411554289,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    "conflict_aware": {
+      "method": "conflict_aware",
+      "metric": "macro_f1",
+      "observed": 0.30011095143764155,
+      "ci_low": 0.2665937189491825,
+      "ci_high": 0.3323383506862081,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    }
+  },
+  "comparisons": [
+    {
+      "method_a": "ds",
+      "method_b": "weighted_average",
+      "metric": "macro_f1",
+      "observed_a": 0.32452474150343336,
+      "observed_b": 0.23283946123375426,
+      "observed_delta": 0.09168528026967909,
+      "ci_low": 0.05145932700927433,
+      "ci_high": 0.132479750182025,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "ds",
+      "method_b": "majority_vote",
+      "metric": "macro_f1",
+      "observed_a": 0.32452474150343336,
+      "observed_b": 0.24348422428169442,
+      "observed_delta": 0.08104051722173894,
+      "ci_low": 0.04155477483593595,
+      "ci_high": 0.12007951161561436,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "ds",
+      "method_b": "single_evaluator",
+      "metric": "macro_f1",
+      "observed_a": 0.32452474150343336,
+      "observed_b": 0.23283946123375426,
+      "observed_delta": 0.09168528026967909,
+      "ci_low": 0.05145932700927433,
+      "ci_high": 0.132479750182025,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "ds",
+      "method_b": "conflict_aware",
+      "metric": "macro_f1",
+      "observed_a": 0.32452474150343336,
+      "observed_b": 0.30011095143764155,
+      "observed_delta": 0.024413790065791807,
+      "ci_low": -0.02258125220772972,
+      "ci_high": 0.07180929711200745,
+      "p_value": 0.3,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "split": "validation",
+  "mapping": {
+    "entailment": [
+      0.6625,
+      0.17916666666666667,
+      0.15833333333333333
+    ],
+    "contradiction": [
+      0.1509803921568628,
+      0.4813725490196077,
+      0.36764705882352955
+    ],
+    "neutral": [
+      0.31802259887005646,
+      0.2274011299435028,
+      0.4545762711864407
+    ]
+  },
+  "pair_count": 400,
+  "stats": [
+    {
+      "label": "entailment",
+      "weight_mass": 20.0,
+      "majority_pairs": 20,
+      "probabilities": [
+        0.6625,
+        0.17916666666666667,
+        0.15833333333333333
+      ],
+      "used_default": false
+    },
+    {
+      "label": "contradiction",
+      "weight_mass": 85.0,
+      "majority_pairs": 85,
+      "probabilities": [
+        0.1509803921568628,
+        0.4813725490196077,
+        0.36764705882352955
+      ],
+      "used_default": false
+    },
+    {
+      "label": "neutral",
+      "weight_mass": 295.0,
+      "majority_pairs": 295,
+      "probabilities": [
+        0.31802259887005646,
+        0.2274011299435028,
+        0.4545762711864407
+      ],
+      "used_default": false
+    }
+  ],
+  "used_default": [],
+  "contingency": {
+    "entailment": {
+      "support": 12,
+      "refute": 1,
+      "unknown": 2,
+      "tie": 5
+    },
+    "contradiction": {
+      "support": 4,
+      "refute": 33,
+      "unknown": 23,
+      "tie": 25
+    },
+    "neutral": {
+      "support": 71,
+      "refute": 44,
+      "unknown": 97,
+      "tie": 83
+    }
+  }
+}

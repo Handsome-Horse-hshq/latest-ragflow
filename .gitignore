@@ -19,21 +19,23 @@ dist/
 .mypy_cache/
 .ruff_cache/
 
-# 数据与实验产物（保留目录结构，忽略内容）
+# 数据与实验产物
+# 论文用到的数据集与实验结果**入库**：v2 数据集、RefChecker / flan-t5 的
+# 输入输出与关系文件、谱系清单、全部指标与图表。这样仓库本身就能复现主结果，
+# 不必重跑约 40 分钟的模型推理。总量约 17 MB，最大单文件约 1.1 MB。
+# 这些文件的换行必须原样保留（SHA-256 写在清单里），见 .gitattributes。
 data/raw/*
 data/processed/*
 !data/raw/climate-fever.jsonl
 !data/processed/climate_fever_v1/
 !data/processed/climate_fever_v1/**
-outputs/predictions/*
-outputs/metrics/*
-outputs/figures/*
-# RAGChecker 的输入/输出与模型关系文件：体量大且随模型变化，不入库，
-# 谱系由 outputs/ragchecker*/*_model_run.json 记录（同样不入库）。
-# 用通配覆盖 ragchecker/、ragchecker_v2/ 及以后的版本目录。
-outputs/ragchecker*/*
-!outputs/metrics/climate_fever_threshold_search.json
-!**/.gitkeep
+!data/processed/climate_fever_v2/
+!data/processed/climate_fever_v2/**
+# 仍然不入库：断点续跑的中间进度与原子写入的临时文件。
+# 例外：作废的 flan-t5 输出（含一个 partial 文件）作为缺陷证据保留，见其 README.txt。
+outputs/**/*.partial.jsonl
+!outputs/ragchecker_v2/_invalid_flan_t5_sum_logprob/*.partial.jsonl
+outputs/**/*.tmp
 
 # 编辑器
 .vscode/

@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "dataset_name": "rag-ds-climate-fever-balanced-v2",
+  "split": "validation",
+  "relation_predictions_kind": "model_prediction",
+  "evaluator": "flan_t5_mnli",
+  "producer": "flan-t5-judge",
+  "producer_version": "flan-mnli-template/first-token/v1",
+  "extractor_name": null,
+  "checker_name": "google/flan-t5-base",
+  "samples": {
+    "path": "validation.jsonl",
+    "sha256": "1709d2b9d746b701c23084f659541de895b1ec359e0c2c9ca12f77f2eee6384f",
+    "records": 124
+  },
+  "relation_predictions": {
+    "path": "validation_relations_flan_t5_mnli_probs.jsonl",
+    "sha256": "58ecd82e7a6d075a36f1ab93e1a540c057b6bb0a4681f4014c439f05e273047d",
+    "records": 620
+  },
+  "source_output": {
+    "path": "outputs/ragchecker_v2/validation_relations_flan_t5_mnli_probs.jsonl",
+    "sha256": "58ecd82e7a6d075a36f1ab93e1a540c057b6bb0a4681f4014c439f05e273047d"
+  },
+  "label_mapping": {
+    "entailment": [
+      0.9,
+      0.05,
+      0.05
+    ],
+    "contradiction": [
+      0.05,
+      0.9,
+      0.05
+    ],
+    "neutral": [
+      0.05,
+      0.05,
+      0.9
+    ]
+  },
+  "label_mapping_source": "continuous_probabilities",
+  "calibration_path": null,
+  "multi_claim_policy": "mixture",
+  "evaluator_reliability": 1.0,
+  "created_at": "2026-09-29T13:04:28+00:00"
+}

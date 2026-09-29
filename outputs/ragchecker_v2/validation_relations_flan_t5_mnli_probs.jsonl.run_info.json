@@ -1,0 +1,19 @@
+{
+  "producer": "flan-t5-judge",
+  "evaluator": "flan_t5_mnli",
+  "scoring_version": "flan-mnli-template/first-token/v1",
+  "checker_model": "google/flan-t5-base",
+  "prompt_template": "Premise: {premise}\nHypothesis: {hypothesis}\nDoes the premise entail the hypothesis?\n\nOPTIONS:\n- yes\n- it is not possible to tell\n- no",
+  "option_first_words": [
+    "yes",
+    "no",
+    "it"
+  ],
+  "option_token_ids": [
+    4273,
+    150,
+    34
+  ],
+  "max_input_tokens": 448,
+  "records": 620
+}

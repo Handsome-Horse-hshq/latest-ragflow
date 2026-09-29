@@ -1,0 +1,1266 @@
+{
+  "split": "validation",
+  "best": {
+    "thresholds": {
+      "theta_threshold": 0.3,
+      "document_conflict_threshold": 0.2,
+      "evaluator_conflict_threshold": 0.2,
+      "tie_tolerance": 1e-06
+    },
+    "macro_f1": 1.0,
+    "accuracy": 1.0
+  },
+  "candidates": [
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.3,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.4,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.5,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.6,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.2,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.3,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.4,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.5,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.2,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.3,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.5,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    },
+    {
+      "thresholds": {
+        "theta_threshold": 0.7,
+        "document_conflict_threshold": 0.6,
+        "evaluator_conflict_threshold": 0.6,
+        "tie_tolerance": 1e-06
+      },
+      "macro_f1": 1.0,
+      "accuracy": 1.0
+    }
+  ],
+  "claim_count": 5
+}

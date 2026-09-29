@@ -1,0 +1,6 @@
+﻿sample_id,claim_id,claim_text,status,context_count,evaluators,m_support,m_refute,m_theta,k_doc,k_eval,region,verdict,primary_state,evidence_insufficient,document_conflict,evaluator_disagreement,gold_state
+demo-001,demo-001-c1,青蒿素由屠呦呦领导的研究团队首次成功提取。,normal,2,mock_evaluator,0.8556631183958515,0.05185600187619706,0.09248087972795142,0.04061250000000005,0.0,sufficient_consistent,supported,supported,False,False,False,supported
+demo-001,demo-001-c2,青蒿素的提取原料是黄花蒿。,normal,2,mock_evaluator,0.970153296137804,0.014530632143437514,0.015316071718758498,0.07694999999999996,0.0,sufficient_consistent,supported,supported,False,False,False,supported
+demo-002,demo-002-c1,在月球上可以用肉眼看到万里长城。,normal,1,mock_evaluator,0.046000000000000006,0.8280000000000001,0.1259999999999999,0.0,0.0,sufficient_consistent,refuted,refuted,False,False,False,refuted
+demo-003,demo-003-c1,该公司 2024 年第四季度净利润为 3.2 亿元。,normal,1,mock_evaluator,0.0425,0.0425,0.915,0.0,0.0,insufficient,undetermined,insufficient,True,False,False,insufficient
+demo-004,demo-004-c1,赛前摄入咖啡因可以显著提升长跑运动员的耐力表现。,normal,2,mock_evaluator,0.4080644679898522,0.5349112072824952,0.05702432472765262,0.66495,0.0,document_conflict,refuted,conflicting,False,True,False,conflicting
