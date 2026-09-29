@@ -23,7 +23,12 @@ import yaml
 
 from rag_ds.baselines.models import BaselineThresholds
 from rag_ds.data_io import load_relation_predictions, load_samples
-from rag_ds.dataset_manifest import DatasetManifestError, verify_split_artifacts
+from rag_ds.dataset_manifest import (
+    DatasetManifestError,
+    load_dataset_manifest,
+    verify_split_artifacts,
+)
+from rag_ds.model_runs import ModelRunError, verify_model_run_artifacts
 from rag_ds.diagnostics.models import DiagnosticThresholds
 from rag_ds.experiments import (
     run_ablation,
@@ -88,6 +93,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         manifest = None
+        model_run = None
         if "manifest" in paths:
             split_name = config.get("data", {}).get("split")
             if split_name not in {"train", "validation", "test"}:
@@ -95,12 +101,23 @@ def main(argv: list[str] | None = None) -> int:
                     "配置包含 manifest 时，data.split 必须是 "
                     "train/validation/test 之一"
                 )
-            manifest = verify_split_artifacts(
-                paths["manifest"],
-                paths["samples"],
-                paths["relation_predictions"],
-                split_name,
-            )
+            if "model_run" in paths:
+                # 关系来自模型：样本仍钉死在数据集清单上，关系钉在模型运行清单上。
+                model_run = verify_model_run_artifacts(
+                    paths["model_run"],
+                    paths["manifest"],
+                    paths["samples"],
+                    paths["relation_predictions"],
+                    split_name,
+                )
+                manifest = load_dataset_manifest(paths["manifest"])
+            else:
+                manifest = verify_split_artifacts(
+                    paths["manifest"],
+                    paths["samples"],
+                    paths["relation_predictions"],
+                    split_name,
+                )
         samples = load_samples(paths["samples"])
         predictions = load_relation_predictions(paths["relation_predictions"])
         report, records = run_comparison(
@@ -111,7 +128,7 @@ def main(argv: list[str] | None = None) -> int:
             single_evaluator,
         )
         ablation = run_ablation(samples, predictions, ds_thresholds)
-    except (PipelineError, DatasetManifestError, ValueError) as error:
+    except (PipelineError, DatasetManifestError, ModelRunError, ValueError) as error:
         print(f"[输入数据错误] {error}", file=sys.stderr)
         return 1
 
@@ -139,10 +156,16 @@ def main(argv: list[str] | None = None) -> int:
     print()
     print("  实验 4 —— 消融：")
     for item in ablation:
+        flag = "   ← 该变体未改变任何输入，Δ 无意义" if item.is_vacuous else ""
         print(
             f"    {item.variant.value:<28}macroF1={item.report.macro_f1:.4f}"
-            f"  Δ={item.macro_f1_delta:+.4f}"
+            f"  Δ={item.macro_f1_delta:+.4f}{flag}"
         )
+    if any(item.is_vacuous for item in ablation):
+        print()
+        print("  注意：标记出来的消融变体在这份数据上是恒等变换（例如数据集里所有")
+        print("  reliability 都是 1.0，去折扣等于什么都没做）。它的 Δ=0 说明的是")
+        print("  消融没跑起来，不能写成「该组件没有作用」。")
     print()
     print("  输出文件：")
     print(f"    {main_csv}")
@@ -151,6 +174,18 @@ def main(argv: list[str] | None = None) -> int:
     print()
     if manifest is None:
         print("  提醒：本次输入没有 manifest 身份与摘要校验。")
+    elif model_run is not None:
+        print(f"  关系输入来自模型预测：evaluator={model_run.evaluator}")
+        print(f"    producer  {model_run.producer} {model_run.producer_version or ''}")
+        print(f"    checker   {model_run.checker_name}")
+        if model_run.extractor_name:
+            print(f"    extractor {model_run.extractor_name}")
+        if model_run.is_calibrated:
+            print("    标签映射  已在验证集上校准")
+        else:
+            print()
+            print("  警告：标签映射是未经校准的占位值（placeholder_default）；")
+            print("  这些数字不能写进论文，请先跑 scripts/calibrate_label_mapping.py。")
     elif manifest.relation_predictions_kind == "annotation_oracle":
         print("  重要：关系输入来自人工标注 oracle；这些结果只用于验证融合链路，")
         print("  不能报告为关系评估模型的真实性能。")

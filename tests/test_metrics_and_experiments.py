@@ -298,7 +298,7 @@ def test_predicted_label_maps_none_to_undetermined() -> None:
 
 
 def test_comparison_covers_all_methods(demo_inputs) -> None:
-    """四个方法都在同一批数据上跑，记录数一致。"""
+    """五个方法都在同一批数据上跑，记录数一致。"""
     samples, predictions = demo_inputs
 
     report, records = run_comparison(
@@ -314,12 +314,13 @@ def test_comparison_covers_all_methods(demo_inputs) -> None:
         "weighted_average",
         "majority_vote",
         "single_evaluator",
+        "conflict_aware",
     )
-    assert len(records) == 5 * 4
+    assert len(records) == 5 * 5
     assert report.claim_count == 5
-    assert len(report.classification) == 4
-    assert len(report.insufficiency_detection) == 4
-    assert len(report.conflict_detection) == 4
+    assert len(report.classification) == 5
+    assert len(report.insufficiency_detection) == 5
+    assert len(report.conflict_detection) == 5
 
 
 def test_ds_beats_baselines_on_the_demo_set(demo_inputs) -> None:
@@ -438,9 +439,9 @@ def test_export_csv_files(tmp_path: Path, demo_inputs) -> None:
     ablation_rows = write_ablation_csv(tmp_path / "ablation.csv", ablation)
     detail_rows = write_predictions_csv(tmp_path / "detail.csv", records)
 
-    assert main_rows == 4 * len(default_label_universe())
+    assert main_rows == 5 * len(default_label_universe())
     assert ablation_rows == len(CLASSIFICATION_ABLATION_VARIANTS)
-    assert detail_rows == 20
+    assert detail_rows == 25
 
     with (tmp_path / "main.csv").open(encoding="utf-8-sig", newline="") as handle:
         row = next(iter(csv.DictReader(handle)))

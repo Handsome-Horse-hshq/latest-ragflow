@@ -38,6 +38,10 @@ class BaselineOptions(BaseModel):
     decision_threshold: float = 0.5
     #: 最高分之间差距不超过该值时视为平局。
     tie_tolerance: float = 1e-6
+    #: conflict_aware 判定冲突的下限：支持与反驳分数都必须达到该值。
+    conflict_threshold: float = 0.3
+    #: conflict_aware 判定冲突的平衡度：两分数差距不得超过该值。
+    conflict_margin: float = 0.1
     #: single-evaluator baseline 使用的评估器名称。
     single_evaluator: str
 
@@ -47,6 +51,8 @@ class BaselineOptions(BaseModel):
         return BaselineThresholds(
             decision_threshold=self.decision_threshold,
             tie_tolerance=self.tie_tolerance,
+            conflict_threshold=self.conflict_threshold,
+            conflict_margin=self.conflict_margin,
         )
 
 

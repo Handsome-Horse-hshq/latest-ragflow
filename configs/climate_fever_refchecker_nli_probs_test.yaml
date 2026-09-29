@@ -1,0 +1,56 @@
+# CLIMATE-FEVER 测试集上的正式对比实验配置。
+#
+# 关系输入 = RefChecker 的 NLI checker，取其**连续 softmax 概率**，
+# 不经过离散标签与映射表（对照配置 climate_fever_refchecker_nli_test.yaml
+# 走的是离散标签 + 验证集校准映射）。
+# 模型 ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli，
+# claim 由数据集给定、未经 LLM 抽取。
+# 论文里不能把它写成「RAGChecker 全流程」。
+#
+# 与 climate_fever_oracle_test.yaml 的区别：
+#   oracle 版的关系来自人工证据投票，只能验证融合链路是否正确；
+#   本配置的关系来自模型，结果才可以作为模型性能写进论文。
+#
+# 前置步骤见 README「接入 RAGChecker 真实输出 / 五步流程」。
+#
+# 路径以本文件所在目录（configs/）为基准解析，与终端当前目录无关。
+paths:
+  manifest: ../data/processed/climate_fever_v1/manifest.json
+  samples: ../data/processed/climate_fever_v1/test.jsonl
+  # 关系与谱系都来自 scripts/ingest_ragchecker.py，不是数据集自带的 oracle。
+  relation_predictions: ../outputs/ragchecker/test_relations_refchecker_nli_probs.jsonl
+  model_run: ../outputs/ragchecker/test_model_run_probs.json
+  output_jsonl: ../outputs/predictions/climate_fever_refchecker_nli_probs_test.jsonl
+  output_csv: ../outputs/predictions/climate_fever_refchecker_nli_probs_test.csv
+
+data:
+  split: test
+
+# theta 与 K_doc 来自 validation 上、用本配置同一份连续概率关系搜出的结果：
+#   scripts/tune_thresholds.py --grid observed --grid-steps 9
+#   -> outputs/metrics/refchecker_nli_probs_threshold_search.json
+#   验证集 Macro-F1 = 0.3427, Accuracy = 0.3625
+#
+# 与离散标签那一版相比，取值量级完全不同：连续概率下 m_theta 的观测范围是
+# [0.0000, 0.9983]、K_doc 是 [0.0000, 0.9551]，诊断空间才是真正二维的；
+# 离散版被压在 m_theta in [0.0024, 0.0481] 的窄带里。
+diagnostics:
+  theta_threshold: 0.8651
+  document_conflict_threshold: 0.135739
+  evaluator_conflict_threshold: 0.4
+  tie_tolerance: 0.000001
+
+# baseline 与 D-S 走同一套协议，在同一验证集上搜索：
+#   scripts/tune_baseline_thresholds.py
+#   -> outputs/metrics/refchecker_nli_probs_baseline_threshold_search.json
+#
+# 注意：weighted_average 与 single_evaluator 的最优平台只有 0.54 这一个网格点
+# （majority_vote 的平台是 [0.02, 0.6]）。单点最优比较脆弱，测试集上很可能
+# 掉下来 —— 这一点要在论文里如实说明，不能只报最优值。
+baseline:
+  decision_threshold: 0.54
+  tie_tolerance: 0.000001
+  single_evaluator: refchecker_nli
+
+output:
+  overwrite: false

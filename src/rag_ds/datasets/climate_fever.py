@@ -301,6 +301,7 @@ def build_climate_fever_dataset(
     validation_per_class: int = 20,
     test_per_class: int = 20,
     overwrite: bool = False,
+    dataset_name: str = "rag-ds-climate-fever-balanced-v1",
 ) -> DatasetManifest:
     """构建平衡、分层、带摘要和 provenance 的 CLIMATE-FEVER 子集。"""
     source = Path(source_path)
@@ -362,7 +363,7 @@ def build_climate_fever_dataset(
         )
 
     manifest = DatasetManifest(
-        dataset_name="rag-ds-climate-fever-balanced-v1",
+        dataset_name=dataset_name,
         source=DatasetSource(
             name="CLIMATE-FEVER",
             homepage=CLIMATE_FEVER_HOMEPAGE,

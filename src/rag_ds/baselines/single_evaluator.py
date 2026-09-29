@@ -50,15 +50,28 @@ def predict_single_evaluator(
 
     Returns:
         :class:`BaselinePrediction`，``evaluator`` 字段记录所用评估器。
+        样本没有任何检索文档时返回 ``(0, 0, 1)`` 与 ``no_evidence``。
 
     Raises:
-        MissingBaselineEvaluatorError: 该 claim 下没有指定评估器的预测。
+        MissingBaselineEvaluatorError: 样本**有**检索文档、但该 claim 下
+            没有指定评估器的预测（数据完整性问题，不会静默降级）。
 
     Note:
         不使用其他评估器，不修改输入对象。
     """
     selected = [p for p in predictions if p.evaluator == evaluator]
     if not selected:
+        if not sample.contexts:
+            # 样本没有检索到任何文档：与 weighted_average / majority_vote
+            # 一样优雅降级为「无证据」，而不是报错 —— 「没检索到文档」是
+            # 检索环节的正常可能结果，不是数据错误。
+            return no_evidence_prediction(
+                sample,
+                claim,
+                BaselineMethod.SINGLE_EVALUATOR,
+                0,
+                evaluator=evaluator,
+            )
         raise MissingBaselineEvaluatorError(
             f"single-evaluator baseline 指定的评估器 {evaluator!r} "
             f"在 sample_id={sample.sample_id!r}, claim_id={claim.claim_id!r} "

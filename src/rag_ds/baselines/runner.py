@@ -1,8 +1,9 @@
 """Baseline 批量运行与结果输出。
 
-对每条 claim 依次运行三个 baseline，顺序固定为::
+对每条 claim 依次运行四个 baseline，顺序固定为::
 
-    样本顺序 -> claim 顺序 -> weighted_average -> majority_vote -> single_evaluator
+    样本顺序 -> claim 顺序 -> weighted_average -> majority_vote
+    -> single_evaluator -> conflict_aware
 
 输入完整性沿用 :mod:`rag_ds.integrity` 里 D-S pipeline 用的同一份检查，
 不另写一套 —— 两条链路对「什么算合法输入」必须理解一致，否则实验对比就
@@ -20,6 +21,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from rag_ds.baselines.conflict_aware import predict_conflict_aware
 from rag_ds.baselines.majority_vote import predict_majority_vote
 from rag_ds.baselines.models import (
     BaselineMethod,
@@ -92,7 +94,7 @@ def run_baselines(
     thresholds: BaselineThresholds,
     single_evaluator: str,
 ) -> list[BaselinePrediction]:
-    """对每条 claim 运行三个 baseline。
+    """对每条 claim 运行四个 baseline。
 
     Args:
         samples: 待判定的样本。
@@ -101,8 +103,9 @@ def run_baselines(
         single_evaluator: single-evaluator baseline 使用的评估器名称。
 
     Returns:
-        ``claim 数 × 3`` 条结果，顺序为
-        「样本 → claim → weighted_average → majority_vote → single_evaluator」。
+        ``claim 数 × 4`` 条结果，顺序为
+        「样本 → claim → weighted_average → majority_vote →
+        single_evaluator → conflict_aware」。
 
     Raises:
         PipelineError: 输入数据不满足完整性要求（缺失预测、引用错误等）。
@@ -130,6 +133,9 @@ def run_baselines(
                 predict_single_evaluator(
                     sample, claim, claim_predictions, single_evaluator, thresholds
                 )
+            )
+            results.append(
+                predict_conflict_aware(sample, claim, claim_predictions, thresholds)
             )
     return results
 

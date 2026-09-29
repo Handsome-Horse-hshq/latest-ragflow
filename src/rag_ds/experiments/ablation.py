@@ -63,6 +63,13 @@ class AblationResult(BaseModel):
     thresholds: DiagnosticThresholds
     #: 相对 ``full`` 变体的 Macro-F1 变化量（``full`` 自身为 0）。
     macro_f1_delta: float = Field(ge=-1.0, le=1.0)
+    #: 该变体在这份数据上**没有改变任何输入**，因此 Δ 恒为 0。
+    #:
+    #: 典型情形：数据集里所有 ``reliability`` 本来就是 1.0，
+    #: ``no_reliability`` 于是退化成恒等变换。此时 Δ=0 说明的是
+    #: **这个消融没跑起来**，而不是「可靠性折扣没有作用」——
+    #: 把它当作后者写进论文是错误结论。
+    is_vacuous: bool = False
 
 
 def _strip_reliability(
@@ -155,10 +162,16 @@ def run_ablation(
     results: list[AblationResult] = []
     full_macro_f1: float | None = None
     for variant in ordered:
+        vacuous = False
         if variant is AblationVariant.NO_RELIABILITY:
             variant_samples, variant_predictions = _strip_reliability(
                 samples, predictions
             )
+            # 所有可靠性本来就是 1.0 时，去折扣是恒等变换：这一行的 Δ=0
+            # 不能读成「可靠性折扣没有作用」。
+            vacuous = list(variant_samples) == list(samples) and list(
+                variant_predictions
+            ) == list(predictions)
         else:
             variant_samples, variant_predictions = list(samples), list(predictions)
 
@@ -180,6 +193,7 @@ def run_ablation(
                 report=report,
                 thresholds=thresholds,
                 macro_f1_delta=delta,
+                is_vacuous=vacuous,
             )
         )
     return results

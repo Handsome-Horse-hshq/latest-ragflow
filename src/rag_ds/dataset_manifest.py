@@ -20,6 +20,7 @@ __all__ = [
     "SplitArtifacts",
     "file_sha256",
     "load_dataset_manifest",
+    "verify_artifact",
     "verify_split_artifacts",
     "verify_validation_artifacts",
     "write_dataset_manifest",
@@ -131,7 +132,13 @@ def load_dataset_manifest(path: str | Path) -> DatasetManifest:
         raise DatasetManifestError(f"数据清单无效：{manifest_path}：{error}") from error
 
 
-def _verify_artifact(manifest_dir: Path, artifact: ArtifactDigest) -> Path:
+def verify_artifact(base_dir: str | Path, artifact: ArtifactDigest) -> Path:
+    """确认 ``base_dir`` 下的登记文件存在、摘要与记录数都未变，返回其绝对路径。
+
+    模型产出的关系文件（见 :mod:`rag_ds.model_runs`）与数据集清单共用这一份
+    校验逻辑，避免两边对「文件没被改过」的判定标准出现分歧。
+    """
+    manifest_dir = Path(base_dir)
     path = (manifest_dir / artifact.path).resolve()
     if not path.is_file():
         raise DatasetManifestError(f"清单中的文件不存在：{path}")
@@ -148,6 +155,10 @@ def _verify_artifact(manifest_dir: Path, artifact: ArtifactDigest) -> Path:
             f"expected={artifact.records}, actual={actual_records}"
         )
     return path
+
+
+#: 内部别名，保留原有调用点。
+_verify_artifact = verify_artifact
 
 
 def verify_split_artifacts(

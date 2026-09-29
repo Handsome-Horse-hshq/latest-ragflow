@@ -19,6 +19,10 @@ from rag_ds.diagnostics.models import DiagnosticThresholds
 from rag_ds.metrics.classification import ClassificationReport, classification_report
 from rag_ds.metrics.detection import DetectionReport, detection_report
 from rag_ds.pipeline import run_pipeline
+from rag_ds.experiments.selective_confidence import (
+    baseline_confidence,
+    ds_confidence,
+)
 from rag_ds.schemas import EvidenceState, NonEmptyStr, RAGSample, RelationPrediction
 from rag_ds.tuning.threshold_search import predicted_label
 
@@ -49,6 +53,12 @@ class MethodPrediction(BaseModel):
     #: 冲突信号：D-S 用 ``k_doc``；baseline 没有冲突量，用
     #: ``1 - |score_support - score_refute|`` 作为**代理**（见模块说明）。
     conflict_score: float = Field(ge=0.0, le=1.0)
+    #: 对**所预测类别**的置信度，用于选择性回答分析。
+    #:
+    #: 与上面两个信号不同：它们衡量「证据不足 / 有冲突」这两类**本身的证据**，
+    #: 而这一项衡量「对自己判出来的那一类有多确信」。详见
+    #: :mod:`rag_ds.experiments.selective_confidence`。
+    confidence: float = Field(default=0.0, ge=0.0, le=1.0)
 
 
 def collect_predictions(
@@ -96,6 +106,13 @@ def collect_predictions(
                     0.0 if diagnostic.m_theta is None else diagnostic.m_theta
                 ),
                 conflict_score=diagnostic.k_doc,
+                confidence=ds_confidence(
+                    predicted_label(diagnostic),
+                    diagnostic.m_support,
+                    diagnostic.m_refute,
+                    diagnostic.m_theta,
+                    diagnostic.k_doc,
+                ),
             )
         )
 
@@ -112,6 +129,12 @@ def collect_predictions(
                 insufficiency_score=prediction.score_unknown,
                 conflict_score=1.0
                 - abs(prediction.score_support - prediction.score_refute),
+                confidence=baseline_confidence(
+                    prediction.predicted_state.value,
+                    prediction.score_support,
+                    prediction.score_refute,
+                    prediction.score_unknown,
+                ),
             )
         )
 
@@ -143,6 +166,7 @@ _METHOD_ORDER = (
     BaselineMethod.WEIGHTED_AVERAGE.value,
     BaselineMethod.MAJORITY_VOTE.value,
     BaselineMethod.SINGLE_EVALUATOR.value,
+    BaselineMethod.CONFLICT_AWARE.value,
 )
 
 

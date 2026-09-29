@@ -434,6 +434,74 @@ def test_evaluator_total_conflict_status() -> None:
     assert result.diagnostic.k_eval == pytest.approx(1.0)
 
 
+def test_zero_reliability_evaluator_conflict_does_not_short_circuit() -> None:
+    """可靠性为 0 的评估器文档级完全冲突时，不让整条 claim 短路。
+
+    该评估器折扣后是完全无知（Dempster 融合的单位元），对结论没有贡献；
+    另一个可靠评估器应正常决定诊断结果。它的 document_result 仍保留。
+    """
+    sample = _sample(doc_ids=("d1", "d2", "d3"))
+    predictions = [
+        # 可靠性为 0 的评估器：前两条文档针锋相对，文档级完全冲突。
+        _prediction(
+            "d1", (1.0, 0.0, 0.0), evaluator="mock_a", evaluator_reliability=0.0
+        ),
+        _prediction(
+            "d2", (0.0, 1.0, 0.0), evaluator="mock_a", evaluator_reliability=0.0
+        ),
+        _prediction(
+            "d3", (0.5, 0.5, 0.0), evaluator="mock_a", evaluator_reliability=0.0
+        ),
+        # 可靠评估器：三条文档一致支持。
+        _prediction("d1", (0.9, 0.05, 0.05), evaluator="mock_b"),
+        _prediction("d2", (0.9, 0.05, 0.05), evaluator="mock_b"),
+        _prediction("d3", (0.9, 0.05, 0.05), evaluator="mock_b"),
+    ]
+
+    result = run_pipeline([sample], predictions, THRESHOLDS)[0]
+
+    assert result.status is PipelineStatus.NORMAL
+    assert result.evaluators == ("mock_a", "mock_b")
+    assert result.diagnostic.primary_state is EvidenceState.SUPPORTED
+    # 三条一致支持文档融合后的 m_support 高于单条的 0.9。
+    assert result.diagnostic.m_support > 0.9
+    # 可靠性为 0 的评估器不参与融合，但其文档级结果完整保留。
+    assert result.evaluator_result is not None
+    assert result.evaluator_result.evaluators == ("mock_b",)
+    assert len(result.document_results) == 2
+    conflicted = next(r for r in result.document_results if r.is_total_conflict)
+    assert conflicted.evaluator == "mock_a"
+    assert conflicted.k_doc == pytest.approx(1.0)
+
+
+def test_all_zero_reliability_conflicted_evaluators_give_full_ignorance() -> None:
+    """全部评估器可靠性为 0 且文档级完全冲突：完全无知，不报错。
+
+    没有任何可信证据，结论与「没有可用证据」一致（m_theta = 1，
+    insufficient），而不是被伪造成冲突结论或直接抛异常。
+    """
+    sample = _sample(doc_ids=("d1", "d2"))
+    predictions = [
+        _prediction(
+            "d1", (1.0, 0.0, 0.0), evaluator="mock_a", evaluator_reliability=0.0
+        ),
+        _prediction(
+            "d2", (0.0, 1.0, 0.0), evaluator="mock_a", evaluator_reliability=0.0
+        ),
+    ]
+
+    result = run_pipeline([sample], predictions, THRESHOLDS)[0]
+
+    assert result.status is PipelineStatus.NORMAL
+    assert result.evaluator_result is None
+    assert result.diagnostic.primary_state is EvidenceState.INSUFFICIENT
+    assert result.diagnostic.m_support == pytest.approx(0.0)
+    assert result.diagnostic.m_refute == pytest.approx(0.0)
+    assert result.diagnostic.m_theta == pytest.approx(1.0)
+    # 完全冲突的记录没有丢失。
+    assert result.document_results[0].is_total_conflict is True
+
+
 def test_two_evaluators_are_folded_in_sorted_order() -> None:
     """多评估器按名称排序融合，与预测文件行序无关。"""
     sample = _sample(doc_ids=("d1",))

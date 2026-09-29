@@ -1,0 +1,58 @@
+# CLIMATE-FEVER 测试集上的正式对比实验配置。
+#
+# 关系输入 = RefChecker 的 NLI checker
+# （ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli），
+# claim 由数据集给定、未经 LLM 抽取。
+# 论文里不能把它写成「RAGChecker 全流程」。
+#
+# 与 climate_fever_oracle_test.yaml 的区别：
+#   oracle 版的关系来自人工证据投票，只能验证融合链路是否正确；
+#   本配置的关系来自模型，结果才可以作为模型性能写进论文。
+#
+# 前置步骤见 README「接入 RAGChecker 真实输出 / 五步流程」。
+#
+# 路径以本文件所在目录（configs/）为基准解析，与终端当前目录无关。
+paths:
+  manifest: ../data/processed/climate_fever_v1/manifest.json
+  samples: ../data/processed/climate_fever_v1/test.jsonl
+  # 关系与谱系都来自 scripts/ingest_ragchecker.py，不是数据集自带的 oracle。
+  relation_predictions: ../outputs/ragchecker/test_relations_refchecker_nli.jsonl
+  model_run: ../outputs/ragchecker/test_model_run.json
+  output_jsonl: ../outputs/predictions/climate_fever_refchecker_nli_test.jsonl
+  output_csv: ../outputs/predictions/climate_fever_refchecker_nli_test.csv
+
+data:
+  split: test
+
+# theta 与 K_doc 来自 validation 的网格搜索。
+#
+# theta 与 K_doc 来自 **validation 上、用本配置同一份模型关系**搜出的结果：
+#   scripts/tune_thresholds.py --grid observed --grid-steps 9
+#   -> outputs/metrics/refchecker_nli_threshold_search.json
+#   验证集 Macro-F1 = 0.4057, Accuracy = 0.4250
+#
+# 注意取值量级：模型关系经校准后概率偏软，5 篇文档做 Dempster 组合后
+# m_theta 的实际范围只有 [0.0024, 0.0481]。oracle 那套 theta=0.3 在这里
+# **一次都不会触发**，不能照搬。
+diagnostics:
+  theta_threshold: 0.037344
+  document_conflict_threshold: 0.65282
+  evaluator_conflict_threshold: 0.4
+  tie_tolerance: 0.000001
+
+# baseline 判定阈值与 D-S 走**同一套协议**：同一个验证集、同样以 Macro-F1 为
+# 目标搜索。这一点不能省 —— 用调试默认值 0.5 时，weighted_average 与
+# single_evaluator 会把测试集 80 条全判成 insufficient（Macro-F1 退化成 0.1），
+# 那不是 baseline 弱，是 baseline 没调参。
+#
+#   scripts/tune_baseline_thresholds.py
+#   -> outputs/metrics/refchecker_nli_baseline_threshold_search.json
+#   三个方法最优平台的交集 [0.02, 0.42]，取中点 0.22：
+#   这一个值能让三个 baseline 同时处于各自的验证集最优。
+baseline:
+  decision_threshold: 0.22
+  tie_tolerance: 0.000001
+  single_evaluator: refchecker_nli
+
+output:
+  overwrite: false

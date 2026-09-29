@@ -25,7 +25,7 @@ from rag_ds.data_io import load_relation_predictions, load_samples
 from rag_ds.diagnostics.models import DiagnosticThresholds
 from rag_ds.integrity import MissingRelationPredictionError
 from rag_ds.pipeline import run_pipeline
-from rag_ds.schemas import EvidenceState, RAGSample, RelationPrediction
+from rag_ds.schemas import Claim, EvidenceState, RAGSample, RelationPrediction
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _DATA_DIR = _PROJECT_ROOT / "data" / "samples"
@@ -52,7 +52,7 @@ def demo_predictions() -> list[RelationPrediction]:
 def demo_results(
     demo_samples: list[RAGSample], demo_predictions: list[RelationPrediction]
 ) -> list[BaselinePrediction]:
-    """跑一遍三个 baseline。"""
+    """跑一遍四个 baseline。"""
     return run_baselines(
         demo_samples, demo_predictions, THRESHOLDS, SINGLE_EVALUATOR
     )
@@ -90,26 +90,27 @@ def _write_config(
 # --------------------------------------------------------------------------
 
 
-def test_every_claim_gets_three_records(
+def test_every_claim_gets_four_records(
     demo_samples: list[RAGSample], demo_results: list[BaselinePrediction]
 ) -> None:
-    """claim 数 × 3 条结果。"""
+    """claim 数 × 4 条结果。"""
     claim_count = sum(len(sample.claims) for sample in demo_samples)
 
     assert claim_count == 5
-    assert len(demo_results) == claim_count * 3 == 15
+    assert len(demo_results) == claim_count * 4 == 20
 
 
 def test_result_order_is_stable(demo_results: list[BaselinePrediction]) -> None:
-    """顺序固定为 样本 → claim → 三个方法。"""
+    """顺序固定为 样本 → claim → 四个方法。"""
     order = [(r.claim_id, r.method.value) for r in demo_results]
 
-    assert order[:3] == [
+    assert order[:4] == [
         ("demo-001-c1", "weighted_average"),
         ("demo-001-c1", "majority_vote"),
         ("demo-001-c1", "single_evaluator"),
+        ("demo-001-c1", "conflict_aware"),
     ]
-    assert [claim for claim, _ in order[::3]] == [
+    assert [claim for claim, _ in order[::4]] == [
         "demo-001-c1",
         "demo-001-c2",
         "demo-002-c1",
@@ -140,20 +141,48 @@ def test_single_evaluator_field_is_set_only_for_that_method(
             assert result.evaluator is None
 
 
+def test_sample_without_contexts_gives_four_no_evidence_records() -> None:
+    """无检索文档的样本：四个 baseline 都优雅降级为 no_evidence，不报错。"""
+    sample = RAGSample(
+        sample_id="s-empty",
+        question="问题？",
+        answer="答案。",
+        claims=[Claim(claim_id="c1", text="断言。")],
+        contexts=[],
+        gold_state=EvidenceState.INSUFFICIENT,
+    )
+
+    results = run_baselines([sample], [], THRESHOLDS, SINGLE_EVALUATOR)
+
+    assert len(results) == 4
+    for result in results:
+        assert result.predicted_state is EvidenceState.INSUFFICIENT
+        assert result.reason.value == "no_evidence"
+        assert result.score_unknown == pytest.approx(1.0)
+        assert result.input_count == 0
+    single = next(r for r in results if r.method is BaselineMethod.SINGLE_EVALUATOR)
+    assert single.evaluator == SINGLE_EVALUATOR
+
+
 # --------------------------------------------------------------------------
 # 6 / 20. 不输出 conflicting，冲突被压缩
 # --------------------------------------------------------------------------
 
 
-def test_no_baseline_ever_outputs_conflicting(
+def test_naive_baselines_never_output_conflicting(
     demo_results: list[BaselinePrediction],
 ) -> None:
-    """三个 baseline 都不会输出 conflicting。"""
+    """三个朴素 baseline 都不会输出 conflicting（conflict_aware 除外）。"""
+    naive = [
+        r
+        for r in demo_results
+        if r.method is not BaselineMethod.CONFLICT_AWARE
+    ]
     assert all(
         result.predicted_state is not EvidenceState.CONFLICTING
-        for result in demo_results
+        for result in naive
     )
-    assert {r.predicted_state for r in demo_results} <= {
+    assert {r.predicted_state for r in naive} <= {
         EvidenceState.SUPPORTED,
         EvidenceState.REFUTED,
         EvidenceState.INSUFFICIENT,
@@ -163,13 +192,36 @@ def test_no_baseline_ever_outputs_conflicting(
 def test_conflicting_demo_is_compressed_to_insufficient(
     demo_results: list[BaselinePrediction],
 ) -> None:
-    """标注为 conflicting 的 demo-004 被三个 baseline 都判成 insufficient。"""
-    conflicting = [r for r in demo_results if r.claim_id == "demo-004-c1"]
+    """标注为 conflicting 的 demo-004 被三个朴素 baseline 都判成 insufficient。"""
+    conflicting = [
+        r
+        for r in demo_results
+        if r.claim_id == "demo-004-c1"
+        and r.method is not BaselineMethod.CONFLICT_AWARE
+    ]
 
     assert len(conflicting) == 3
     for result in conflicting:
         assert result.gold_state is EvidenceState.CONFLICTING
         assert result.predicted_state is EvidenceState.INSUFFICIENT
+
+
+def test_conflict_aware_baseline_detects_the_conflicting_demo(
+    demo_results: list[BaselinePrediction],
+) -> None:
+    """同一条 demo-004，conflict_aware 用默认阈值能判出 conflicting。
+
+    demo-004-c1 的平均分数约 0.463 / 0.487 / 0.05：两方向都超过默认
+    conflict_threshold 0.3 且差距小于默认 margin 0.1。
+    """
+    result = next(
+        r
+        for r in demo_results
+        if r.claim_id == "demo-004-c1" and r.method is BaselineMethod.CONFLICT_AWARE
+    )
+
+    assert result.predicted_state is EvidenceState.CONFLICTING
+    assert result.reason.value == "conflict_detected"
 
 
 def test_ds_pipeline_still_identifies_the_conflict(
@@ -266,12 +318,12 @@ def test_jsonl_round_trips(
     """JSONL 每条一行，能重新解析回模型，中文不转义。"""
     target = tmp_path / "out.jsonl"
 
-    assert write_baseline_jsonl(target, demo_results) == 15
+    assert write_baseline_jsonl(target, demo_results) == 20
 
     raw = target.read_text(encoding="utf-8")
     assert "\\u" not in raw
     lines = [line for line in raw.splitlines() if line.strip()]
-    assert len(lines) == 15
+    assert len(lines) == 20
     assert [
         BaselinePrediction.model_validate(json.loads(line)) for line in lines
     ] == demo_results
@@ -283,18 +335,22 @@ def test_csv_columns_and_content(
     """CSV 字段完整，内容正确。"""
     target = tmp_path / "out.csv"
 
-    assert write_baseline_csv(target, demo_results) == 15
+    assert write_baseline_csv(target, demo_results) == 20
 
     with target.open("r", encoding="utf-8-sig", newline="") as handle:
         rows = list(csv.DictReader(handle))
 
-    assert len(rows) == 15
+    assert len(rows) == 20
     assert list(rows[0].keys()) == list(BASELINE_CSV_COLUMNS)
     assert rows[0]["method"] == "weighted_average"
     assert rows[0]["evaluator"] == ""
     assert rows[2]["method"] == "single_evaluator"
     assert rows[2]["evaluator"] == SINGLE_EVALUATOR
-    assert all(row["predicted_state"] != "conflicting" for row in rows)
+    assert all(
+        row["predicted_state"] != "conflicting"
+        for row in rows
+        if row["method"] != "conflict_aware"
+    )
 
 
 @pytest.mark.parametrize("writer", [write_baseline_jsonl, write_baseline_csv])
@@ -308,7 +364,7 @@ def test_writers_refuse_to_overwrite_by_default(
     with pytest.raises(FileExistsError):
         writer(target, demo_results)
 
-    assert writer(target, demo_results, overwrite=True) == 15
+    assert writer(target, demo_results, overwrite=True) == 20
 
 
 def test_failed_write_leaves_no_temporary_file(tmp_path: Path) -> None:
@@ -361,16 +417,18 @@ def test_run_from_config_produces_outputs_and_summary(tmp_path: Path) -> None:
 
     assert summary.sample_count == 4
     assert summary.claim_count == 5
-    assert summary.method_count == 3
-    assert summary.record_count == 15
+    assert summary.method_count == 4
+    assert summary.record_count == 20
     assert summary.single_evaluator == SINGLE_EVALUATOR
     assert set(summary.state_counts_by_method) == {
         "weighted_average",
         "majority_vote",
         "single_evaluator",
+        "conflict_aware",
     }
-    for counts in summary.state_counts_by_method.values():
-        assert "conflicting" not in counts
+    for method, counts in summary.state_counts_by_method.items():
+        if method != "conflict_aware":
+            assert "conflicting" not in counts
         assert sum(counts.values()) == 5
     assert Path(summary.output_jsonl).is_file()
     assert Path(summary.output_csv).is_file()
@@ -384,7 +442,7 @@ def test_run_from_config_refuses_to_overwrite_by_default(tmp_path: Path) -> None
     with pytest.raises(FileExistsError):
         run_baselines_from_config(config_path)
 
-    assert run_baselines_from_config(config_path, overwrite=True).record_count == 15
+    assert run_baselines_from_config(config_path, overwrite=True).record_count == 20
 
 
 def test_run_from_config_does_not_half_write_on_conflict(tmp_path: Path) -> None:

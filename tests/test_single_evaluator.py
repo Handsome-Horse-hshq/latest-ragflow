@@ -168,10 +168,28 @@ def test_missing_evaluator_error_reports_ids() -> None:
     assert "c1" in message
 
 
-def test_no_predictions_at_all_also_raises() -> None:
-    """完全没有预测时同样报错，而不是返回 no_evidence。"""
+def test_no_contexts_gives_no_evidence_instead_of_raising() -> None:
+    """样本没有检索文档时优雅降级为 no_evidence，与另两个 baseline 一致。
+
+    「没检索到文档」是检索环节的正常可能结果，不是数据错误；D-S pipeline
+    侧同样有专门的 no_contexts 处理。
+    """
+    result = predict_single_evaluator(_sample([]), CLAIM, [], "mock_a", THRESHOLDS)
+
+    assert result.score_support == pytest.approx(0.0)
+    assert result.score_refute == pytest.approx(0.0)
+    assert result.score_unknown == pytest.approx(1.0)
+    assert result.predicted_state is EvidenceState.INSUFFICIENT
+    assert result.reason is BaselineDecisionReason.NO_EVIDENCE
+    assert result.method is BaselineMethod.SINGLE_EVALUATOR
+    assert result.evaluator == "mock_a"
+    assert result.input_count == 0
+
+
+def test_no_predictions_with_contexts_still_raises() -> None:
+    """有检索文档却没有任何预测：数据完整性问题，仍然报错。"""
     with pytest.raises(MissingBaselineEvaluatorError):
-        predict_single_evaluator(_sample([]), CLAIM, [], "mock_a", THRESHOLDS)
+        predict_single_evaluator(_sample([("d1", 1.0)]), CLAIM, [], "mock_a", THRESHOLDS)
 
 
 # --------------------------------------------------------------------------

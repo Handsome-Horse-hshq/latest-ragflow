@@ -138,6 +138,66 @@ class ThresholdGrid(BaseModel):
             raise ValueError("tie_tolerance 必须位于 [0, 1]")
         return self
 
+    @classmethod
+    def from_observed(
+        cls,
+        theta_values: Sequence[float],
+        document_conflict_values: Sequence[float],
+        *,
+        steps: int = 5,
+        evaluator_conflict_threshold: float = 0.4,
+        tie_tolerance: float = 1e-6,
+    ) -> ThresholdGrid:
+        """按验证集上**实际观测到的** m_theta / K_doc 分位数构造网格。
+
+        固定网格 ``(0.3, 0.4, ..., 0.7)`` 隐含了一个假设：融合后的 m_theta
+        会落在 0.3 以上。这个假设只在概率比较尖锐时成立 —— 换成校准后的软
+        概率、或文档数变多时，m_theta 会被 Dempster 组合压到很小，整条 theta
+        轴就全部落在观测范围之外，门控**一次都不会触发**，而搜索结果看上去
+        却一切正常（所有网格点 Macro-F1 完全相同）。
+
+        本方法让网格跟着数据走：取观测值的等距分位数作为候选阈值。
+
+        Args:
+            theta_values: 验证集上观测到的 m_theta。
+            document_conflict_values: 验证集上观测到的 K_doc。
+            steps: 每个轴的候选点数。
+            evaluator_conflict_threshold: 固定的 K_eval 告警阈值。
+            tie_tolerance: 平局容差。
+
+        Returns:
+            :class:`ThresholdGrid`。
+
+        Raises:
+            ValueError: 任一序列为空，或 ``steps`` 小于 1。
+        """
+        if steps < 1:
+            raise ValueError("steps 必须是正整数")
+
+        def _quantile_candidates(values: Sequence[float]) -> tuple[float, ...]:
+            if not values:
+                raise ValueError("观测值序列不能为空")
+            ordered = sorted(values)
+            last = len(ordered) - 1
+            picked: list[float] = []
+            for index in range(steps):
+                # 分位点**含两端**：取不到上沿的话，「阈值高到门控几乎不触发」
+                # 这种配置就永远进不了网格，而它恰恰是有意义的一种取值
+                # （消融里的 no_doc_conflict_gate 就是把阈值抬到 1.0）。
+                position = 0.5 if steps == 1 else index / (steps - 1)
+                raw = ordered[min(round(position * last), last)]
+                value = round(min(max(raw, 0.0), 1.0), 6)
+                if value not in picked:
+                    picked.append(value)
+            return tuple(picked)
+
+        return cls(
+            theta_values=_quantile_candidates(theta_values),
+            document_conflict_values=_quantile_candidates(document_conflict_values),
+            evaluator_conflict_threshold=evaluator_conflict_threshold,
+            tie_tolerance=tie_tolerance,
+        )
+
     def __len__(self) -> int:
         """网格点总数。"""
         return len(self.theta_values) * len(self.document_conflict_values)

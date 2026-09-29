@@ -2,14 +2,19 @@
 
 用于研究 claim-level RAG 证据状态诊断的 Python 项目。
 
-当前进度：总规划的 14 个生成步骤已完成 1–14。
-适配器层（RAGChecker / RAGAS / LLM）只有**接口与转换**，不导入也不调用
-这些第三方库；SURE-RAG 尚未接入。
+当前进度：总规划的 14 个生成步骤已完成 1–14，**RefChecker NLI checker 的
+真实输出已接入并在 v1 / v2 两个数据集上跑出结果**（导出输入 → 推理 →
+摄取 → 谱系记录 → 阈值搜索 → 显著性检验 → 嵌套交叉验证）。
+适配器层（RAGChecker 全流程 / RAGAS / LLM）仍然只有**接口与转换**，不导入也
+不调用这些第三方库；RAGAS 接入与 SURE-RAG 尚未开展。多评估器实验已在 v2 上
+完成（RefChecker NLI 管线 × 两个 NLI 模型），K_eval 有真实取值。
 
 第一版正式数据 `data/processed/climate_fever_v1/` 已从 CLIMATE-FEVER 构建完成
-（400 条、四类各 100、train/validation/test = 240/80/80）。关系文件是人工证据
-投票的 **annotation oracle**，只用于验证 D-S 融合链路，**不能**当作模型实验
-结果写入论文。多评估器真实实验、RAGChecker / RAGAS 真实输出接入均尚未开展。
+（400 条、四类各 100、train/validation/test = 240/80/80）；v2 扩到 616 条
+（四类各 154，train/validation/test = 368/124/124）。两个数据集自带的
+`*_relations.jsonl` 都是人工证据投票的 **annotation oracle**，只用于验证
+D-S 融合链路，**不能**当作模型实验结果写入论文；模型结果以
+`outputs/ragchecker*/` 下的谱系清单为准。
 
 ## 环境要求
 
@@ -466,6 +471,15 @@ k_doc_weighted = sum(r_e x K_doc,e) / sum(r_e)
 K_doc）。不跳过、不替换成全无知或任一侧质量 —— 文档级完全冲突是需要被下游
 直接诊断的结论。
 
+> **pipeline 层的例外**：评估器可靠性为 0 时，其折扣后的质量是完全无知
+> （Dempster 融合的单位元），对结论毫无贡献。因此 pipeline 只在**可靠性
+> 大于 0** 的评估器出现文档级完全冲突时才把整条 claim 诊断为
+> `document_total_conflict`；可靠性为 0 且 `mass=None` 的评估器不进入
+> 评估器融合（避免触发上面的异常），但其文档级结果仍完整保留在
+> `document_results` 中供诊断。若全部评估器都可靠性为 0 且文档级完全
+> 冲突，结论为完全无知（`m_theta = 1`，insufficient），不报错也不伪造
+> 冲突结论。
+
 ### 接口变更（第八阶段）
 
 `discounted_mass_from_prediction` 与 `effective_reliability` **已废弃**，
@@ -704,16 +718,23 @@ claim × 文档网格**（当前 8 条）。缺失的预测不会被 `p_unknown=
 python scripts/run_baselines.py --config configs/baselines_demo.yaml --overwrite
 ```
 
-### 三种方法
+### 四种方法
 
-| 方法 | 规则 | 用到的可靠性 |
-| --- | --- | --- |
-| **Weighted Average** | 对全部评估器 × 全部文档的三个概率做加权平均 | 文档可靠性 × 评估器可靠性 |
-| **Majority Vote** | 每条关系预测一票，少数服从多数 | **都不用**（一票一权） |
-| **Single Evaluator** | 只用一个指定评估器，按文档可靠性加权平均 | 只用文档可靠性 |
+| 方法 | 规则 | 用到的可靠性 | 输出空间 |
+| --- | --- | --- | --- |
+| **Weighted Average** | 对全部评估器 × 全部文档的三个概率做加权平均 | 文档可靠性 × 评估器可靠性 | 三类 |
+| **Majority Vote** | 每条关系预测一票，少数服从多数 | **都不用**（一票一权） | 三类 |
+| **Single Evaluator** | 只用一个指定评估器，按文档可靠性加权平均 | 只用文档可靠性 | 三类 |
+| **Conflict Aware** | 与 Weighted Average 完全相同的加权分数 + 显式冲突规则 | 文档可靠性 × 评估器可靠性 | **四类** |
 
 Majority Vote 中单条预测内部出现并列最大值时投 `unknown` 票 —— 该条本身就
 分不清方向，不替它选边。
+
+样本**没有任何检索文档**时，四个 baseline 统一返回 `(0, 0, 1)` 与
+`no_evidence`（与 D-S 侧的 `no_contexts` 处理对齐），Single Evaluator 也
+不会因指定评估器没有预测而报错。反之，样本**有**检索文档但指定评估器
+没有预测时，Single Evaluator 仍抛 `MissingBaselineEvaluatorError` —— 那是
+数据完整性问题，不静默降级。
 
 ### 统一判定规则
 
@@ -734,32 +755,60 @@ Majority Vote 中单条预测内部出现并列最大值时投 `unknown` 票 —
 > 阈值 `decision_threshold = 0.5`、`tie_tolerance = 1e-6` **仅为调试值**。
 > 正式实验必须在验证集上选择，测试集不得参与选择。
 
-### 三个 baseline 都不会输出 conflicting
+### 三个朴素 baseline 都不会输出 conflicting
 
 这是**刻意的设计**，也是实验要展示的核心局限：朴素聚合把「两条针锋相对的
-证据」压成一个低分或一个平局，无法与「谁都说不清楚」区分开。
+证据」压成一个低分或一个平局，无法与「谁都说不清楚」区分开。这三个方法的
 `BaselinePrediction` 在模型层就禁止 `predicted_state = conflicting`。
 
 D-S 方法用 `K_doc` 把这件事显式量化出来，因此能给出 `conflicting`。
 
+### Conflict Aware：输出空间公平的第四个 baseline
+
+前三个 baseline 无法输出 `conflicting`，意味着「D-S 四分类占优」总有一部分
+功劳可以算在输出空间差异上。`conflict_aware` 在与 Weighted Average **完全相同
+的加权分数**上加一条显式冲突规则，让 baseline 也拥有四类输出空间：
+
+```
+1. min(s, r) >= conflict_threshold 且 |s - r| <= conflict_margin
+     -> conflicting, conflict_detected
+2. 其余情况 -> 上面的标准级联
+```
+
+- 冲突检查**排在最前**：两派证据都足够强时，「它们互相矛盾」比「整体信心
+  不足」更具体，与 D-S 混合区域映射为 CONFLICTING 的取舍一致；
+- `conflict_margin` 要求两方向**势均力敌**（0.90 / 0.35 的一边倒不是冲突）；
+- `conflict_threshold` 要求两方向**真的有分量**（0.05 / 0.05 的平局是无知）；
+- 它不做任何 D-S 组合、不计算冲突量 K —— 看到的仍然只是三个平均后的分数。
+
+`conflict_threshold` 与 `decision_threshold` 一样在验证集（或 CV 内折）上
+做二维网格搜索；`conflict_margin` 固定为 0.1。**一个必须如实记录的现象**：
+两套 CV 设定下搜出的最优 `conflict_threshold` 都顶在网格下界
+（0.005–0.01）—— 这个 baseline 的最优策略是让冲突规则尽量放宽地触发，
+它的分数因此依赖网格下界的具体取值，解读时应注意这一脆弱性。
+
 ### demo 上的实际对照
 
-| claim | 标注 | D-S | Weighted Average | Majority Vote | Single Evaluator |
-| --- | --- | --- | --- | --- | --- |
-| demo-001-c1 | supported | **supported** | insufficient | insufficient | insufficient |
-| demo-001-c2 | supported | **supported** | supported | supported | supported |
-| demo-002-c1 | refuted | **refuted** | refuted | refuted | refuted |
-| demo-003-c1 | insufficient | **insufficient** | insufficient | insufficient | insufficient |
-| demo-004-c1 | conflicting | **conflicting** | insufficient | insufficient | insufficient |
+| claim | 标注 | D-S | Weighted Average | Majority Vote | Single Evaluator | Conflict Aware |
+| --- | --- | --- | --- | --- | --- | --- |
+| demo-001-c1 | supported | **supported** | insufficient | insufficient | insufficient | insufficient |
+| demo-001-c2 | supported | **supported** | supported | supported | supported | supported |
+| demo-002-c1 | refuted | **refuted** | refuted | refuted | refuted | refuted |
+| demo-003-c1 | insufficient | **insufficient** | insufficient | insufficient | insufficient | insufficient |
+| demo-004-c1 | conflicting | **conflicting** | insufficient | insufficient | insufficient | **conflicting** |
 
-两处 baseline 失手：
+两处朴素 baseline 失手：
 
 - **demo-004-c1**（标注 conflicting）—— 一条支持、一条反驳的文档被压成
   0.463 / 0.487 / 0.05，最高分不到 0.5，判为 `below_threshold`；投票则是
-  1:1 的 `score_tie`。三个 baseline 都只能说「不确定」，说不出「有冲突」。
+  1:1 的 `score_tie`。三个朴素 baseline 都只能说「不确定」，说不出「有冲突」。
+  `conflict_aware` 的显式规则在这里能判对 —— 这正是它被引入的原因，
+  也说明这一类样本上的差距确实来自输出空间，而不是融合机制。
 - **demo-001-c1**（标注 supported）—— 一条强支持文档（0.90）与一条无信息
-  文档（unknown 0.90）平均后得到 0.486 / 0.050 / 0.464，同样卡在阈值下方。
-  D-S 的 Dempster 组合让无信息证据自然让位，得到 m(S) = 0.856。
+  文档（unknown 0.90）平均后得到 0.486 / 0.050 / 0.464，同样卡在阈值下方，
+  `conflict_aware` 也一样失手（0.05 低于 conflict_threshold）。
+  D-S 的 Dempster 组合让无信息证据自然让位，得到 m(S) = 0.856 ——
+  **这一类样本上的差距才是融合机制本身的贡献**。
 
 > 当前 baseline 使用**预设 mock 概率**，只验证代码流程是否正确，
 > 不构成任何实验结论。
@@ -812,6 +861,463 @@ neutral       -> (0.05, 0.05, 0.90)
 `Faithfulness` 是**答案级**指标。适配器用 `granularity` 字段显式记录粒度，
 **绝不**把答案级分数复制到每条 claim 上冒充 claim-level 结果 —— 那会让
 RAGAS 凭空获得「所有 claim 判断完全一致」的优势，是不公平比较。
+
+## 接入 RAGChecker 真实输出
+
+本节是把 RAGChecker 的真实判断接进 D-S 链路的完整流程。代码**不 import
+`ragchecker`**，只读它写在磁盘上的结果文件。
+
+### 依据的输出契约
+
+以下三条取自 RAGChecker / RefChecker 源码，不是凭记忆写的：
+
+| 事实 | 出处 |
+| --- | --- |
+| 输入为 `{"results": [{query_id, query, gt_answer, response, retrieved_context:[{doc_id, text}]}]}` | `examples/checking_inputs.json` |
+| `retrieved2response: List[List[str]]`，形状 `[claim_num][doc_num]` | `ragchecker/container.py` 的 `RAGResult` |
+| 标签只有 `Entailment` / `Neutral` / `Contradiction` | `refchecker/checker/checker_base.py` |
+| `faithfulness` **只依赖** `retrieved2response` | `ragchecker/metrics.py` |
+
+因此只需 `--metrics faithfulness` 就能拿到完整的 (claim, document) 网格，
+`gt_answer` 不参与任何计算。导出脚本往 `gt_answer` 写的是一句显式占位说明，
+**不是**把 claim 文本复制过去：万一有人误跑 `--metrics all_metrics`，得到的
+precision / recall 会是一眼可见的垃圾值，而不是因为「gt_answer == response」
+虚高到 1.0 的假好成绩。
+
+### claim 对齐
+
+RAGChecker 用自己的 extractor 从 `response` 抽 claim，抽出的条数 N 不一定
+等于 1，而本项目的 `claim_id` 是数据集固定的：
+
+| N | 处理 |
+| --- | --- |
+| 1 | 直接一一对应（CLIMATE-FEVER v1 的常见情形） |
+| >1 | 把 N 个子 claim 的标签当作对同一条 claim 的 N 次投票，按标签分布对映射表做**凸组合**；N=1 时该式精确退化为查表 |
+| 0 | **报错**。extractor 没抽出 claim 是失败，不会被伪造成 neutral |
+
+`--strict-single-claim` 可要求 N 必须为 1，否则报错。
+
+### 标签映射必须在验证集上校准
+
+默认的 `(0.90, 0.05, 0.05)` 是**占位值**。`scripts/calibrate_label_mapping.py`
+用 CLIMATE-FEVER 的人工证据投票作为验证集上的监督信号，对每个标签求条件平均：
+
+```
+mapping[L] = sum_pairs w_L(pair) * oracle_triple(pair) / sum_pairs w_L(pair)
+```
+
+即「RAGChecker 说 L 时，人工投票平均长什么样」。
+
+> **论文必须写明**：映射表由**验证集**的人工投票标定，这是方法的一部分；
+> **测试集全程不接触 oracle**，其关系概率完全由 RAGChecker 的标签换算而来。
+
+某个标签在验证集上一次都没出现时直接报错，不静默沿用占位值 —— 否则「校准过
+的参数」和「没校准的占位值」会在结果里混在一起看不出来。
+
+### 两条判定路径
+
+| 路径 | checker | 需要 LLM 凭证 | claim 来源 |
+| --- | --- | --- | --- |
+| **A. 本地 NLI**（当前采用） | RefChecker 自带 `NLIChecker` | 否，零费用离线 | 数据集给定，跳过 extractor |
+| B. ragchecker-cli | 你指定的 LLM | 是 | LLM extractor 抽取 |
+
+路径 A 用 `scripts/run_refchecker_nli.py`，跑在**独立的 `.venv-refchecker` 环境**里
+—— refchecker 的依赖很重（torch / spacy / litellm / pytorch_lightning），装进主
+venv 有可能顶掉主环境的 numpy 与 scikit-learn。
+
+选 A 的理由不只是省钱：本数据集每个样本**恰好一条 claim**，且 `answer` 就是
+claim 原文，extractor 在这里没有任何信息增益，却会带来「一句话被拆成 N 条」
+的错位风险。跳过它之后 claim 对齐天然是 1:1。
+
+判定环节与 RAGChecker 完全一致：同一个 `checker.check(...)`、同样
+`merge_psg=False`、同样产出 `[claim_num][doc_num]` 的 `retrieved2response`。
+
+> **论文里必须写成**「RefChecker NLI checker（`ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli`），
+> claim 由数据集给定、未经 LLM 抽取」，**不能**写成「RAGChecker 全流程」。
+
+### 五步流程
+
+```powershell
+# 0. 一次性：装好独立环境（CPU 版 torch，避免拉 2.5 GB 的 CUDA 包）
+py -3.12 -m venv .venv-refchecker
+.venv-refchecker\Scripts\python.exe -m pip install --index-url https://download.pytorch.org/whl/cpu torch
+.venv-refchecker\Scripts\python.exe -m pip install refchecker
+
+# 1. 导出两个 split 的输入（不调模型）
+python scripts/export_ragchecker_input.py --split validation
+python scripts/export_ragchecker_input.py --split test
+
+# 2. 跑本地 NLI checker，两个 split 各一次（首次会下载约 1.4 GB 模型）
+.venv-refchecker\Scripts\python.exe scripts/run_refchecker_nli.py `
+  --input outputs/ragchecker/validation_checking_inputs.json `
+  --output outputs/ragchecker/validation_checking_outputs.json
+
+# 3. 在验证集上校准标签映射
+python scripts/calibrate_label_mapping.py `
+  --outputs outputs/ragchecker/validation_checking_outputs.json
+
+# 4. 摄取两个 split，产出关系文件与谱系清单
+python scripts/ingest_ragchecker.py --split validation `
+  --outputs outputs/ragchecker/validation_checking_outputs.json `
+  --calibration outputs/metrics/ragchecker_label_calibration.json `
+  --checker-name <模型>
+python scripts/ingest_ragchecker.py --split test ...   # 同上，换 test
+
+# 5a. 在验证集上重搜 D-S 阈值
+python scripts/tune_thresholds.py --manifest data/processed/climate_fever_v1/manifest.json `
+  --samples data/processed/climate_fever_v1/validation.jsonl `
+  --predictions outputs/ragchecker/validation_relations_ragchecker.jsonl `
+  --model-run outputs/ragchecker/validation_model_run.json --grid observed
+
+# 5b. 给三个 baseline 同样的调参机会（不做这步，对比就不公平）
+python scripts/tune_baseline_thresholds.py `
+  --predictions outputs/ragchecker/validation_relations_refchecker_nli.jsonl `
+  --model-run outputs/ragchecker/validation_model_run.json `
+  --single-evaluator refchecker_nli
+
+# 6. 把两组阈值手工填回配置，跑测试集，出图
+python scripts/run_experiment.py --config configs/climate_fever_refchecker_nli_test.yaml
+python scripts/export_results.py --config configs/climate_fever_refchecker_nli_test.yaml `
+  --threshold-search outputs/metrics/refchecker_nli_threshold_search.json
+```
+
+### baseline 必须和 D-S 用同一套调参协议
+
+D-S 的门控阈值在验证集上搜过；baseline 若还用着 `decision_threshold = 0.5`
+这个调试默认值，两边就不在同一条件下比较 —— **那不是 baseline 弱，是 baseline
+没调参**。实测差别是决定性的：校准后的概率偏软，最高分几乎都够不到 0.5，
+`weighted_average` 与 `single_evaluator` 会把测试集 80 条**全部**判成
+`insufficient`，Macro-F1 退化成 0.1000。
+
+`scripts/tune_baseline_thresholds.py` 用与 D-S 相同的协议（同一验证集、同样以
+Macro-F1 为目标）为每个方法搜索阈值，并给出三个方法最优**平台的交集** ——
+交集非空时填一个值就能让三者同时处于各自最优。Macro-F1 常在整段阈值上持平，
+取平台**中位数**而不是边缘值（边缘再动一点就掉出平台）。
+
+先用 `--limit 5` 跑通一遍再跑完整 split：导出脚本和 `run_refchecker_nli.py`
+都有 `--limit`，摄取脚本的 `--allow-partial` 专为这种冒烟测试准备，它会强制
+进入 dry-run，不写任何文件。
+
+### 关系文件的谱系：oracle 与模型输入分家
+
+数据集清单里登记的 `*_relations.jsonl` 是人工 oracle，`verify_split_artifacts`
+要求关系文件**就是**登记的那一份。模型产出的关系不属于数据集，因此另配一份
+`ModelRunManifest`（`src/rag_ds/model_runs.py`），它同时钉住：
+
+- 这批关系属于哪个 split 的哪份样本（samples 摘要须与数据集清单一致）；
+- 关系文件本身的摘要与记录数；
+- 产出它的 evaluator、extractor / checker 模型名、原始输出文件摘要；
+- 用的标签映射表及其来源（`calibrated_on_validation` / `placeholder_default`）。
+
+`relation_predictions_kind` 固定为 `model_prediction`，与数据集清单的
+`annotation_oracle` 形成对照。`run_experiment.py` 与 `tune_thresholds.py` 读到
+模型清单时会打印模型名；映射表没校准时会明确警告**结果不能写进论文**。
+
+### 换了关系输入，阈值必须重搜
+
+`configs/climate_fever_oracle_test.yaml` 里的 `theta=0.3`、`K_doc=0.6` 是在
+**oracle 关系**上搜出来的，不能直接套用到 RAGChecker 的关系上。
+
+更要紧的是**网格范围本身**：固定网格 `theta ∈ (0.3, ..., 0.7)` 隐含「融合后的
+m_theta 会落在 0.3 以上」这个假设。校准后的概率比占位值软得多，而 Dempster
+组合在 5 篇文档上会把 m(Θ) 连乘压下去 —— 用合成数据彩排时，m_theta 的实际
+范围是 `[0.002, 0.143]`，**整条 theta 轴全部落在观测范围之外，门控一次都没有
+触发**，而搜索结果看上去毫无异常（所有网格点 Macro-F1 完全相同，消融里
+`no_theta_gate` 的 Δ 恰好为 0）。
+
+因此 `tune_thresholds.py` 增加了两样东西：
+
+- `--grid observed`：按验证集上**实际观测到的** m_theta / K_doc 分位数构造网格；
+- 网格健康检查：候选阈值整体落在观测范围之外、最优值落在网格边界、或所有网格点
+  得分完全相同时，都会明确报警。
+
+默认仍是 `fixed` 网格，既有 oracle 结果保持可复现。
+
+### 第一次真实结果（CLIMATE-FEVER test，80 条 claim）
+
+关系输入 = RefChecker NLI checker，标签映射在验证集上校准，D-S 与三个 baseline
+的阈值都在验证集上按同一协议搜出。谱系见 `outputs/ragchecker/test_model_run.json`。
+
+**实验 1 —— 四分类**
+
+| 方法 | Accuracy | Macro-F1 |
+| --- | --- | --- |
+| **D-S** | 0.3500 | **0.3212** |
+| Weighted Average | 0.3500 | 0.2640 |
+| Majority Vote | 0.3500 | 0.2486 |
+| Single Evaluator | 0.3500 | 0.2640 |
+
+**实验 2 —— 证据不足识别**：`m_theta` AUROC = 0.5583，三个 baseline 分别是
+0.5558 / 0.5608 / 0.5558。**全部贴近随机，D-S 在这条轴上没有优势。**
+
+**实验 3 —— 文档冲突识别**：`K_doc` AUROC = **0.7308**，baseline 最好的是
+0.6871（Majority Vote 只有 0.4138，低于随机）。**这是本方法唯一站得住的优势。**
+
+**实验 4 —— 消融**
+
+| 变体 | Macro-F1 | Δ |
+| --- | --- | --- |
+| full | 0.3212 | — |
+| no_reliability | 0.3212 | +0.0000（恒等变换，Δ 无意义） |
+| no_theta_gate | 0.3525 | **+0.0313** |
+| no_doc_conflict_gate | 0.2635 | −0.0576 |
+| no_two_dimensional_gate | 0.2527 | −0.0684 |
+
+去掉 theta 门控反而**更好**，去掉 K_doc 门控明显变差 —— 与实验 2、3 的结论一致：
+冲突这条轴有效，证据不足那条轴在当前关系输入下无效。
+
+### 换 NLI 模型时的一个静默陷阱
+
+RefChecker 的 `nli_checker.py` 里写着：
+
+```python
+LABELS = ["Entailment", "Neutral", "Contradiction"]
+...
+ret = [LABELS[p] for p in batch_preds]      # p 是 argmax 下标
+```
+
+它**直接用硬编码的顺序去索引**，从没查过模型自己的 `config.id2label`。而各家
+NLI 模型的类别顺序并不一致，实测四个常用模型出现了**三种**顺序：
+
+| 模型 | `id2label` 顺序 |
+| --- | --- |
+| `ynie/roberta-large-...-nli`（RefChecker 默认） | `[entailment, neutral, contradiction]` |
+| `microsoft/deberta-large-mnli` | `[CONTRADICTION, NEUTRAL, ENTAILMENT]` |
+| `FacebookAI/roberta-large-mnli` | `[CONTRADICTION, NEUTRAL, ENTAILMENT]` |
+| `cross-encoder/nli-deberta-v3-base` | `[contradiction, entailment, neutral]` |
+
+也就是说，把默认模型以外的模型交给 RefChecker 的 `NLIChecker`，**entailment 与
+contradiction 会被静默对调** —— 不抛异常、不打警告、数字照常产出。用 DeBERTa
+跑出来的"支持"其实全是"反驳"。
+
+`scripts/run_refchecker_nli.py` 因此一律以模型 `config.id2label` 为准重新取标签：
+
+- 顺序与 RefChecker 的假设一致时，额外拿 `check()` 的返回值**逐条交叉验证**；
+- 不一致时打出醒目警告，按模型真实顺序重算，并把
+  `refchecker_order_matches: false` 写进输出的 `rag_ds_run_info`。
+
+输出里的概率三元组一律按 `(Entailment, Neutral, Contradiction)` 排列，与模型
+内部顺序无关，下游无需关心这件事。
+
+### 离散标签 vs 连续概率：两个变体的对照
+
+**离散路径的结构性缺陷。** checker 每篇文档只输出 3 个标签之一、共 5 篇文档；
+Dempster 组合与 `K_doc = 1 - ∏(1-K_i)` 都与顺序无关，于是诊断结果**只取决于
+(n_E, n_N, n_C) 三个计数**，上限只有 C(7,2) = 21 个格点。实测 80 条 claim 落在
+**11 个点**上，其中 42 条（52.5%）全部落在同一个点（5 篇文档全 Neutral）——
+这 42 条里四类金标准都有，**任何阈值都分不开它们**，构成不可约的误差下界。
+
+NLI 模型本身输出的就是三类 softmax，正好对应 `(p_support, p_unknown, p_refute)`，
+只是 RefChecker 在 `nli_checker.py` 里用 `argmax` 丢掉了。
+`run_refchecker_nli.py --emit-probabilities` 把它捞回来（复用同一份已加载的模型，
+并**逐条断言 argmax 与 `check()` 返回的标签一致**），
+`ingest_ragchecker.py --use-probabilities` 直接用连续值，完全绕开映射表。
+
+**两个变体，同一套协议**（阈值与 baseline 阈值都在验证集上搜）：
+
+| 指标（test，80 条） | A 离散标签 + 校准映射 | B 连续 softmax |
+| --- | --- | --- |
+| 不同的诊断点 | 11 | **80** |
+| D-S Accuracy | 0.3500 | **0.3625** |
+| D-S Macro-F1 | 0.3212 | **0.3333** |
+| 最好的 baseline Macro-F1 | 0.2640 | 0.2519 |
+| `m_theta` AUROC（证据不足） | 0.5583 | **0.5975** |
+| `K_doc` AUROC（文档冲突） | **0.7308** | 0.6900 |
+| `supported` 答对数 | **0 / 20** | 3 / 20 |
+
+**消融结果发生了质变**，这是两者最重要的差别：
+
+| 变体 | A 离散 Δ | B 连续 Δ |
+| --- | --- | --- |
+| no_theta_gate | **+0.0313**（门控有害） | **−0.0687**（门控有效） |
+| no_doc_conflict_gate | −0.0576 | −0.0601 |
+| no_two_dimensional_gate | −0.0684 | **−0.1316** |
+
+离散路径下 theta 门控是**负作用**（去掉反而更好）；连续路径下两个门控都有正贡献，
+同时去掉损失最大。**支撑「二维门控各自有用」这一论点的是连续概率版本。**
+
+代价是 `K_doc` 的冲突识别 AUROC 从 0.7308 降到 0.6900。论文里两组数字都应报告。
+
+### v2 与嵌套交叉验证：主结论的统计证据
+
+v1 测试集只有 80 条 claim，D-S 相对最好 baseline 的 Macro-F1 差异（+0.081）
+95% 置信区间跨 0（p = 0.166），**单次留出划分无法支撑「显著优于」**。
+v2（`data/processed/climate_fever_v2/`，616 条、四类各 154）配合嵌套交叉验证
+解决了这个问题：5 个外折，阈值只在每个外折的其余各折上搜，测试折全程不参与；
+每条 claim 恰好被预测一次，n = 616，区间随 √n 收窄。
+
+v2 的 RefChecker NLI 推理用 `scripts/run_refchecker_nli_chunked.py` 完成
+（CPU 环境下分轮断点续跑，输出与 `run_refchecker_nli.py` 同形；三个 split
+的标签分布均为 Neutral 约 77%、Contradiction 约 19%、Entailment 约 3.5%），
+摄取时用 `--use-probabilities` 连续概率路径。运行方式：
+
+```powershell
+python scripts/run_cross_validation.py `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --relations-template "outputs/ragchecker_v2/{split}_relations_{evaluator}_probs.jsonl" `
+  --model-run-template "outputs/ragchecker_v2/{split}_model_run_{evaluator}_probs.json" `
+  --evaluator refchecker_nli --single-evaluator refchecker_nli
+```
+
+**结果（616 条 claim，阈值逐折重选）：**
+
+| 方法 | Accuracy | Macro-F1 | 95% CI |
+| --- | --- | --- | --- |
+| **D-S** | 0.3750 | **0.3535** | [0.3145, 0.3932] |
+| Conflict Aware | 0.3523 | 0.3074 | [0.2738, 0.3419] |
+| Weighted Average | 0.3442 | 0.2512 | [0.2242, 0.2773] |
+| Single Evaluator | 0.3442 | 0.2512 | [0.2242, 0.2773] |
+| Majority Vote | 0.3425 | 0.2496 | [0.2229, 0.2759] |
+
+与 D-S 的配对自助比较（5000 次重采样）：
+
+| 对手 | Δ Macro-F1 | 95% CI | p |
+| --- | --- | --- | --- |
+| Weighted Average | +0.1023 | [+0.0587, +0.1442] | < 0.001 |
+| Single Evaluator | +0.1023 | [+0.0587, +0.1442] | < 0.001 |
+| Majority Vote | +0.1039 | [+0.0600, +0.1462] | < 0.001 |
+| Conflict Aware | +0.0461 | [+0.0007, +0.0906] | 0.048 |
+
+**所有区间都不跨 0，主结论「D-S 显著优于聚合类 baseline」成立。**
+各折选出的 theta 在 [0.69, 0.88]、K_doc 在 [0.03, 0.14] 之间小幅波动，
+baseline 判定阈值五折一致（0.475），结论对折划分不敏感。逐折明细与逐条
+预测见 `outputs/metrics/cross_validation/`。
+
+**优势的分解（本节最重要的读法）：**
+
+- D-S 对朴素 baseline 的总优势 ≈ **+0.102**；
+- 其中 **输出空间**（能输出 conflicting）贡献 ≈ +0.056
+  （conflict_aware 0.3074 − weighted_average 0.2512）；
+- 剩下的 **融合机制**贡献 ≈ +0.046（0.3535 − 0.3074），仍然显著
+  （p = 0.048），但已不到总优势的一半。
+
+论文里必须同时报告这三层数字：只拿 D-S 对朴素 baseline 的 +0.102 说事，
+会把输出空间差异误记成机制优势。
+
+注意 v2 的单评估器设定下 K_eval 恒为 0、weighted_average 与
+single_evaluator 数值相同，且三个朴素 baseline 结构上仍不能输出
+conflicting（conflict_aware 可以）—— 其余限制见下节。
+
+v1（80 条）两个变体的显著性检验在
+`outputs/metrics/refchecker_nli/significance.json`（离散）与
+`outputs/metrics/refchecker_nli_probs/significance.json`（连续），均由
+`scripts/run_significance.py` 产出。离散版对 Majority Vote 显著
+（p = 0.034）、对 Weighted Average / Single Evaluator 不显著（p = 0.188）；
+连续版对三个 baseline 均不显著（最好 p = 0.148）—— v1 的数字只能作为
+初步结果引用，正式结论以上面的嵌套交叉验证为准。
+
+### 多评估器：K_eval 第一次有真实取值
+
+第二个评估器为 `MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli`（MNLI+FEVER+ANLI
+训练，与 ynie roberta-large 同源但不同架构；base 规模，CPU 上约快 2.5 倍），
+同样走 RefChecker NLIChecker + 连续概率路径，摄取为 `refchecker_nli_deberta`。
+其 `id2label` 顺序恰好与 RefChecker 硬编码一致；若换其他模型，脚本会以模型
+`config.id2label` 为准重取标签并交叉验证。
+
+双评估器嵌套交叉验证（协议与单评估器完全相同，阈值逐折重选）：
+
+```powershell
+python scripts/run_cross_validation.py `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --relations-template "outputs/ragchecker_v2/{split}_relations_{evaluator}_probs.jsonl" `
+  --model-run-template "outputs/ragchecker_v2/{split}_model_run_{evaluator}_probs.json" `
+  --evaluator refchecker_nli refchecker_nli_deberta `
+  --single-evaluator refchecker_nli `
+  --out-dir outputs/metrics/cross_validation_2eval
+```
+
+| 方法 | Accuracy | Macro-F1 | 95% CI |
+| --- | --- | --- | --- |
+| **D-S** | 0.3523 | **0.3320** | [0.2934, 0.3708] |
+| Conflict Aware | 0.3312 | 0.2856 | [0.2535, 0.3167] |
+| Weighted Average | 0.3474 | 0.2531 | [0.2265, 0.2793] |
+| Single Evaluator | 0.3442 | 0.2510 | [0.2239, 0.2772] |
+| Majority Vote | 0.3377 | 0.2452 | [0.2182, 0.2720] |
+
+D-S 对三个朴素 baseline 的配对比较均为 **p < 0.001**（Δ 在 +0.079 到
++0.087 之间），对 conflict_aware 为 **Δ = +0.0464，p = 0.040**
+（CI [+0.003, +0.092]，不跨 0）。分解与单评估器一致：总优势里约一半来自
+输出空间，一半来自融合机制，两层各自都仍显著。三点必须如实报告：
+
+1. **加入第二个评估器后 D-S 的 Macro-F1 从 0.3535 降到 0.3320** —— 多评估器
+   融合没有带来增益。两个 NLI 模型同源同任务，错误高度相关，第二个评估器
+   更多是稀释了第一个的有效信号而不是补充新信息。
+2. **K_eval 机制已真实激活，但告警尚无判别力**：616 条 claim 中 23 条
+   （3.7%）触发 `evaluator_disagreement`（默认阈值 0.4），K_eval 最大 0.92；
+   但触发组的错误率（60.9%）与未触发组（63.1%）没有差别。K_eval 作为
+   「这条结论可疑」的信号在本数据上还没有实用价值，论文里不能把它写成
+   已验证的优势。
+3. **conflict_aware 的最优 conflict_threshold 顶在网格下界**（各折
+   0.005–0.01）：这个 baseline 的最优策略是让冲突规则尽量放宽地触发，
+   其分数对网格下界敏感；且 D-S 对它的优势（p ≈ 0.04–0.05）远小于对朴素
+   baseline（p < 0.001），机制优势是「显著但不大」，不能写成「大幅领先」。
+
+双评估器下 weighted_average 与 single_evaluator 不再等价（前者融合两个
+评估器，后者只用 roberta），加上 conflict_aware，对照方法有了四个真实
+变体。
+
+> **注意一处脆弱性**：连续版 baseline 搜索中，`weighted_average` 与
+> `single_evaluator` 的最优平台只有 `0.54` 这一个网格点（`majority_vote` 的平台是
+> `[0.02, 0.6]`）。单点最优容易在测试集上掉下来，需如实说明。
+
+### 仍然存在的两个限制
+
+1. **`supported` 类几乎无法识别**：NLI checker 在测试集 400 个组合里只给出 9 次
+   Entailment（2.2%），支持质量累积不起来。连续概率把答对数从 0 提到 3，
+   但仍远低于其他三类。瓶颈在关系评估器本身，不在 D-S 融合。
+2. **`no_reliability` 消融无法进行**：数据集里 2000 个 `reliability` 全是 1.0，
+   `retrieval_score` 全是 `None`，去折扣是恒等变换。结果里的 `is_vacuous`
+   字段会标出来。这条改用下面的敏感性分析来补。
+
+### 可靠性折扣的敏感性分析
+
+既然 `no_reliability` 消融在本数据集上是空转，可靠性折扣这个核心机制就不能留成
+空白。`scripts/run_reliability_sensitivity.py` 用两组设定把它实际跑起来：
+
+```powershell
+python scripts/run_reliability_sensitivity.py `
+  --config configs/climate_fever_refchecker_nli_probs_test.yaml `
+  --provenance data/processed/climate_fever_v1/test_provenance.jsonl `
+  --figure outputs/figures/refchecker_nli_probs/reliability_sensitivity.png
+```
+
+**S1 —— 均匀可靠性扫描（无 oracle，可直接报告）**
+
+把所有文档可靠性统一设为 r 并扫 r。折扣只把质量从确定焦元移向 Theta，因此理论上
+`m_theta` 必须单调上升、`K_doc` 必须单调下降。连续概率版实测（test，80 条）：
+
+| r | Macro-F1 | Δ | m_theta 均值 | K_doc 均值 |
+| --- | --- | --- | --- | --- |
+| 1.00 | 0.3333 | — | 0.4424 | 0.0495 |
+| 0.80 | **0.3430** | **+0.0098** | 0.4954 | 0.0357 |
+| 0.60 | 0.3147 | −0.0185 | 0.5642 | 0.0227 |
+| 0.40 | 0.2715 | −0.0618 | 0.6583 | 0.0114 |
+| 0.20 | 0.2582 | −0.0751 | 0.7944 | 0.0032 |
+| 0.10 | 0.2616 | −0.0716 | 0.8863 | 0.0008 |
+
+两条单调性在全部 10 个取值上都成立 —— 这是折扣实现**在整条链路上**（而不只是
+单元测试的小例子上）行为正确的证据。Macro-F1 在 r≈0.8 处有一个很小的峰值
+（+0.0098），之后随 r 下降持续退化。
+
+**S2 —— 标注一致度作为可靠性（oracle 上界，不是模型性能）**
+
+CLIMATE-FEVER 为每段证据记录了标注投票与熵值，据此取 `r = 1 - H / ln(3)`：
+一致度高的证据给高可靠性。实测该信号有真实差异（7 种取值，400 篇中 208 篇为
+1.0，最低 0.0，均值 0.70），但结果是：
+
+| 设定 | Macro-F1 | Δ |
+| --- | --- | --- |
+| oracle_vote_agreement | 0.3349 | **+0.0016** |
+
+**即便给一个来自人工标注的完美可靠性信号，也只改变 80 条里的 2 条预测、
+Macro-F1 只涨 0.0016。** 这比「消融是空转」强得多：它给出的结论是
+**在 CLIMATE-FEVER 上，文档级可靠性差异不是限制因素**，而不是「没测」。
+
+> 离散标签版的同一分析还暴露了额外的脆弱性：r ≤ 0.8 时 Macro-F1 直接塌到
+> 0.1000（退化成全判一类）—— 它的阈值只在 r=1.0 那个窄带里有效。
+> 连续概率版在整个扫描区间里都保持在 0.26 以上。
+
+两组都是敏感性分析，不是主结果；CSV 里的 `is_oracle` 列把 S2 标了出来。
 
 ## 指标与实验
 
@@ -879,6 +1385,75 @@ from rag_ds.metrics import classification_report
 from rag_ds.tuning import search_thresholds
 ```
 
+## 三处必须正视的问题及其处理
+
+### 一、主结论对分折种子的敏感性
+
+单次 5 折 CV 给出 D-S 相对最强 baseline（`conflict_aware`）的 Δ Macro-F1 =
++0.0461，95% 区间 `[+0.0007, +0.0906]` —— 下界离 0 只有 0.0007。这种"刚好
+显著"必须做稳健性检验（`scripts/run_cv_seed_robustness.py`，5 个分折种子，
+**全部报告，不挑**）：
+
+| 对手 | Δ 均值 | Δ 标准差 | Δ 范围 | 显著种子数 |
+| --- | --- | --- | --- | --- |
+| `conflict_aware` | **+0.0522** | 0.0067 | [+0.0461, +0.0637] | **5/5** |
+| `majority_vote` | +0.1090 | 0.0063 | [+0.1039, +0.1212] | 5/5 |
+| `single_evaluator` | +0.1075 | 0.0066 | [+0.1023, +0.1203] | 5/5 |
+| `weighted_average` | +0.1075 | 0.0066 | [+0.1023, +0.1203] | 5/5 |
+
+D-S 的 Macro-F1 均值 0.3586、标准差 0.0063。**种子 42 的 +0.0461 是五个里最小
+的那个**，结论不随划分翻转。
+
+> **措辞限制**：五次 CV 共用同一批 616 条样本、只是换了划分，因此这衡量的是
+> **划分敏感性**，不是独立重复实验。论文里不能写成"重复五次均显著"。
+
+### 二、加第二个评估器反而变差
+
+单评估器 Macro-F1 0.3535 → 双评估器 0.3320（估计可靠性可回到 0.3466，仍更低）。
+这与"多源融合更好"的直觉相反，原因是**两个评估器的误差高度相关**：
+
+| 指标 | 取值 |
+| --- | --- |
+| 三个概率通道的 Pearson r | +0.71 ~ +0.74 |
+| argmax 标签一致率 | 85.1%（相互独立时期望仅 60.6%） |
+| Cohen's kappa | **0.623** |
+
+**Dempster 组合规则要求证据源相互独立。** 两个同源 NLI 模型
+（都出自 MNLI/FEVER/ANLI 家族）在重复计算同一份证据，质量被虚假锐化，
+融合因此不增反减。双评估器下 K_eval 告警只占 3.7% 也是同一现象的表现。
+
+这正是引入机制异构的第三个评估器（生成式 flan-t5，见
+`scripts/run_t5_judge_chunked.py`）的动机。
+
+### 三、选择性回答分析里的两个 bug
+
+**Bug A：指标方向写反了。** 早期脚本计算的是
+`trapezoid(accuracy, coverage)` —— **准确率曲线下面积，越高越好** —— 却把列名
+写成 `aurc` 并注明"越低越好"。按错误方向读会把 D-S 的最好成绩读成最差。
+
+**Bug B：风险定义对 D-S 系统性不公。** 原定义
+`risk = max(insufficiency_score, conflict_score)` 中，`m_theta` 与 `K_doc`
+并不是不确定性，而是四类里**两类的证据本身**：`m_theta` 高意味着 D-S 有把握判
+`insufficient`，`K_doc` 高意味着有把握判 `conflicting`。实测 616 条里 170 条
+`insufficient` 预测的风险分均值高达 0.94，被整体顶到弃答队列最前 —— 排序实际
+在排"是不是判了 insufficient"。
+
+修正：新增按预测类别取该类证据的置信度（见
+`src/rag_ds/experiments/selective_confidence.py`），两侧对称；**两套定义并列
+报告**，因为它们问的是不同的问题。
+
+| 风险定义 | 方法 | AURC ↓ | AUROC ↑ |
+| --- | --- | --- | --- |
+| `max_signal` | **ds** | **0.6115** | 0.5761 |
+| `max_signal` | `weighted_average` | 0.6438 | **0.5930** |
+| `class_conditional` | **ds** | **0.5924** | **0.6212** |
+| `class_conditional` | `majority_vote` | 0.6402 | 0.5363 |
+| `class_conditional` | `weighted_average` | 0.6468 | 0.5235 |
+
+修正后 D-S 在两个指标上都领先（AUROC 0.576 → 0.621，baseline 全在 0.51~0.54）。
+但**并非全部翻转**：`max_signal` 下 AUROC 仍是 `weighted_average` 略高，
+两套数字论文里都要给出。
+
 ## 目录说明
 
 - `configs/`：项目配置文件。
@@ -889,6 +1464,7 @@ from rag_ds.tuning import search_thresholds
 - `scripts/`：后续用于运行数据处理或实验的命令行脚本。
 - `tests/`：自动化测试。
 - `outputs/predictions/`：模型或评估器的预测输出。
+- `outputs/ragchecker/`：RAGChecker 的输入/输出、模型关系文件与谱系清单。
 - `outputs/metrics/`：评估指标输出。
 - `outputs/figures/`：图表输出。
 

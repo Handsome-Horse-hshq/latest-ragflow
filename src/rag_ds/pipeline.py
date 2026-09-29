@@ -168,8 +168,17 @@ def _run_claim(
             )
         )
 
+    # 文档级完全冲突只在评估器可靠性 > 0 时才让整条 claim 短路：可靠性为
+    # 0 的评估器折扣后是完全无知（Dempster 融合的单位元），对结论毫无贡献，
+    # 它内部的矛盾不应盖过其他评估器的有效证据。它的 document_result 仍
+    # 保留在输出里供诊断。
     conflicted = next(
-        (result for result in document_results if result.is_total_conflict), None
+        (
+            result
+            for result, reliability in zip(document_results, reliabilities)
+            if result.is_total_conflict and reliability > 0.0
+        ),
+        None,
     )
     if conflicted is not None:
         # 文档级完全冲突：不跳过该评估器，也不让别的评估器把它盖过去。
@@ -182,15 +191,29 @@ def _run_claim(
             evaluator_result=None,
         )
 
-    evaluator_result = aggregate_evaluators(
-        [
-            EvaluatorEvidence(
-                document_result=document_result,
-                evaluator_reliability=reliability,
-            )
-            for document_result, reliability in zip(document_results, reliabilities)
-        ]
-    )
+    # 走到这里时，mass=None 的文档聚合结果只可能来自可靠性为 0 的评估器。
+    # 它们对融合结果没有任何影响（折扣后是单位元），因此不参与评估器融合，
+    # 避免触发 UndefinedDocumentMassError；可靠性为 0 但 mass 有定义的
+    # 评估器仍然保留（折扣后同样是单位元，保留可维持既有的
+    # 「全部可靠性为 0 → m_theta = 1」语义）。
+    evidences = [
+        EvaluatorEvidence(document_result=result, evaluator_reliability=reliability)
+        for result, reliability in zip(document_results, reliabilities)
+        if result.mass is not None
+    ]
+    if not evidences:
+        # 全部评估器都可靠性为 0 且文档级完全冲突：没有任何可信证据，
+        # 结论为完全无知（m_theta = 1），不报错也不伪造冲突结论。
+        return ClaimPipelineResult(
+            **common,
+            evaluators=evaluators,
+            status=PipelineStatus.NORMAL,
+            diagnostic=diagnose_no_evidence(sample.sample_id, claim_id, thresholds),
+            document_results=tuple(document_results),
+            evaluator_result=None,
+        )
+
+    evaluator_result = aggregate_evaluators(evidences)
     status = (
         PipelineStatus.EVALUATOR_TOTAL_CONFLICT
         if evaluator_result.is_total_conflict

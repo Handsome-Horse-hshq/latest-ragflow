@@ -26,6 +26,11 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--train-per-class", type=int, default=60)
     parser.add_argument("--validation-per-class", type=int, default=20)
     parser.add_argument("--test-per-class", type=int, default=20)
+    parser.add_argument(
+        "--dataset-name",
+        default="rag-ds-climate-fever-balanced-v1",
+        help="写进 manifest 的数据集名；不同规模的子集必须取不同的名字",
+    )
     parser.add_argument("--overwrite", action="store_true")
     return parser.parse_args()
 
@@ -40,6 +45,7 @@ def main() -> int:
         validation_per_class=args.validation_per_class,
         test_per_class=args.test_per_class,
         overwrite=args.overwrite,
+        dataset_name=args.dataset_name,
     )
     print(f"数据集构建完成：{manifest.dataset_name}")
     print(f"  每类总数：{manifest.per_class}")

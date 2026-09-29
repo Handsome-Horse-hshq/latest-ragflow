@@ -1,12 +1,15 @@
-"""三个不使用证据理论的对照 baseline。
+"""对照 baseline。
 
 * **Weighted Average** —— 按 文档可靠性 × 评估器可靠性 加权平均三个概率；
 * **Majority Vote** —— 每条关系预测一票，不使用任何可靠性；
-* **Single Evaluator** —— 只用一个指定评估器，按文档可靠性加权平均。
+* **Single Evaluator** —— 只用一个指定评估器，按文档可靠性加权平均；
+* **Conflict Aware** —— 与 Weighted Average 相同的加权分数，加一条显式
+  冲突规则（支持与反驳都强且接近时判 ``conflicting``）。
 
-三者**都不会输出** ``conflicting``：朴素聚合把「两条针锋相对的证据」压成
-一个低分或一个平局，无法与「谁都说不清楚」区分开。这正是与 D-S 诊断方法
-对比时要展示的核心局限。
+前三个方法**都不会输出** ``conflicting``：朴素聚合把「两条针锋相对的证据」
+压成一个低分或一个平局，无法与「谁都说不清楚」区分开。第四个方法用显式
+规则补上四类输出空间，是把「输出空间差异」与「融合机制差异」分开的公平
+对照。
 """
 
 from rag_ds.baselines.config import (
@@ -14,6 +17,7 @@ from rag_ds.baselines.config import (
     BaselineOptions,
     load_baseline_config,
 )
+from rag_ds.baselines.conflict_aware import predict_conflict_aware
 from rag_ds.baselines.decision import decide_baseline_state
 from rag_ds.baselines.majority_vote import cast_vote, predict_majority_vote
 from rag_ds.baselines.models import (
@@ -49,6 +53,7 @@ __all__ = [
     "cast_vote",
     "decide_baseline_state",
     "load_baseline_config",
+    "predict_conflict_aware",
     "predict_majority_vote",
     "predict_single_evaluator",
     "predict_weighted_average",
