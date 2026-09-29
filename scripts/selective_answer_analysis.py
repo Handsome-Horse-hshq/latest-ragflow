@@ -82,10 +82,72 @@ def auroc(scores: np.ndarray, labels: np.ndarray) -> float:
     return float((ranks[pos].sum() - n_pos * (n_pos + 1) / 2) / (n_pos * n_neg))
 
 
+#: 显著性检验的重采样次数与种子。
+N_RESAMPLES = 2000
+BOOT_SEED = 42
+
+
+def _aurc(risk: np.ndarray, correct: np.ndarray, order_key: np.ndarray) -> float:
+    """与主表同口径的 AURC：按风险升序（并列按 claim 定序），各覆盖率下 1-准确率的均值。"""
+    order = np.lexsort((order_key, risk))
+    cum = np.cumsum(correct[order])
+    n = len(risk)
+    ks = np.maximum(1, np.rint(n * COVERAGES).astype(int))
+    return float(np.mean(1.0 - cum[ks - 1] / ks))
+
+
+def paired_selective_bootstrap(
+    risk_a: np.ndarray,
+    risk_b: np.ndarray,
+    correct_a: np.ndarray,
+    correct_b: np.ndarray,
+    order_key: np.ndarray,
+    rng: np.random.Generator,
+) -> dict[str, float]:
+    """对 AUROC 与 AURC 的差（a - b）做配对自助检验。
+
+    两个方法在同一批 claim 上评估，每次重采样的下标对两者共用。
+    AUROC 越高越好、AURC 越低越好，因此 D-S 占优分别对应
+    ``delta_auroc > 0`` 与 ``delta_aurc < 0``。
+    """
+    n = len(risk_a)
+    obs_auroc = auroc(risk_a, 1 - correct_a) - auroc(risk_b, 1 - correct_b)
+    obs_aurc = _aurc(risk_a, correct_a, order_key) - _aurc(risk_b, correct_b, order_key)
+    d_auroc, d_aurc = [], []
+    for _ in range(N_RESAMPLES):
+        idx = rng.integers(0, n, n)
+        a = auroc(risk_a[idx], 1 - correct_a[idx])
+        b = auroc(risk_b[idx], 1 - correct_b[idx])
+        if not (np.isnan(a) or np.isnan(b)):
+            d_auroc.append(a - b)
+        # 重采样后 claim 会重复，用下标位置作并列时的次级排序键，保证可复现。
+        key = np.arange(n)
+        d_aurc.append(
+            _aurc(risk_a[idx], correct_a[idx], key) - _aurc(risk_b[idx], correct_b[idx], key)
+        )
+
+    def _summary(obs: float, deltas: list[float]) -> tuple[float, float, float, float]:
+        arr = np.sort(np.asarray(deltas))
+        low, high = float(np.quantile(arr, 0.025)), float(np.quantile(arr, 0.975))
+        p = min(1.0, 2.0 * min((arr <= 0).mean(), (arr >= 0).mean()))
+        return obs, low, high, float(p)
+
+    auroc_s = _summary(obs_auroc, d_auroc)
+    aurc_s = _summary(obs_aurc, d_aurc)
+    return {
+        "delta_auroc": auroc_s[0], "auroc_ci_low": auroc_s[1],
+        "auroc_ci_high": auroc_s[2], "auroc_p": auroc_s[3],
+        "delta_aurc": aurc_s[0], "aurc_ci_low": aurc_s[1],
+        "aurc_ci_high": aurc_s[2], "aurc_p": aurc_s[3],
+    }
+
+
 def main() -> int:
     """命令行入口，返回进程退出码。"""
     OUT.mkdir(parents=True, exist_ok=True)
     curve_rows, auroc_rows, aurc_rows = [], [], []
+    significance_rows = []
+    rng = np.random.default_rng(BOOT_SEED)
 
     for setting, path in SETTINGS.items():
         df = pd.read_csv(path, encoding="utf-8-sig")
@@ -148,6 +210,57 @@ def main() -> int:
                         "acc_60": round(accs[list(COVERAGES).index(0.60)], 4),
                     }
                 )
+
+            # D-S 与每个 baseline 的配对自助检验：先按 claim 对齐。
+            aligned = {}
+            for method in METHODS:
+                sub = df[df["method"] == method].copy()
+                if sub.empty:
+                    continue
+                sub["risk"] = compute(sub)
+                aligned[method] = sub.sort_values(["sample_id", "claim_id"]).reset_index(
+                    drop=True
+                )
+            if "ds" not in aligned:
+                continue
+            reference = aligned["ds"]
+            # 并列时的次级排序键：claim_id 的字典序名次，与主表的排序口径一致。
+            _, order_key = np.unique(reference["claim_id"].to_numpy(), return_inverse=True)
+            for method, other in aligned.items():
+                if method == "ds":
+                    continue
+                if not (
+                    other["claim_id"].to_numpy() == reference["claim_id"].to_numpy()
+                ).all():
+                    print(f"[对齐失败] {setting} / {method} 与 ds 覆盖的 claim 不一致")
+                    return 1
+                stats = paired_selective_bootstrap(
+                    reference["risk"].to_numpy(float),
+                    other["risk"].to_numpy(float),
+                    reference["correct"].to_numpy(float),
+                    other["correct"].to_numpy(float),
+                    order_key,
+                    rng,
+                )
+                significance_rows.append(
+                    {
+                        "setting": setting,
+                        "risk_definition": definition,
+                        "reference": "ds",
+                        "rival": method,
+                        **{k: round(v, 4) for k, v in stats.items()},
+                        # AUROC 越高越好、AURC 越低越好。
+                        "auroc_significant": stats["auroc_ci_low"] > 0
+                        or stats["auroc_ci_high"] < 0,
+                        "aurc_significant": stats["aurc_ci_low"] > 0
+                        or stats["aurc_ci_high"] < 0,
+                        "n_resamples": N_RESAMPLES,
+                    }
+                )
+
+    pd.DataFrame(significance_rows).to_csv(
+        OUT / "selective_significance.csv", index=False, encoding="utf-8-sig"
+    )
 
     curves = pd.DataFrame(curve_rows)
     curves.to_csv(OUT / "risk_coverage_curves.csv", index=False, encoding="utf-8-sig")
@@ -223,6 +336,20 @@ def main() -> int:
                 )
     print()
     print(f"  输出目录 {OUT}")
+    print()
+    print(f"  D-S 与各 baseline 的配对自助检验（{N_RESAMPLES} 次，种子 {BOOT_SEED}）：")
+    print(f"    {'定义/设定':<44}{'对手':<18}{'ΔAUROC':>8}{'95% CI':>18}{'ΔAURC':>9}{'95% CI':>18}")
+    for row in significance_rows:
+        label = f"{row['risk_definition']} / {row['setting']}"
+        auroc_ci = f"[{row['auroc_ci_low']:+.3f},{row['auroc_ci_high']:+.3f}]"
+        aurc_ci = f"[{row['aurc_ci_low']:+.3f},{row['aurc_ci_high']:+.3f}]"
+        print(
+            f"    {label:<44}{row['rival']:<18}{row['delta_auroc']:>+8.3f}"
+            f"{auroc_ci + ('*' if row['auroc_significant'] else ' '):>18}"
+            f"{row['delta_aurc']:>+9.3f}"
+            f"{aurc_ci + ('*' if row['aurc_significant'] else ' '):>18}"
+        )
+    print("    * = 95% 区间不跨 0。ΔAUROC>0、ΔAURC<0 表示 D-S 占优。")
     print()
     print("  两套定义问的是不同的问题，论文里都要报：")
     print("    max_signal        证据不足/冲突信号能否预测错误（对 D-S 不公）")

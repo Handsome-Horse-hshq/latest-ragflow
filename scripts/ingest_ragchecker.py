@@ -58,6 +58,18 @@ DEFAULT_MANIFEST = (
 DEFAULT_OUT_DIR = PROJECT_ROOT / "outputs" / "ragchecker"
 
 
+def _project_relative(path: Path) -> str:
+    """项目内的路径记成相对项目根目录的 POSIX 路径，项目外的保留绝对路径。
+
+    谱系清单会随仓库分发，写进本机绝对路径既不可移植，也会暴露本地目录结构。
+    """
+    resolved = Path(path).resolve()
+    try:
+        return resolved.relative_to(PROJECT_ROOT).as_posix()
+    except ValueError:
+        return str(resolved)
+
+
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """解析命令行参数。"""
     parser = argparse.ArgumentParser(
@@ -134,7 +146,7 @@ def _load_mapping(args: argparse.Namespace) -> tuple[LabelProbabilityMapping, st
                 f"校准文件记录的 split 是 {split!r}，标签映射只能在验证集上校准"
             )
         mapping = LabelProbabilityMapping.model_validate(payload["mapping"])
-        return mapping, "calibrated_on_validation", str(args.calibration.resolve())
+        return mapping, "calibrated_on_validation", _project_relative(args.calibration)
     if not args.allow_placeholder_mapping:
         raise ValueError(
             "没有传 --calibration。标签映射必须先在验证集上校准；"
@@ -285,7 +297,7 @@ def main(argv: list[str] | None = None) -> int:
         predictions_path=relations_path,
         predictions_relative_path=relations_name,
         source_output_path=args.outputs,
-        source_output_relative_path=str(args.outputs.resolve()),
+        source_output_relative_path=_project_relative(args.outputs),
         label_mapping=mapping,
         label_mapping_source=mapping_source,
         calibration_path=calibration_path,

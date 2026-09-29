@@ -58,7 +58,10 @@ class MethodPrediction(BaseModel):
     #: 与上面两个信号不同：它们衡量「证据不足 / 有冲突」这两类**本身的证据**，
     #: 而这一项衡量「对自己判出来的那一类有多确信」。详见
     #: :mod:`rag_ds.experiments.selective_confidence`。
-    confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    #:
+    #: 刻意**没有默认值**：曾经默认取 0.0，结果另一条产出路径漏传时整列
+    #: 静默变成 0，选择性回答分析会把所有预测当成同等风险。
+    confidence: float = Field(ge=0.0, le=1.0)
 
 
 def collect_predictions(

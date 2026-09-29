@@ -56,6 +56,10 @@ from rag_ds.experiments.cross_validation import (
     _subset,
 )
 from rag_ds.experiments.comparison import DS_METHOD, MethodPrediction
+from rag_ds.experiments.selective_confidence import (
+    baseline_confidence,
+    ds_confidence,
+)
 from rag_ds.experiments.export import write_predictions_csv
 from rag_ds.metrics import (
     DEFAULT_RESAMPLES,
@@ -302,6 +306,13 @@ def run_cv_with_estimated_reliability(
                     gold_label=gold[(result.sample_id, result.claim_id)],
                     insufficiency_score=result.diagnostic.m_theta or 0.0,
                     conflict_score=result.diagnostic.k_doc,
+                    confidence=ds_confidence(
+                        predicted_label(result.diagnostic),
+                        result.diagnostic.m_support,
+                        result.diagnostic.m_refute,
+                        result.diagnostic.m_theta,
+                        result.diagnostic.k_doc,
+                    ),
                 )
             )
         baseline_thresholds = BaselineThresholds(
@@ -318,6 +329,12 @@ def run_cv_with_estimated_reliability(
                     gold_label=gold[(item.sample_id, item.claim_id)],
                     insufficiency_score=item.score_unknown,
                     conflict_score=1.0 - abs(item.score_support - item.score_refute),
+                    confidence=baseline_confidence(
+                        item.predicted_state.value,
+                        item.score_support,
+                        item.score_refute,
+                        item.score_unknown,
+                    ),
                 )
             )
         records.append(
