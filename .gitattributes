@@ -1,0 +1,4 @@
+# 数据集文件按字节原样检出，不做换行转换。
+# manifest.json 记录了这些文件的 SHA256；Windows 上 core.autocrlf=true
+# 会把 LF 改写成 CRLF，导致完整性校验失败。
+data/** -text
