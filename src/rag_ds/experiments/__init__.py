@@ -22,6 +22,20 @@ from rag_ds.experiments.cross_validation import (
     make_stratified_folds,
     run_nested_cross_validation,
 )
+from rag_ds.experiments.cv_ablation import (
+    CV_ABLATION_VARIANTS,
+    AblationFoldThresholds,
+    NestedAblationResult,
+    run_nested_ablation,
+)
+from rag_ds.experiments.detection_proxies import (
+    CONFLICT_PROXIES,
+    INSUFFICIENCY_PROXIES,
+    ClaimDetectionScores,
+    DetectionComparison,
+    compare_detection,
+    detection_scores,
+)
 from rag_ds.experiments.reliability_sensitivity import (
     MAX_VOTE_ENTROPY,
     ReliabilitySensitivityPoint,
@@ -42,18 +56,27 @@ from rag_ds.experiments.export import (
 )
 
 __all__ = [
+    "CONFLICT_PROXIES",
+    "CV_ABLATION_VARIANTS",
     "DS_METHOD",
+    "INSUFFICIENCY_PROXIES",
     "MAX_VOTE_ENTROPY",
+    "AblationFoldThresholds",
+    "ClaimDetectionScores",
     "CrossValidationResult",
+    "DetectionComparison",
     "FoldThresholds",
     "AblationResult",
     "AblationVariant",
     "CLASSIFICATION_ABLATION_VARIANTS",
     "ExperimentReport",
     "MethodPrediction",
+    "NestedAblationResult",
     "ReliabilitySensitivityPoint",
     "apply_document_reliability",
     "collect_predictions",
+    "compare_detection",
+    "detection_scores",
     "make_stratified_folds",
     "oracle_reliability_from_provenance",
     "plot_confusion_matrix",
@@ -62,6 +85,7 @@ __all__ = [
     "plot_threshold_sensitivity",
     "run_ablation",
     "run_comparison",
+    "run_nested_ablation",
     "run_nested_cross_validation",
     "run_reliability_sensitivity",
     "uniform_reliability_sweep",

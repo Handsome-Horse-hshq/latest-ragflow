@@ -1,0 +1,261 @@
+{
+  "dataset_name": "rag-ds-climate-fever-balanced-v2",
+  "evaluators": [
+    "refchecker_nli"
+  ],
+  "claim_count": 616,
+  "tasks": {
+    "conflict": {
+      "positive_label": "conflicting",
+      "reference": "k_doc",
+      "reports": [
+        {
+          "score_name": "k_doc",
+          "positive_label": "conflicting",
+          "auroc": 0.6063417102378141,
+          "auprc": 0.3830695714261493,
+          "best_f1": 0.42340791738382094,
+          "best_threshold": 0.0011259745633538376,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "one_minus_abs_margin",
+          "positive_label": "conflicting",
+          "auroc": 0.46335807050092764,
+          "auprc": 0.22292393968438118,
+          "best_f1": 0.42485549132947975,
+          "best_threshold": 0.4049468736936962,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "min_mean",
+          "positive_label": "conflicting",
+          "auroc": 0.5950413223140496,
+          "auprc": 0.3680943285555196,
+          "best_f1": 0.40881763527054116,
+          "best_threshold": 0.0017536557783430873,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "mean_product",
+          "positive_label": "conflicting",
+          "auroc": 0.5962219598583235,
+          "auprc": 0.3741149058884518,
+          "best_f1": 0.4199066874027994,
+          "best_threshold": 2.270834085915078e-05,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "max_product",
+          "positive_label": "conflicting",
+          "auroc": 0.6115702479338843,
+          "auprc": 0.3826669490205178,
+          "best_f1": 0.42492012779552724,
+          "best_threshold": 0.0002121753240015906,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "min_max",
+          "positive_label": "conflicting",
+          "auroc": 0.5971214932253892,
+          "auprc": 0.3776577524154717,
+          "best_f1": 0.4133333333333333,
+          "best_threshold": 0.006770630200788964,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "sr_std",
+          "positive_label": "conflicting",
+          "auroc": 0.6268342047562826,
+          "auprc": 0.4030559384325172,
+          "best_f1": 0.43738317757009343,
+          "best_threshold": 0.06571257850981212,
+          "positive_count": 154,
+          "negative_count": 462
+        }
+      ],
+      "comparisons": [
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "one_minus_abs_margin",
+          "auroc_reference": 0.6063417102378141,
+          "auroc_rival": 0.46335807050092764,
+          "observed_delta": 0.1429836397368865,
+          "ci_low": 0.05329855240487591,
+          "ci_high": 0.23464191055049055,
+          "p_value": 0.0016,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "min_mean",
+          "auroc_reference": 0.6063417102378141,
+          "auroc_rival": 0.5950413223140496,
+          "observed_delta": 0.011300387923764532,
+          "ci_low": -0.01377149519090648,
+          "ci_high": 0.0370033495033496,
+          "p_value": 0.3812,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "mean_product",
+          "auroc_reference": 0.6063417102378141,
+          "auroc_rival": 0.5962219598583235,
+          "observed_delta": 0.010119750379490644,
+          "ci_low": 0.0006184291898577721,
+          "ci_high": 0.01946954240746135,
+          "p_value": 0.0408,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "max_product",
+          "auroc_reference": 0.6063417102378141,
+          "auroc_rival": 0.6115702479338843,
+          "observed_delta": -0.0052285376960701235,
+          "ci_low": -0.016414609513825784,
+          "ci_high": 0.0051723168606285785,
+          "p_value": 0.3396,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "min_max",
+          "auroc_reference": 0.6063417102378141,
+          "auroc_rival": 0.5971214932253892,
+          "observed_delta": 0.009220217012424925,
+          "ci_low": -0.019171304885590712,
+          "ci_high": 0.03775357912774313,
+          "p_value": 0.51,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "sr_std",
+          "auroc_reference": 0.6063417102378141,
+          "auroc_rival": 0.6268342047562826,
+          "observed_delta": -0.020492494518468463,
+          "ci_low": -0.0594170403587444,
+          "ci_high": 0.017048968347669557,
+          "p_value": 0.292,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        }
+      ]
+    },
+    "insufficiency": {
+      "positive_label": "insufficient",
+      "reference": "m_theta",
+      "reports": [
+        {
+          "score_name": "m_theta",
+          "positive_label": "insufficient",
+          "auroc": 0.6213245628830044,
+          "auprc": 0.3082745573693386,
+          "best_f1": 0.44939965694682676,
+          "best_threshold": 0.029324159165921904,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "mean_unknown",
+          "positive_label": "insufficient",
+          "auroc": 0.6144375105414066,
+          "auprc": 0.30645081990337675,
+          "best_f1": 0.44334975369458124,
+          "best_threshold": 0.639857829280058,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "min_unknown",
+          "positive_label": "insufficient",
+          "auroc": 0.6275369651993028,
+          "auprc": 0.3136668594926377,
+          "best_f1": 0.44833625218914175,
+          "best_threshold": 0.11811963312029394,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "unknown_product",
+          "positive_label": "insufficient",
+          "auroc": 0.6222100410412099,
+          "auprc": 0.30871349846470153,
+          "best_f1": 0.45407279029462744,
+          "best_threshold": 0.029283861618284102,
+          "positive_count": 154,
+          "negative_count": 462
+        }
+      ],
+      "comparisons": [
+        {
+          "positive_label": "insufficient",
+          "reference": "m_theta",
+          "rival": "mean_unknown",
+          "auroc_reference": 0.6213245628830044,
+          "auroc_rival": 0.6144375105414066,
+          "observed_delta": 0.00688705234159781,
+          "ci_low": -0.000849256900212314,
+          "ci_high": 0.01502113526570048,
+          "p_value": 0.0764,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "insufficient",
+          "reference": "m_theta",
+          "rival": "min_unknown",
+          "auroc_reference": 0.6213245628830044,
+          "auroc_rival": 0.6275369651993028,
+          "observed_delta": -0.006212402316298382,
+          "ci_low": -0.015095184770436698,
+          "ci_high": 0.0022767929744674786,
+          "p_value": 0.1552,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "insufficient",
+          "reference": "m_theta",
+          "rival": "unknown_product",
+          "auroc_reference": 0.6213245628830044,
+          "auroc_rival": 0.6222100410412099,
+          "observed_delta": -0.0008854781582054994,
+          "ci_low": -0.0025166191832857177,
+          "ci_high": 0.0007835716080959454,
+          "p_value": 0.3032,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        }
+      ]
+    }
+  }
+}

@@ -46,6 +46,12 @@ from pathlib import Path
 
 from rag_ds.baselines.models import BaselineThresholds
 from rag_ds.baselines.single_evaluator import predict_single_evaluator
+from rag_ds.baselines.stat_gate import (
+    STAT_GATE_VARIANTS,
+    StatGateVariant,
+    decide_stat_gate,
+    stat_gate_scores,
+)
 from rag_ds.data_io import load_relation_predictions, load_samples
 from rag_ds.dataset_manifest import load_dataset_manifest, verify_artifact
 from rag_ds.experiments.cross_validation import (
@@ -75,6 +81,10 @@ from rag_ds.schemas import RAGSample, RelationPrediction
 from rag_ds.tuning.baseline_threshold_search import (
     DEFAULT_DECISION_THRESHOLDS,
     search_baseline_thresholds,
+)
+from rag_ds.tuning.stat_gate_search import (
+    search_stat_gate_thresholds,
+    stat_gate_label,
 )
 from rag_ds.tuning.threshold_search import (
     SplitName,
@@ -106,6 +116,13 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         choices=("macro_f1", "auroc"),
         default="auroc",
         help="macro_f1：单评估器四分类 Macro-F1 折算；auroc：按职能的判别 AUROC 折算",
+    )
+    parser.add_argument(
+        "--stat-gate",
+        nargs="+",
+        default=[],
+        choices=list(STAT_GATE_VARIANTS),
+        help="加入不用 D-S 的两维判定对照组，使用同一份估计出来的可靠性作权重",
     )
     parser.add_argument("--overwrite", action="store_true")
     return parser.parse_args(argv)
@@ -243,8 +260,14 @@ def run_cv_with_estimated_reliability(
     grid_steps: int,
     evaluator_conflict_threshold: float = 0.4,
     estimator: str = "auroc",
+    stat_gate_statistics: tuple[StatGateVariant, ...] = (),
 ) -> tuple[CrossValidationResult, list[dict]]:
-    """与 run_nested_cross_validation 同协议，但可靠性逐折从内层估计。"""
+    """与 run_nested_cross_validation 同协议，但可靠性逐折从内层估计。
+
+    ``stat_gate_statistics`` 非空时加入 Statistic Gate 对照：它拿到的是同一份
+    改写后的可靠性（作为加权与折扣的权重），因此「D-S 的可靠性折扣是否比
+    简单的可靠性加权更有用」可以直接配对比较。
+    """
     folds = make_stratified_folds(samples, n_folds, seed)
     pooled: list[MethodPrediction] = []
     records: list[FoldThresholds] = []
@@ -337,6 +360,44 @@ def run_cv_with_estimated_reliability(
                     ),
                 )
             )
+
+        inner_gold = {
+            (s.sample_id, claim.claim_id): s.gold_state.value
+            for s in inner_samples
+            for claim in s.claims
+        }
+        stat_gate_chosen: dict[str, DiagnosticThresholds] = {}
+        for variant in stat_gate_statistics:
+            method = variant.method_name
+            chosen = search_stat_gate_thresholds(
+                stat_gate_scores(inner_samples, inner_predictions, variant),
+                inner_gold,
+                SplitName.VALIDATION,
+                steps=grid_steps,
+                evaluator_conflict_threshold=evaluator_conflict_threshold,
+            ).best.thresholds
+            stat_gate_chosen[method] = chosen
+            for scores in stat_gate_scores(test_samples, test_predictions, variant):
+                label = stat_gate_label(decide_stat_gate(scores, chosen))
+                pooled.append(
+                    MethodPrediction(
+                        method=method,
+                        sample_id=scores.sample_id,
+                        claim_id=scores.claim_id,
+                        predicted_label=label,
+                        gold_label=gold[(scores.sample_id, scores.claim_id)],
+                        insufficiency_score=scores.insufficiency,
+                        conflict_score=scores.conflict,
+                        confidence=ds_confidence(
+                            label,
+                            scores.score_support,
+                            scores.score_refute,
+                            scores.insufficiency,
+                            scores.conflict,
+                        ),
+                    )
+                )
+
         records.append(
             FoldThresholds(
                 fold=fold_index,
@@ -345,6 +406,7 @@ def run_cv_with_estimated_reliability(
                 ds_thresholds=ds_thresholds,
                 baseline_decision_threshold=decision_threshold,
                 baseline_conflict_threshold=conflict_threshold,
+                stat_gate_thresholds=stat_gate_chosen or None,
                 inner_macro_f1=search.best.macro_f1,
             )
         )
@@ -404,6 +466,7 @@ def main(argv: list[str] | None = None) -> int:
         samples, predictions, args.evaluator, args.single_evaluator,
         n_folds=args.n_folds, seed=args.seed, grid_steps=args.grid_steps,
         estimator=args.estimator,
+        stat_gate_statistics=tuple(STAT_GATE_VARIANTS[s] for s in args.stat_gate),
     )
 
     by_method: dict[str, list] = defaultdict(list)
@@ -447,7 +510,10 @@ def main(argv: list[str] | None = None) -> int:
             "n_folds": result.n_folds,
             "fold_seed": result.seed,
             "claim_count": result.claim_count,
-            "folds": [json.loads(f.model_dump_json()) for f in result.folds],
+            # exclude_none：没开 Statistic Gate 时不多出空字段，旧输出保持不变。
+            "folds": [
+                json.loads(f.model_dump_json(exclude_none=True)) for f in result.folds
+            ],
             "reports": {m: json.loads(r.model_dump_json()) for m, r in reports.items()},
             "intervals": {m: json.loads(i.model_dump_json()) for m, i in intervals.items()},
             "comparisons": [json.loads(c.model_dump_json()) for c in comparisons],

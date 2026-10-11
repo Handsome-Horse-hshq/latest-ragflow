@@ -41,6 +41,7 @@ __all__ = [
     "diagnose_no_evidence",
     "diagnose_document_total_conflict",
     "diagnose_evaluator_result",
+    "gate_primary_state",
 ]
 
 #: ``(证据不足, 文档冲突)`` 到区域的映射。
@@ -116,6 +117,19 @@ def _primary_state(
     ):
         return EvidenceState.CONFLICTING
     return None  # EVALUATOR_TOTAL_CONFLICT
+
+
+def gate_primary_state(
+    evidence_insufficient: bool, document_conflict: bool, verdict: ClaimVerdict
+) -> EvidenceState | None:
+    """二维门控的最后一步：由两个布尔量与倾向得出主状态。
+
+    与 :func:`diagnose_evaluator_result` 使用同一张区域表与同一个映射。
+    不用 D-S 的两维判定对照组（:mod:`rag_ds.baselines.stat_gate`）也调用
+    这里，保证两边的差别**只来自坐标轴上的分数**，而不是区域到类别的映射。
+    """
+    region = _REGION_BY_FLAGS[(evidence_insufficient, document_conflict)]
+    return _primary_state(region, verdict)
 
 
 def diagnose_evaluator_result(

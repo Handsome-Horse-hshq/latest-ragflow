@@ -34,8 +34,15 @@ from collections.abc import Sequence
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from rag_ds.baselines.models import BaselineThresholds
+from rag_ds.baselines.conflict_aware import decide_conflict_aware_state
+from rag_ds.baselines.models import BaselineMethod, BaselineThresholds
 from rag_ds.baselines.runner import run_baselines
+from rag_ds.baselines.stat_gate import (
+    ConflictStatistic,
+    StatGateVariant,
+    decide_stat_gate,
+    stat_gate_scores,
+)
 from rag_ds.diagnostics.models import DiagnosticThresholds
 from rag_ds.experiments.comparison import DS_METHOD, MethodPrediction
 from rag_ds.experiments.selective_confidence import (
@@ -47,6 +54,10 @@ from rag_ds.schemas import RAGSample, RelationPrediction
 from rag_ds.tuning.baseline_threshold_search import (
     DEFAULT_DECISION_THRESHOLDS,
     search_baseline_thresholds,
+)
+from rag_ds.tuning.stat_gate_search import (
+    search_stat_gate_thresholds,
+    stat_gate_label,
 )
 from rag_ds.tuning.threshold_search import (
     SplitName,
@@ -75,6 +86,14 @@ class FoldThresholds(BaseModel):
     baseline_decision_threshold: float = Field(ge=0.0, le=1.0)
     #: conflict_aware 在该折内层搜出的冲突分数下限；无该方法的候选时为 None。
     baseline_conflict_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
+    #: 仅在搜索 conflict_margin 时有值：conflict_aware 自己的判定阈值与平衡度。
+    #: 不搜 margin 时 conflict_aware 沿用三个 baseline 的公共判定阈值。
+    conflict_aware_decision_threshold: float | None = Field(
+        default=None, ge=0.0, le=1.0
+    )
+    conflict_aware_margin: float | None = Field(default=None, ge=0.0, le=1.0)
+    #: 各 Statistic Gate 变体在内层搜出的阈值；没跑该对照组时为 None。
+    stat_gate_thresholds: dict[str, DiagnosticThresholds] | None = None
     #: 该折在内层验证集上取得的 Macro-F1，仅供观察调参是否稳定。
     inner_macro_f1: float = Field(ge=0.0, le=1.0)
 
@@ -164,6 +183,8 @@ def run_nested_cross_validation(
     grid_steps: int = 9,
     evaluator_conflict_threshold: float = 0.4,
     baseline_decision_thresholds: Sequence[float] = DEFAULT_DECISION_THRESHOLDS,
+    stat_gate_statistics: Sequence[StatGateVariant | ConflictStatistic] = (),
+    conflict_margins: Sequence[float] | None = None,
 ) -> CrossValidationResult:
     """跑嵌套交叉验证，返回汇总后的逐条预测与每折阈值。
 
@@ -176,8 +197,14 @@ def run_nested_cross_validation(
         n_folds: 外折数。
         seed: 分折随机种子。
         grid_steps: D-S 阈值网格每个轴的候选点数（按内层观测值分位数构造）。
+            Statistic Gate 用同样的点数。
         evaluator_conflict_threshold: 固定的 K_eval 告警阈值。
         baseline_decision_thresholds: baseline 判定阈值候选。
+        stat_gate_statistics: 要加入对照的 Statistic Gate 变体；空表示不跑。
+            只给 :class:`ConflictStatistic` 时横轴取平均 ``p_unknown``。
+        conflict_margins: conflict_aware 的平衡度候选。``None`` 保持原协议
+            （margin 固定 0.1、判定阈值与三个 baseline 共用）；给出时
+            conflict_aware 在三维网格上**单独**调好全部三个参数。
 
     Returns:
         :class:`CrossValidationResult`。
@@ -186,6 +213,7 @@ def run_nested_cross_validation(
         ValueError: 分折失败，或某折内层数据不足以搜索阈值。
     """
     folds = make_stratified_folds(samples, n_folds, seed)
+    stat_gate_variants = [StatGateVariant.of(item) for item in stat_gate_statistics]
 
     pooled: list[MethodPrediction] = []
     records: list[FoldThresholds] = []
@@ -229,6 +257,7 @@ def run_nested_cross_validation(
             SplitName.VALIDATION,
             single_evaluator,
             decision_thresholds=baseline_decision_thresholds,
+            conflict_margins=conflict_margins,
         )
         # 取各方法最优平台的公共取值；没有交集时退回 D-S 之外最常见的那个。
         decision_threshold = _shared_decision_threshold(baseline_search)
@@ -237,6 +266,32 @@ def run_nested_cross_validation(
         conflict_threshold = (
             ca_best.conflict_threshold if ca_best is not None else None
         )
+        # 搜 margin 时 conflict_aware 用它自己的整组最优参数。
+        ca_own = (
+            BaselineThresholds(
+                decision_threshold=ca_best.decision_threshold,
+                conflict_threshold=ca_best.conflict_threshold,
+                conflict_margin=ca_best.conflict_margin,
+            )
+            if conflict_margins is not None and ca_best is not None
+            else None
+        )
+
+        inner_gold = {
+            (s.sample_id, claim.claim_id): s.gold_state.value  # type: ignore[union-attr]
+            for s in inner_samples
+            for claim in s.claims
+        }
+        stat_gate_chosen: dict[str, DiagnosticThresholds] = {}
+        for variant in stat_gate_variants:
+            stat_search = search_stat_gate_thresholds(
+                stat_gate_scores(inner_samples, inner_predictions, variant),
+                inner_gold,
+                SplitName.VALIDATION,
+                steps=grid_steps,
+                evaluator_conflict_threshold=evaluator_conflict_threshold,
+            )
+            stat_gate_chosen[variant.method_name] = stat_search.best.thresholds
 
         # --- 外层：用选好的阈值预测测试折 ---
         test_results = run_pipeline(test_samples, test_predictions, ds_thresholds)
@@ -279,12 +334,18 @@ def run_nested_cross_validation(
             single_evaluator,
         )
         for item in baseline_results:
+            predicted_state = item.predicted_state
+            if ca_own is not None and item.method is BaselineMethod.CONFLICT_AWARE:
+                # 分数与阈值无关，只按 conflict_aware 自己的参数重新判定。
+                predicted_state, _ = decide_conflict_aware_state(
+                    item.score_support, item.score_refute, item.score_unknown, ca_own
+                )
             pooled.append(
                 MethodPrediction(
                     method=item.method.value,
                     sample_id=item.sample_id,
                     claim_id=item.claim_id,
-                    predicted_label=item.predicted_state.value,
+                    predicted_label=predicted_state.value,
                     gold_label=gold[(item.sample_id, item.claim_id)],
                     insufficiency_score=item.score_unknown,
                     # 与 collect_predictions 保持同一口径：baseline 没有冲突量，
@@ -292,13 +353,40 @@ def run_nested_cross_validation(
                     conflict_score=1.0
                     - abs(item.score_support - item.score_refute),
                     confidence=baseline_confidence(
-                        item.predicted_state.value,
+                        predicted_state.value,
                         item.score_support,
                         item.score_refute,
                         item.score_unknown,
                     ),
                 )
             )
+
+        for variant in stat_gate_variants:
+            method = variant.method_name
+            for scores in stat_gate_scores(test_samples, test_predictions, variant):
+                label = stat_gate_label(
+                    decide_stat_gate(scores, stat_gate_chosen[method])
+                )
+                pooled.append(
+                    MethodPrediction(
+                        method=method,
+                        sample_id=scores.sample_id,
+                        claim_id=scores.claim_id,
+                        predicted_label=label,
+                        gold_label=gold[(scores.sample_id, scores.claim_id)],
+                        insufficiency_score=scores.insufficiency,
+                        conflict_score=scores.conflict,
+                        # 两个坐标与三个平均分在结构上对应 D-S 的
+                        # m_theta / K_doc / m_support / m_refute，置信度同口径。
+                        confidence=ds_confidence(
+                            label,
+                            scores.score_support,
+                            scores.score_refute,
+                            scores.insufficiency,
+                            scores.conflict,
+                        ),
+                    )
+                )
 
         records.append(
             FoldThresholds(
@@ -308,12 +396,20 @@ def run_nested_cross_validation(
                 ds_thresholds=ds_thresholds,
                 baseline_decision_threshold=decision_threshold,
                 baseline_conflict_threshold=conflict_threshold,
+                conflict_aware_decision_threshold=(
+                    ca_own.decision_threshold if ca_own is not None else None
+                ),
+                conflict_aware_margin=(
+                    ca_own.conflict_margin if ca_own is not None else None
+                ),
+                stat_gate_thresholds=stat_gate_chosen or None,
                 inner_macro_f1=search.best.macro_f1,
             )
         )
         if not methods:
             methods = [DS_METHOD] + sorted(
                 {item.method.value for item in baseline_results}
+                | set(stat_gate_chosen)
             )
 
     claim_count = len({(p.sample_id, p.claim_id) for p in pooled})

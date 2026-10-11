@@ -28,6 +28,7 @@ import tempfile
 from collections import defaultdict
 from pathlib import Path
 
+from rag_ds.baselines.stat_gate import STAT_GATE_VARIANTS
 from rag_ds.data_io import load_relation_predictions, load_samples
 from rag_ds.dataset_manifest import (
     DatasetManifestError,
@@ -64,6 +65,20 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--resamples", type=int, default=DEFAULT_RESAMPLES)
     parser.add_argument(
         "--reference", default="ds", help="作为基准的方法名"
+    )
+    parser.add_argument(
+        "--stat-gate",
+        nargs="+",
+        default=[],
+        choices=list(STAT_GATE_VARIANTS),
+        help="加入不用 D-S 的两维判定对照组（同 run_cross_validation.py）",
+    )
+    parser.add_argument(
+        "--conflict-margins",
+        nargs="+",
+        type=float,
+        default=None,
+        help="conflict_aware 的平衡度候选；给出时三个参数一起搜",
     )
     parser.add_argument("--out", type=Path, default=None)
     parser.add_argument("--overwrite", action="store_true")
@@ -134,6 +149,8 @@ def main(argv: list[str] | None = None) -> int:
                 n_folds=args.n_folds,
                 seed=seed,
                 grid_steps=args.grid_steps,
+                stat_gate_statistics=[STAT_GATE_VARIANTS[s] for s in args.stat_gate],
+                conflict_margins=args.conflict_margins,
             )
         except (PipelineError, ValueError) as error:
             print(f"[种子 {seed} 失败] {error}", file=sys.stderr)

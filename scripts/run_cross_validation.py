@@ -23,6 +23,18 @@
 ``K_eval``（评估器之间的冲突）才会真正被激活。只给一个评估器时 K_eval 恒为 0，
 多评估器融合那一整套机制就没有任何实验支撑。
 
+补充对照
+--------
+``--stat-gate sr_std max_product sr_std_uprod max_product_uprod``：加入不用
+D-S 的两维判定对照组（:mod:`rag_ds.baselines.stat_gate`），判定规则与 D-S
+相同，只换坐标轴分数，用来区分「两维判定框架」与「Dempster 融合」各自的
+贡献。带 ``_uprod`` 的变体横轴用 ``p_unknown`` 连乘，否则用平均。
+
+``--conflict-margins 0.05 0.1 0.2 0.3 0.5 1.0``：conflict_aware 在三维网格上
+单独调好判定阈值、冲突下限与平衡度，而不是固定 margin = 0.1。
+
+两个选项都不给时，输出与原协议逐位一致。
+
 不联网，不调用任何大模型。
 """
 
@@ -36,13 +48,10 @@ import tempfile
 from collections import defaultdict
 from pathlib import Path
 
-from rag_ds.data_io import load_relation_predictions, load_samples
-from rag_ds.dataset_manifest import (
-    DatasetManifestError,
-    load_dataset_manifest,
-    verify_artifact,
-)
+from rag_ds.baselines.stat_gate import STAT_GATE_VARIANTS
+from rag_ds.dataset_manifest import DatasetManifestError
 from rag_ds.experiments import run_nested_cross_validation
+from rag_ds.experiments.data_loading import load_verified_dataset
 from rag_ds.experiments.export import write_predictions_csv
 from rag_ds.integrity import PipelineError
 from rag_ds.metrics import (
@@ -53,10 +62,9 @@ from rag_ds.metrics import (
     classification_report,
     paired_bootstrap,
 )
-from rag_ds.model_runs import ModelRunError, verify_model_run_artifacts
+from rag_ds.model_runs import ModelRunError
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SPLITS = ("train", "validation", "test")
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -89,6 +97,20 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--grid-steps", type=int, default=9)
     parser.add_argument("--resamples", type=int, default=DEFAULT_RESAMPLES)
     parser.add_argument("--bootstrap-seed", type=int, default=DEFAULT_SEED)
+    parser.add_argument(
+        "--stat-gate",
+        nargs="+",
+        default=[],
+        choices=list(STAT_GATE_VARIANTS),
+        help="加入不用 D-S 的两维判定对照组，可给多个纵轴统计量",
+    )
+    parser.add_argument(
+        "--conflict-margins",
+        nargs="+",
+        type=float,
+        default=None,
+        help="conflict_aware 的平衡度候选；给出时三个参数一起搜",
+    )
     parser.add_argument("--out-dir", type=Path, default=None)
     parser.add_argument("--overwrite", action="store_true")
     return parser.parse_args(argv)
@@ -124,31 +146,13 @@ def main(argv: list[str] | None = None) -> int:
             print("提示：加 --overwrite 可覆盖。", file=sys.stderr)
             return 1
 
-    manifest_path = args.manifest.resolve()
     try:
-        manifest = load_dataset_manifest(manifest_path)
-        samples = []
-        predictions = []
-        for split in SPLITS:
-            samples_path = verify_artifact(
-                manifest_path.parent, manifest.splits[split].samples
-            )
-            samples.extend(load_samples(samples_path))
-            for evaluator in args.evaluator:
-                relations = Path(
-                    args.relations_template.format(split=split, evaluator=evaluator)
-                )
-                if args.model_run_template:
-                    run_path = Path(
-                        args.model_run_template.format(
-                            split=split, evaluator=evaluator
-                        )
-                    )
-                    verify_model_run_artifacts(
-                        run_path, manifest_path, samples_path, relations, split
-                    )
-                predictions.extend(load_relation_predictions(relations))
-
+        manifest, samples, predictions = load_verified_dataset(
+            args.manifest,
+            args.relations_template,
+            args.evaluator,
+            args.model_run_template,
+        )
         result = run_nested_cross_validation(
             samples,
             predictions,
@@ -156,6 +160,8 @@ def main(argv: list[str] | None = None) -> int:
             n_folds=args.n_folds,
             seed=args.seed,
             grid_steps=args.grid_steps,
+            stat_gate_statistics=[STAT_GATE_VARIANTS[s] for s in args.stat_gate],
+            conflict_margins=args.conflict_margins,
         )
     except (
         PipelineError,
@@ -209,23 +215,48 @@ def main(argv: list[str] | None = None) -> int:
         for method, items in ordered.items()
         if method != reference
     ]
+    # 分解用：不用 D-S 的两维判定 vs 只加一条冲突规则的 conflict_aware ——
+    # 回答「光有两维判定框架、不做 Dempster 融合，能比 conflict_aware 好多少」。
+    stat_gate_methods = [m for m in result.methods if m.startswith("stat_gate_")]
+    framework_comparisons = [
+        paired_bootstrap(
+            truth,
+            [r.predicted_label for r in ordered[method]],
+            [r.predicted_label for r in ordered["conflict_aware"]],
+            method,
+            "conflict_aware",
+            labels=GOLD_LABELS,
+            n_resamples=args.resamples,
+            seed=args.bootstrap_seed,
+        )
+        for method in stat_gate_methods
+        if "conflict_aware" in ordered
+    ]
 
     write_predictions_csv(predictions_path, list(result.predictions))
-    _atomic_write_json(
-        summary_path,
-        {
-            "dataset_name": manifest.dataset_name,
-            "evaluators": list(args.evaluator),
-            "n_folds": result.n_folds,
-            "fold_seed": result.seed,
-            "claim_count": result.claim_count,
-            "macro_labels": list(GOLD_LABELS),
-            "folds": [json.loads(f.model_dump_json()) for f in result.folds],
-            "reports": {m: json.loads(r.model_dump_json()) for m, r in reports.items()},
-            "intervals": {m: json.loads(i.model_dump_json()) for m, i in intervals.items()},
-            "comparisons": [json.loads(c.model_dump_json()) for c in comparisons],
-        },
-    )
+    summary = {
+        "dataset_name": manifest.dataset_name,
+        "evaluators": list(args.evaluator),
+        "n_folds": result.n_folds,
+        "fold_seed": result.seed,
+        "claim_count": result.claim_count,
+        "macro_labels": list(GOLD_LABELS),
+        # exclude_none：没开补充对照时不多出空字段，与原协议的输出逐字一致。
+        "folds": [
+            json.loads(f.model_dump_json(exclude_none=True)) for f in result.folds
+        ],
+        "reports": {m: json.loads(r.model_dump_json()) for m, r in reports.items()},
+        "intervals": {m: json.loads(i.model_dump_json()) for m, i in intervals.items()},
+        "comparisons": [json.loads(c.model_dump_json()) for c in comparisons],
+    }
+    if args.stat_gate:
+        summary["stat_gate"] = list(args.stat_gate)
+        summary["framework_comparisons"] = [
+            json.loads(c.model_dump_json()) for c in framework_comparisons
+        ]
+    if args.conflict_margins is not None:
+        summary["conflict_margins"] = list(args.conflict_margins)
+    _atomic_write_json(summary_path, summary)
 
     print("嵌套交叉验证完成。")
     print(f"  数据集   {manifest.dataset_name}")
@@ -242,6 +273,26 @@ def main(argv: list[str] | None = None) -> int:
             f"{fold.ds_thresholds.document_conflict_threshold:>11.4f}"
             f"{fold.baseline_decision_threshold:>10.3f}{fold.inner_macro_f1:>9.4f}"
         )
+    if args.conflict_margins is not None:
+        print()
+        print("  conflict_aware 各折单独选出的参数：")
+        print(f"    {'折':<4}{'decision':>10}{'conflict':>10}{'margin':>10}")
+        for fold in result.folds:
+            print(
+                f"    {fold.fold:<4}{fold.conflict_aware_decision_threshold:>10.3f}"
+                f"{fold.baseline_conflict_threshold:>10.3f}"
+                f"{fold.conflict_aware_margin:>10.3f}"
+            )
+    for method in stat_gate_methods:
+        print()
+        print(f"  {method} 各折选出的阈值（横轴证据不足统计量，纵轴冲突统计量）：")
+        print(f"    {'折':<4}{'unknown':>11}{'conflict':>11}")
+        for fold in result.folds:
+            chosen = fold.stat_gate_thresholds[method]
+            print(
+                f"    {fold.fold:<4}{chosen.theta_threshold:>11.4f}"
+                f"{chosen.document_conflict_threshold:>11.4f}"
+            )
     print()
     print("  汇总结果（95% 自助置信区间）：")
     print(f"    {'方法':<20}{'Accuracy':>10}{'Macro-F1':>10}{'CI 下界':>10}{'CI 上界':>10}")
@@ -262,6 +313,16 @@ def main(argv: list[str] | None = None) -> int:
             f"    {item.method_b:<20}{item.observed_delta:>+10.4f}"
             f"{item.ci_low:>+10.4f}{item.ci_high:>+10.4f}{item.p_value:>8.3f}   {verdict}"
         )
+    if framework_comparisons:
+        print()
+        print("  两维判定框架本身（不用 D-S）与 conflict_aware 的配对比较：")
+        print(f"    {'方法':<24}{'Δ':>10}{'CI 下界':>10}{'CI 上界':>10}{'p':>8}   结论")
+        for item in framework_comparisons:
+            verdict = "显著" if item.is_significant else "不显著（区间跨 0）"
+            print(
+                f"    {item.method_a:<24}{item.observed_delta:>+10.4f}"
+                f"{item.ci_low:>+10.4f}{item.ci_high:>+10.4f}{item.p_value:>8.3f}   {verdict}"
+            )
     print()
     print(f"  输出 {summary_path}")
     print(f"       {predictions_path}")

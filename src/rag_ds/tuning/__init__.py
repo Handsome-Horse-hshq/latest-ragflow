@@ -26,6 +26,10 @@ from rag_ds.tuning.threshold_search import (
     rediagnose,
     search_thresholds,
 )
+from rag_ds.tuning.stat_gate_search import (
+    search_stat_gate_thresholds,
+    stat_gate_label,
+)
 
 __all__ = [
     "DEFAULT_DECISION_THRESHOLDS",
@@ -42,5 +46,7 @@ __all__ = [
     "predicted_label",
     "search_baseline_thresholds",
     "rediagnose",
+    "search_stat_gate_thresholds",
     "search_thresholds",
+    "stat_gate_label",
 ]

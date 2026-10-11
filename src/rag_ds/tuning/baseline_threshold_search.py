@@ -29,6 +29,7 @@ Macro-F1 常常在一整段阈值上完全持平：阈值低到一定程度后�
 from __future__ import annotations
 
 from collections.abc import Sequence
+from itertools import product
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -69,6 +70,8 @@ class BaselineThresholdCandidate(BaseModel):
     decision_threshold: float = Field(ge=0.0, le=1.0)
     #: 仅 conflict_aware 方法有值：本次候选使用的冲突分数下限。
     conflict_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
+    #: 仅 conflict_aware 方法有值：本次候选使用的冲突平衡度。
+    conflict_margin: float | None = Field(default=None, ge=0.0, le=1.0)
     macro_f1: float = Field(ge=0.0, le=1.0)
     accuracy: float = Field(ge=0.0, le=1.0)
     #: 预测落在各标签上的条数，用来识别「全判成同一类」的退化解。
@@ -113,12 +116,14 @@ def search_baseline_thresholds(
     conflict_thresholds: Sequence[float] = DEFAULT_CONFLICT_THRESHOLDS,
     tie_tolerance: float = 1e-6,
     conflict_margin: float = 0.1,
+    conflict_margins: Sequence[float] | None = None,
 ) -> BaselineThresholdSearchResult:
     """为每个 baseline 在验证集上搜索使 Macro-F1 最大的判定阈值。
 
     前三个方法只搜 ``decision_threshold``；``conflict_aware`` 额外搜
-    ``conflict_threshold``（二维网格），``conflict_margin`` 固定不参与
-    搜索。
+    ``conflict_threshold``（二维网格）。``conflict_margins`` 为 ``None`` 时
+    ``conflict_margin`` 固定不参与搜索；给出候选时三者一起搜（三维网格）——
+    只固定 margin 会被质疑「对照组没调好」，D-S 的两个阈值都是搜出来的。
 
     Args:
         samples: 验证集样本，每条须带 ``gold_state``。
@@ -128,7 +133,8 @@ def search_baseline_thresholds(
         decision_thresholds: 判定阈值候选。
         conflict_thresholds: conflict_aware 的冲突分数下限候选。
         tie_tolerance: 平局容差，不参与搜索。
-        conflict_margin: 冲突平衡度，固定值，不参与搜索。
+        conflict_margin: ``conflict_margins`` 为 ``None`` 时使用的固定平衡度。
+        conflict_margins: conflict_aware 的冲突平衡度候选；``None`` 表示不搜。
 
     Returns:
         :class:`BaselineThresholdSearchResult`。
@@ -144,6 +150,11 @@ def search_baseline_thresholds(
         raise ValueError("decision_thresholds 不能为空")
     if not conflict_thresholds:
         raise ValueError("conflict_thresholds 不能为空")
+    margins = (
+        (conflict_margin,) if conflict_margins is None else tuple(conflict_margins)
+    )
+    if not margins:
+        raise ValueError("conflict_margins 不能为空；不搜 margin 时请传 None")
     missing = [s.sample_id for s in samples if s.gold_state is None]
     if missing:
         raise ValueError(
@@ -194,42 +205,42 @@ def search_baseline_thresholds(
                 )
             )
 
-    # conflict_aware 的二维网格：分数只算一次，判定规则对每个
-    # (decision_threshold, conflict_threshold) 组合重新应用。
-    for decision_threshold in sorted(decision_thresholds):
-        for conflict_threshold in sorted(conflict_thresholds):
-            thresholds = BaselineThresholds(
+    # conflict_aware 的网格：分数只算一次，判定规则对每个
+    # (decision_threshold, conflict_threshold, conflict_margin) 组合重新应用。
+    truth = [gold[(i.sample_id, i.claim_id)] for i in conflict_aware_rows]
+    for decision_threshold, conflict_threshold, margin in product(
+        sorted(decision_thresholds), sorted(conflict_thresholds), sorted(margins)
+    ):
+        thresholds = BaselineThresholds(
+            decision_threshold=decision_threshold,
+            tie_tolerance=tie_tolerance,
+            conflict_threshold=conflict_threshold,
+            conflict_margin=margin,
+        )
+        predicted = [
+            decide_conflict_aware_state(
+                item.score_support, item.score_refute, item.score_unknown,
+                thresholds,
+            )[0].value
+            for item in conflict_aware_rows
+        ]
+        report = classification_report(
+            truth, predicted, method=BaselineMethod.CONFLICT_AWARE.value
+        )
+        counts = {}
+        for label in predicted:
+            counts[label] = counts.get(label, 0) + 1
+        candidates.append(
+            BaselineThresholdCandidate(
+                method=BaselineMethod.CONFLICT_AWARE,
                 decision_threshold=decision_threshold,
-                tie_tolerance=tie_tolerance,
                 conflict_threshold=conflict_threshold,
-                conflict_margin=conflict_margin,
+                conflict_margin=margin,
+                macro_f1=report.macro_f1,
+                accuracy=report.accuracy,
+                label_counts=counts,
             )
-            predicted = [
-                decide_conflict_aware_state(
-                    item.score_support, item.score_refute, item.score_unknown,
-                    thresholds,
-                )[0].value
-                for item in conflict_aware_rows
-            ]
-            truth = [
-                gold[(i.sample_id, i.claim_id)] for i in conflict_aware_rows
-            ]
-            report = classification_report(
-                truth, predicted, method=BaselineMethod.CONFLICT_AWARE.value
-            )
-            counts = {}
-            for label in predicted:
-                counts[label] = counts.get(label, 0) + 1
-            candidates.append(
-                BaselineThresholdCandidate(
-                    method=BaselineMethod.CONFLICT_AWARE,
-                    decision_threshold=decision_threshold,
-                    conflict_threshold=conflict_threshold,
-                    macro_f1=report.macro_f1,
-                    accuracy=report.accuracy,
-                    label_counts=counts,
-                )
-            )
+        )
 
     best: dict[str, BaselineThresholdCandidate] = {}
     for method_name in {c.method.value for c in candidates}:
@@ -240,7 +251,11 @@ def search_baseline_thresholds(
         # 中位数对数据扰动更稳健，且取法唯一、可复现。
         plateau = sorted(
             (c for c in same_method if c.macro_f1 == top),
-            key=lambda c: (c.decision_threshold, c.conflict_threshold or 0.0),
+            key=lambda c: (
+                c.decision_threshold,
+                c.conflict_threshold or 0.0,
+                c.conflict_margin or 0.0,
+            ),
         )
         best[method_name] = plateau[(len(plateau) - 1) // 2]
 
@@ -255,6 +270,7 @@ def search_baseline_thresholds(
                     c.method.value,
                     c.decision_threshold,
                     c.conflict_threshold or 0.0,
+                    c.conflict_margin or 0.0,
                 ),
             )
         ),

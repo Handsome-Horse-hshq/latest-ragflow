@@ -12,6 +12,7 @@ from rag_ds.diagnostics.gating import (
     diagnose_document_total_conflict,
     diagnose_evaluator_result,
     diagnose_no_evidence,
+    gate_primary_state,
 )
 from rag_ds.diagnostics.models import (
     ClaimVerdict,
@@ -29,4 +30,5 @@ __all__ = [
     "diagnose_document_total_conflict",
     "diagnose_evaluator_result",
     "diagnose_no_evidence",
+    "gate_primary_state",
 ]

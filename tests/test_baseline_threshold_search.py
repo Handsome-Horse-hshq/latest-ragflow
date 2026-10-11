@@ -191,3 +191,62 @@ class TestGuards:
             search_baseline_thresholds(
                 samples, predictions, SplitName.VALIDATION, EVALUATOR
             )
+
+
+class TestConflictMarginSearch:
+    def test_margin_is_fixed_by_default(self) -> None:
+        samples, predictions = _dataset()
+
+        result = search_baseline_thresholds(
+            samples, predictions, SplitName.VALIDATION, EVALUATOR
+        )
+        conflict_aware = [
+            c for c in result.candidates if c.method.value == "conflict_aware"
+        ]
+
+        assert {c.conflict_margin for c in conflict_aware} == {0.1}
+        assert all(
+            c.conflict_margin is None
+            for c in result.candidates
+            if c.method.value != "conflict_aware"
+        )
+
+    def test_margins_extend_the_grid(self) -> None:
+        samples, predictions = _dataset()
+
+        fixed = search_baseline_thresholds(
+            samples, predictions, SplitName.VALIDATION, EVALUATOR
+        )
+        searched = search_baseline_thresholds(
+            samples,
+            predictions,
+            SplitName.VALIDATION,
+            EVALUATOR,
+            conflict_margins=(0.05, 0.1, 1.0),
+        )
+
+        def count(result):
+            return sum(1 for c in result.candidates if c.method.value == "conflict_aware")
+
+        assert count(searched) == 3 * count(fixed)
+        assert searched.best["conflict_aware"].conflict_margin in (0.05, 0.1, 1.0)
+        # 搜得更宽，内层最优只可能持平或更好。
+        assert (
+            searched.best["conflict_aware"].macro_f1
+            >= fixed.best["conflict_aware"].macro_f1
+        )
+        # 其余三个方法不受影响。
+        for method in ("weighted_average", "majority_vote", "single_evaluator"):
+            assert searched.best[method] == fixed.best[method]
+
+    def test_empty_margin_list_is_rejected(self) -> None:
+        samples, predictions = _dataset()
+
+        with pytest.raises(ValueError, match="conflict_margins 不能为空"):
+            search_baseline_thresholds(
+                samples,
+                predictions,
+                SplitName.VALIDATION,
+                EVALUATOR,
+                conflict_margins=(),
+            )

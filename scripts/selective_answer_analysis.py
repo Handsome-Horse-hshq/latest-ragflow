@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 import matplotlib
@@ -56,6 +57,26 @@ METHODS = [
     "single_evaluator",
 ]
 COVERAGES = np.round(np.arange(0.50, 1.0001, 0.02), 2)
+
+#: ``--profile controls``：换用带补充对照的交叉验证结果（Statistic Gate 与
+#: 三个参数都调好的 conflict_aware），输出写到单独目录，不覆盖主分析。
+CONTROL_SETTINGS = {
+    "single-eval controls": ROOT
+    / "outputs/metrics/cross_validation_controls/cv_predictions.csv",
+    "two-eval controls": ROOT
+    / "outputs/metrics/cross_validation_2eval_controls/cv_predictions.csv",
+}
+CONTROL_METHODS = [
+    "ds",
+    "stat_gate_max_product",
+    "stat_gate_sr_std",
+    "stat_gate_max_product_uprod",
+    "stat_gate_sr_std_uprod",
+    "conflict_aware",
+    "weighted_average",
+    "majority_vote",
+]
+CONTROL_OUT = ROOT / "outputs" / "metrics" / "selective_answer_controls"
 
 #: 两套风险定义。值是「从明细行算出风险」的函数。
 RISK_DEFINITIONS = {
@@ -142,8 +163,19 @@ def paired_selective_bootstrap(
     }
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     """命令行入口，返回进程退出码。"""
+    global SETTINGS, METHODS, OUT
+    parser = argparse.ArgumentParser(description="选择性回答分析")
+    parser.add_argument(
+        "--profile",
+        choices=("main", "controls"),
+        default="main",
+        help="main：原分析；controls：带补充对照的交叉验证结果，输出到单独目录",
+    )
+    if parser.parse_args(argv).profile == "controls":
+        SETTINGS, METHODS, OUT = CONTROL_SETTINGS, CONTROL_METHODS, CONTROL_OUT
+
     OUT.mkdir(parents=True, exist_ok=True)
     curve_rows, auroc_rows, aurc_rows = [], [], []
     significance_rows = []

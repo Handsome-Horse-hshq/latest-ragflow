@@ -15,7 +15,12 @@ from rag_ds.metrics.classification import (
     classification_report,
     default_label_universe,
 )
-from rag_ds.metrics.detection import DetectionReport, detection_report
+from rag_ds.metrics.detection import (
+    AurocComparison,
+    DetectionReport,
+    detection_report,
+    paired_auroc_bootstrap,
+)
 from rag_ds.metrics.significance import (
     DEFAULT_RESAMPLES,
     DEFAULT_SEED,
@@ -31,6 +36,7 @@ __all__ = [
     "DEFAULT_SEED",
     "GOLD_LABELS",
     "UNDETERMINED_LABEL",
+    "AurocComparison",
     "BootstrapComparison",
     "BootstrapInterval",
     "ClassMetrics",
@@ -41,5 +47,6 @@ __all__ = [
     "classification_report",
     "default_label_universe",
     "detection_report",
+    "paired_auroc_bootstrap",
     "paired_bootstrap",
 ]

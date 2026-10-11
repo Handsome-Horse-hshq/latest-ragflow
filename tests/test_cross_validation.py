@@ -11,11 +11,14 @@ import collections
 
 import pytest
 
+from rag_ds.baselines.stat_gate import STAT_GATE_VARIANTS, ConflictStatistic
+from rag_ds.experiments.ablation import AblationVariant
 from rag_ds.experiments.comparison import DS_METHOD
 from rag_ds.experiments.cross_validation import (
     make_stratified_folds,
     run_nested_cross_validation,
 )
+from rag_ds.experiments.cv_ablation import CV_ABLATION_VARIANTS, run_nested_ablation
 from rag_ds.schemas import Claim, ContextChunk, EvidenceState, RAGSample, RelationPrediction
 
 EVALUATOR = "e1"
@@ -262,3 +265,213 @@ class TestNoLeakage:
                 for i in fold
             }
             assert not (set(test_indices) & inner)
+
+
+def _labels(predictions, method):
+    return {
+        (r.sample_id, r.claim_id): r.predicted_label
+        for r in predictions
+        if r.method == method
+    }
+
+
+class TestStatGateControl:
+    STATISTICS = (ConflictStatistic.SUPPORT_REFUTE_STD, ConflictStatistic.MAX_PRODUCT)
+
+    def test_default_run_is_unchanged(self) -> None:
+        """不开新对照时，输出与原协议完全相同，已提交的结果仍可逐位复现。"""
+        samples, predictions = _dataset()
+
+        result = run_nested_cross_validation(
+            samples, predictions, EVALUATOR, n_folds=5, seed=42
+        )
+
+        assert all(f.stat_gate_thresholds is None for f in result.folds)
+        assert all(f.conflict_aware_margin is None for f in result.folds)
+        assert "stat_gate_sr_std" not in result.methods
+
+    def test_stat_gate_is_added_without_touching_other_methods(self) -> None:
+        samples, predictions = _dataset()
+
+        plain = run_nested_cross_validation(
+            samples, predictions, EVALUATOR, n_folds=5, seed=42
+        )
+        extended = run_nested_cross_validation(
+            samples,
+            predictions,
+            EVALUATOR,
+            n_folds=5,
+            seed=42,
+            stat_gate_statistics=self.STATISTICS,
+        )
+
+        assert set(extended.methods) == set(plain.methods) | {
+            "stat_gate_sr_std",
+            "stat_gate_max_product",
+        }
+        assert extended.methods[0] == DS_METHOD
+        for method in plain.methods:
+            assert _labels(extended.predictions, method) == _labels(
+                plain.predictions, method
+            )
+        for method in ("stat_gate_sr_std", "stat_gate_max_product"):
+            assert len(_labels(extended.predictions, method)) == len(samples)
+
+    def test_stat_gate_thresholds_come_from_inner_data_alone(self) -> None:
+        """与 D-S 的防泄漏检验同一思路：只用内层数据重算，阈值必须一字不差。"""
+        from rag_ds.baselines.stat_gate import stat_gate_scores
+        from rag_ds.tuning import SplitName, search_stat_gate_thresholds
+
+        samples, predictions = _dataset()
+        folds = make_stratified_folds(samples, 5, seed=42)
+        result = run_nested_cross_validation(
+            samples,
+            predictions,
+            EVALUATOR,
+            n_folds=5,
+            seed=42,
+            stat_gate_statistics=(ConflictStatistic.SUPPORT_REFUTE_STD,),
+        )
+
+        for fold_index in range(len(folds)):
+            inner = [
+                samples[i]
+                for position, fold in enumerate(folds)
+                if position != fold_index
+                for i in fold
+            ]
+            keep = {s.sample_id for s in inner}
+            gold = {(s.sample_id, f"{s.sample_id}-c1"): s.gold_state.value for s in inner}
+            expected = search_stat_gate_thresholds(
+                stat_gate_scores(
+                    inner,
+                    [p for p in predictions if p.sample_id in keep],
+                    ConflictStatistic.SUPPORT_REFUTE_STD,
+                ),
+                gold,
+                SplitName.VALIDATION,
+                steps=9,
+            ).best.thresholds
+
+            chosen = result.folds[fold_index].stat_gate_thresholds
+            assert chosen is not None
+            assert chosen["stat_gate_sr_std"] == expected
+
+    def test_margin_search_only_changes_conflict_aware(self) -> None:
+        samples, predictions = _dataset()
+
+        plain = run_nested_cross_validation(
+            samples, predictions, EVALUATOR, n_folds=5, seed=42
+        )
+        tuned = run_nested_cross_validation(
+            samples,
+            predictions,
+            EVALUATOR,
+            n_folds=5,
+            seed=42,
+            conflict_margins=(0.05, 0.1, 0.3, 1.0),
+        )
+
+        for method in ("ds", "weighted_average", "majority_vote", "single_evaluator"):
+            assert _labels(tuned.predictions, method) == _labels(plain.predictions, method)
+        for fold in tuned.folds:
+            assert fold.conflict_aware_margin in (0.05, 0.1, 0.3, 1.0)
+            assert fold.conflict_aware_decision_threshold is not None
+
+
+class TestNestedAblation:
+    def test_full_variant_matches_main_cross_validation(self) -> None:
+        """``full`` 必须与主实验的 D-S 逐条一致，否则 Δ 比的不是主表里的方法。"""
+        samples, predictions = _dataset()
+
+        ablation = run_nested_ablation(samples, predictions, n_folds=5, seed=42)
+        main = run_nested_cross_validation(
+            samples, predictions, EVALUATOR, n_folds=5, seed=42
+        )
+
+        assert _labels(ablation.predictions, "full") == _labels(main.predictions, DS_METHOD)
+        assert [f.thresholds["full"] for f in ablation.folds] == [
+            f.ds_thresholds for f in main.folds
+        ]
+
+    def test_every_claim_is_predicted_once_per_variant(self) -> None:
+        samples, predictions = _dataset()
+
+        result = run_nested_ablation(samples, predictions, n_folds=5, seed=42)
+
+        assert result.variants == tuple(v.value for v in CV_ABLATION_VARIANTS)
+        for variant in result.variants:
+            keys = [
+                (r.sample_id, r.claim_id)
+                for r in result.predictions
+                if r.method == variant
+            ]
+            assert len(keys) == len(set(keys)) == len(samples)
+
+    def test_removed_dimension_is_pinned_to_one(self) -> None:
+        samples, predictions = _dataset()
+
+        result = run_nested_ablation(samples, predictions, n_folds=5, seed=42)
+
+        for fold in result.folds:
+            assert fold.thresholds["no_theta_gate"].theta_threshold == 1.0
+            assert fold.thresholds["no_doc_conflict_gate"].document_conflict_threshold == 1.0
+            both = fold.thresholds["no_two_dimensional_gate"]
+            assert (both.theta_threshold, both.document_conflict_threshold) == (1.0, 1.0)
+
+    def test_without_both_gates_only_direction_is_left(self) -> None:
+        """两个门控都去掉后只剩支持/反驳方向（测试数据里没有完全冲突）。"""
+        samples, predictions = _dataset()
+
+        result = run_nested_ablation(samples, predictions, n_folds=5, seed=42)
+
+        assert set(_labels(result.predictions, "no_two_dimensional_gate").values()) <= {
+            "supported",
+            "refuted",
+            "undetermined",
+        }
+
+    @pytest.mark.parametrize(
+        "variant",
+        [AblationVariant.NO_RELIABILITY, AblationVariant.NO_EVAL_CONFLICT_ALERT],
+    )
+    def test_unsupported_variant_is_rejected(self, variant: AblationVariant) -> None:
+        samples, predictions = _dataset()
+
+        with pytest.raises(ValueError, match="不支持"):
+            run_nested_ablation(samples, predictions, variants=[variant])
+
+
+class TestStatGateProductVariant:
+    def test_all_four_variants_run_side_by_side(self) -> None:
+        samples, predictions = _dataset()
+
+        result = run_nested_cross_validation(
+            samples,
+            predictions,
+            EVALUATOR,
+            n_folds=5,
+            seed=42,
+            stat_gate_statistics=list(STAT_GATE_VARIANTS.values()),
+        )
+
+        for name in STAT_GATE_VARIANTS:
+            method = f"stat_gate_{name}"
+            assert method in result.methods
+            assert len(_labels(result.predictions, method)) == len(samples)
+            assert all(method in f.stat_gate_thresholds for f in result.folds)
+
+    def test_adding_product_variants_leaves_mean_variants_unchanged(self) -> None:
+        samples, predictions = _dataset()
+
+        two = run_nested_cross_validation(
+            samples, predictions, EVALUATOR, n_folds=5, seed=42,
+            stat_gate_statistics=(ConflictStatistic.SUPPORT_REFUTE_STD, ConflictStatistic.MAX_PRODUCT),
+        )
+        four = run_nested_cross_validation(
+            samples, predictions, EVALUATOR, n_folds=5, seed=42,
+            stat_gate_statistics=list(STAT_GATE_VARIANTS.values()),
+        )
+
+        for method in ("ds", "stat_gate_sr_std", "stat_gate_max_product"):
+            assert _labels(four.predictions, method) == _labels(two.predictions, method)

@@ -11,6 +11,16 @@
 结论是多评估器融合**没有**优于最好的单评估器，详见「二、多评估器融合为什么
 没有增益」。
 
+**2026-09-29 至 10-02 补充的对照改写了主结论的归因**：判定规则与 D-S 完全
+相同、只把两个坐标轴换成简单统计量的 Statistic Gate（四个变体）与 D-S **打平**，
+单 / 双 / 三评估器、估计可靠性、5 个分折种子下都如此；conflict_aware 三个参数
+都调好后，D-S 对它的优势也**不再显著**；m_theta / K_doc 作为检测分数与简单
+统计量**打平**；v2 嵌套消融则确认两个判定维度**各自显著有用**。把 NLI 输入换成
+人工投票（上限分析）后，两维判定显著优于调充分的 conflict_aware（+0.10 ~
++0.13），但起作用的是「证据不足一维用连乘」，不是 Dempster 规则。D-S 相对
+朴素 baseline 的优势应归功于「证据不足 + 文档冲突」两维判定框架，而不是
+Dempster 融合本身；当前瓶颈在关系评估器。详见「四」到「七」。
+
 第一版正式数据 `data/processed/climate_fever_v1/` 已从 CLIMATE-FEVER 构建完成
 （400 条、四类各 100、train/validation/test = 240/80/80）；v2 扩到 616 条
 （四类各 154，train/validation/test = 368/124/124）。两个数据集自带的
@@ -1069,6 +1079,11 @@ m_theta 会落在 0.3 以上」这个假设。校准后的概率比占位值软�
 **实验 3 —— 文档冲突识别**：`K_doc` AUROC = **0.7308**，baseline 最好的是
 0.6871（Majority Vote 只有 0.4138，低于随机）。**这是本方法唯一站得住的优势。**
 
+> **已被推翻**：这里 baseline 的冲突分数是 `1 - |s - r|`，所有文档都说不清时
+> 它也接近 1，等于把「证据不足」当成冲突，是过弱的对手。换成定义合理的简单
+> 统计量后 `K_doc` 与它们打平，见「五、m_theta / K_doc 作为检测分数不优于
+> 简单统计量」。
+
 **实验 4 —— 消融**
 
 | 变体 | Macro-F1 | Δ |
@@ -1151,6 +1166,8 @@ NLI 模型本身输出的就是三类 softmax，正好对应 `(p_support, p_unkn
 
 离散路径下 theta 门控是**负作用**（去掉反而更好）；连续路径下两个门控都有正贡献，
 同时去掉损失最大。**支撑「二维门控各自有用」这一论点的是连续概率版本。**
+v2 的 616 条嵌套交叉验证（每个变体各自重搜阈值）已确认两个维度各自显著有用，
+见「六、v2 嵌套消融」。
 
 代价是 `K_doc` 的冲突识别 AUROC 从 0.7308 降到 0.6900。论文里两组数字都应报告。
 
@@ -1180,7 +1197,7 @@ python scripts/run_cross_validation.py `
 | 方法 | Accuracy | Macro-F1 | 95% CI |
 | --- | --- | --- | --- |
 | **D-S** | 0.3750 | **0.3535** | [0.3145, 0.3932] |
-| Conflict Aware | 0.3523 | 0.3074 | [0.2738, 0.3419] |
+| Conflict Aware | 0.3653 | 0.3074 | [0.2738, 0.3419] |
 | Weighted Average | 0.3442 | 0.2512 | [0.2242, 0.2773] |
 | Single Evaluator | 0.3442 | 0.2512 | [0.2242, 0.2773] |
 | Majority Vote | 0.3425 | 0.2496 | [0.2229, 0.2759] |
@@ -1209,6 +1226,11 @@ baseline 判定阈值五折一致（0.475），结论对折划分不敏感。逐
 
 论文里必须同时报告这三层数字：只拿 D-S 对朴素 baseline 的 +0.102 说事，
 会把输出空间差异误记成机制优势。
+
+> **更正**：上面的 conflict_aware 只单独调了冲突下限（margin 固定 0.1，判定
+> 阈值与三个朴素 baseline 共用）。三个参数都单独调好后它升到 0.3374，D-S 对它的
+> Δ 降到 +0.016（p = 0.41）；判定规则相同、不用 D-S 的 Statistic Gate 与 D-S
+> 打平。「+0.046 来自融合机制」这一分解**不再成立**，见「四」。
 
 注意 v2 的单评估器设定下 K_eval 恒为 0、weighted_average 与
 single_evaluator 数值相同，且三个朴素 baseline 结构上仍不能输出
@@ -1253,7 +1275,9 @@ python scripts/run_cross_validation.py `
 D-S 对三个朴素 baseline 的配对比较均为 **p < 0.001**（Δ 在 +0.079 到
 +0.087 之间），对 conflict_aware 为 **Δ = +0.0464，p = 0.040**
 （CI [+0.003, +0.092]，不跨 0）。分解与单评估器一致：总优势里约一半来自
-输出空间，一半来自融合机制，两层各自都仍显著。三点必须如实报告：
+输出空间，一半来自融合机制，两层各自都仍显著。（这里的 conflict_aware 同样
+没有调充分；调充分后，单评估器、双评估器、三评估器三种设定下 D-S 对它的差异
+都不再显著，见「四」。）三点必须如实报告：
 
 1. **加入第二个评估器后 D-S 的 Macro-F1 从 0.3535 降到 0.3320，但这个下降
    不显著**（配对 Δ = −0.0215，95% CI [−0.055, +0.011]，p = 0.196）。能说的
@@ -1402,7 +1426,7 @@ from rag_ds.metrics import classification_report
 from rag_ds.tuning import search_thresholds
 ```
 
-## 三处必须正视的问题及其处理
+## 必须正视的问题及其处理
 
 ### 一、主结论对分折种子的敏感性
 
@@ -1423,6 +1447,10 @@ D-S 的 Macro-F1 均值 0.3586、标准差 0.0063。**种子 42 的 +0.0461 是�
 
 > **措辞限制**：五次 CV 共用同一批 616 条样本、只是换了划分，因此这衡量的是
 > **划分敏感性**，不是独立重复实验。论文里不能写成"重复五次均显著"。
+
+> **后续更正**：这张表里的 `conflict_aware` 是只调了冲突下限的版本。三个参数都
+> 调好之后，同样 5 个种子上 D-S 对它的优势**一个都不显著**（Δ 均值 +0.0198，
+> 见「四」），因此「对 conflict_aware 5/5 显著」不能再作为主结论引用。
 
 ### 二、多评估器融合为什么没有增益
 
@@ -1466,6 +1494,8 @@ Dempster 规则的独立性假设」来解释。两件事推翻了这个说法�
    已无显著差异。这是**可靠性折扣机制在真实数据上第一次起作用的证据**
    （此前它在 CLIMATE-FEVER 上一直是空转，见「可靠性折扣的敏感性分析」）。
    但「估计 vs 等权」的改进 CI 下界只有 +0.0001，是**边缘显著**，措辞要克制。
+   而且这不是 D-S 独有的：把同一份估计出来的可靠性交给不用 D-S 的 Statistic
+   Gate 作权重，它与 D-S 打平（12 组对比全部不显著，见「四」）。
 3. **没有任何多评估器组合优于最好的单评估器。**
 
 估计器给三个评估器的可靠性分别约为 0.44 / 0.42 / 0.39（逐折），彼此差距远小于
@@ -1553,6 +1583,323 @@ oracle 的 Cohen's κ = +0.002（随机水平）：
   对 `conflict_aware` 不显著；双评估器下对谁都不显著；
 - 按 `max_signal` 口径，D-S 没有优势，双评估器下 AUROC 甚至**显著更差**。
   这一行不能省略 —— 它说明结论依赖于置信度的定义。
+
+### 四、Dempster 融合本身没有带来四分类增益
+
+「D-S 显著优于聚合类 baseline」里混着三件事：能输出 `conflicting`（输出空间）、
+先分「证据不足 / 文档冲突」再看方向的**两维判定框架**、以及用 Dempster 融合
+算这两个维度的分数。`conflict_aware` 只分离了第一件，而且它本身没有调充分。
+两组补充对照把剩下两件拆开：
+
+1. **Statistic Gate**（`src/rag_ds/baselines/stat_gate.py`）：判定规则、区域到
+   类别的映射（与 D-S 共用 `gate_primary_state`）、网格构造与搜索协议都与 D-S
+   相同，只把两个坐标轴换成简单统计量。共四个变体，**全部报告**：
+
+   | 短名 | 横轴（证据不足） | 纵轴（文档冲突） |
+   | --- | --- | --- |
+   | `sr_std` | 平均 `p_unknown` | 各文档 `s - r` 的标准差 |
+   | `max_product` | 平均 `p_unknown` | 最强支持 × 最强反驳 |
+   | `sr_std_uprod` | `p_unknown` 连乘 | 各文档 `s - r` 的标准差 |
+   | `max_product_uprod` | `p_unknown` 连乘 | 最强支持 × 最强反驳 |
+
+   前两个是事先定好的；后两个（横轴换成连乘）是看到「人工标注输入的上限」
+   结果之后补的，动机见该小节。补变体只会让对照更强，不会让 D-S 显得更好。
+2. **conflict_aware 调充分**：判定阈值、冲突下限、平衡度（0.05–1.0）在内层
+   三维网格上单独搜，不再固定 margin = 0.1、也不再与朴素 baseline 共用判定阈值。
+
+```powershell
+python scripts/run_cross_validation.py `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --relations-template "outputs/ragchecker_v2/{split}_relations_{evaluator}_probs.jsonl" `
+  --model-run-template "outputs/ragchecker_v2/{split}_model_run_{evaluator}_probs.json" `
+  --evaluator refchecker_nli --single-evaluator refchecker_nli `
+  --stat-gate sr_std max_product sr_std_uprod max_product_uprod `
+  --conflict-margins 0.05 0.1 0.2 0.3 0.5 1.0 `
+  --out-dir outputs/metrics/cross_validation_controls
+```
+
+两个选项都不给时输出与原协议**逐字节一致**（已用 `cmp` 核对
+`outputs/metrics/cross_validation/` 下的两个文件）。
+
+**结果**（v2，616 条，与主实验同一分折种子 42，阈值逐折在内层重选）：
+
+| 方法 | Accuracy | Macro-F1 | 95% CI |
+| --- | --- | --- | --- |
+| Statistic Gate（`max_product_uprod`） | 0.3831 | 0.3659 | [0.3266, 0.4040] |
+| **D-S** | 0.3750 | **0.3535** | [0.3145, 0.3932] |
+| Statistic Gate（`max_product`） | 0.3734 | 0.3535 | [0.3153, 0.3920] |
+| Statistic Gate（`sr_std`） | 0.3685 | 0.3519 | [0.3134, 0.3907] |
+| Statistic Gate（`sr_std_uprod`） | 0.3620 | 0.3481 | [0.3094, 0.3863] |
+| conflict_aware（调充分） | 0.3847 | 0.3374 | [0.3022, 0.3705] |
+| conflict_aware（原协议） | 0.3653 | 0.3074 | [0.2738, 0.3419] |
+| Weighted Average / Single Evaluator | 0.3442 | 0.2512 | [0.2242, 0.2773] |
+| Majority Vote | 0.3425 | 0.2496 | [0.2229, 0.2759] |
+
+| 配对比较（5000 次自助） | Δ Macro-F1 | 95% CI | p |
+| --- | --- | --- | --- |
+| D-S − Statistic Gate（`max_product`） | +0.0001 | [−0.0174, +0.0172] | 0.990 |
+| D-S − Statistic Gate（`sr_std`） | +0.0016 | [−0.0282, +0.0306] | 0.917 |
+| D-S − Statistic Gate（`sr_std_uprod`） | +0.0054 | [−0.0250, +0.0361] | 0.736 |
+| D-S − Statistic Gate（`max_product_uprod`） | −0.0124 | [−0.0344, +0.0092] | 0.263 |
+| D-S − conflict_aware（调充分） | +0.0161 | [−0.0236, +0.0565] | 0.410 |
+| 四个 Statistic Gate − conflict_aware（调充分） | +0.011 ~ +0.029 | 均跨 0 | 0.15–0.62 |
+| D-S − 三个朴素 baseline | +0.102 ~ +0.104 | 下界 ≥ +0.059 | < 0.001 |
+
+conflict_aware 的提升**全部来自放宽 margin**：各折选出的都是判定阈值 0.35、
+冲突下限 0.01、margin 0.5 或 1.0（1.0 即不要求两方向势均力敌）。只让它用自己
+的判定阈值、margin 仍固定 0.1 时，Macro-F1 是 0.3070，与原协议的 0.3074 几乎
+相同，D-S 对它仍是 +0.0465（p = 0.047）—— 原先那个「刚好显著」的差距，来自
+固定 margin = 0.1 这个没搜过的选择（输出在
+`outputs/metrics/cross_validation_ca_margin_fixed/`）。
+
+**为什么会打平。** 本数据是单评估器、全部可靠性为 1.0，此时 Dempster 顺序
+融合有一个精确恒等式：
+
+```
+            ∏ p_unknown(i)
+m_theta = ─────────────────
+             1 − K_doc
+```
+
+616 条上实测最大误差 5×10⁻¹⁵。`K_doc` 的中位数只有 0.005，所以对大多数
+claim，`m_theta` 就是各文档 `p_unknown` 的连乘 —— 一个不需要证据理论也能
+算出来的量。D-S 与 Statistic Gate（`max_product`）在 92.0% 的 claim 上给出
+相同预测（`sr_std` 版 83.6%），各类 F1 也几乎相同。D-S 在形式上真正与简单
+统计量不同的地方 —— 可靠性折扣、多评估器的可靠性加权 —— 在这份数据上
+几乎用不上（可靠性全为 1.0，见「可靠性折扣的敏感性分析」）。
+
+调充分的 conflict_aware 与 D-S 差距不显著，但**错误模式不同**：它在 616 条里
+只判了 3 条 `supported`（F1 0.025），D-S 判了 51 条（F1 0.273）；它在
+`refuted` / `insufficient` / `conflicting` 三类上 F1 反而更高。
+
+**换分折种子，结论不变。** `scripts/run_cv_seed_robustness.py` 加上同样两个
+选项，5 个种子全部报告（输出 `outputs/metrics/cv_seed_robustness_controls.csv`）：
+
+| 对手 | Δ 均值 | Δ 标准差 | Δ 范围 | 显著种子数 |
+| --- | --- | --- | --- | --- |
+| Statistic Gate（`max_product`） | +0.0006 | 0.0056 | [−0.0076, +0.0082] | 0/5 |
+| Statistic Gate（`sr_std`） | +0.0025 | 0.0043 | [−0.0056, +0.0061] | 0/5 |
+| Statistic Gate（`max_product_uprod`） | −0.0008 | 0.0081 | [−0.0124, +0.0108] | 0/5 |
+| Statistic Gate（`sr_std_uprod`） | +0.0029 | 0.0033 | [−0.0034, +0.0055] | 0/5 |
+| conflict_aware（调充分） | +0.0198 | 0.0055 | [+0.0151, +0.0304] | 0/5 |
+| 三个朴素 baseline | +0.108 ~ +0.109 | 0.006–0.007 | [+0.102, +0.121] | 5/5 |
+
+D-S 对四个 Statistic Gate 的差距五个种子平均不到 0.003，对调充分的 conflict_aware
+稳定在 +0.02 左右但**没有一个种子显著**。与「一」同样的措辞限制：五次 CV 共用
+同一批 616 条样本，衡量的是划分敏感性，不是独立重复实验。
+
+**多评估器设定下结论相同。** 同一条命令把 `--evaluator` 换成两个或三个评估器
+（输出在 `cross_validation_2eval_controls/` 与 `cross_validation_3eval_controls/`）。
+Statistic Gate 把所有 (文档, 评估器) 组合的关系一起统计，不区分 `K_doc` 与
+`K_eval`。Macro-F1：
+
+| 设定 | D-S | `max_product` | `sr_std` | `max_product_uprod` | `sr_std_uprod` | conflict_aware（调充分） | 朴素 baseline |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 单评估器（roberta） | 0.3535 | 0.3535 | 0.3519 | 0.3659 | 0.3481 | 0.3374 | 0.250–0.251 |
+| 双评估器（+ deberta） | 0.3320 | 0.3448 | 0.3331 | 0.3321 | 0.3264 | 0.3363 | 0.245–0.253 |
+| 三评估器（+ flan-t5） | 0.3302 | 0.3351 | 0.3276 | 0.3305 | 0.3242 | **0.3591** | 0.250–0.254 |
+
+三种设定下 D-S 与四个 Statistic Gate、与调充分的 conflict_aware 的配对差异
+**全部不显著**（p 在 0.14 到 0.99 之间）；D-S 对三个朴素 baseline 始终显著
+（Δ = +0.076 ~ +0.104，p < 0.001）。三评估器下数值最高的是调充分的
+conflict_aware（D-S − 它 = −0.029，CI [−0.067, +0.010]，p = 0.136）——
+D-S 的多评估器融合没有比「平均后加一条冲突规则」更好地利用多个评估器。
+
+**D-S 的可靠性折扣也没有独立价值。** 「二」里内层估计评估器可靠性后，D-S 的
+多评估器退化被消除，那是可靠性折扣第一次在真实数据上起作用。但 Statistic Gate
+拿到**同一份**估计出来的可靠性（作加权与折扣的权重）之后同样打平
+（`scripts/run_reliability_estimation_cv.py --stat-gate ...`，输出在
+`cross_validation_*_est_rel_controls/`）。Macro-F1：
+
+| 评估器组合 | D-S | `max_product` | `sr_std` | `max_product_uprod` | `sr_std_uprod` |
+| --- | --- | --- | --- | --- | --- |
+| roberta + deberta | 0.3466 | 0.3425 | 0.3379 | 0.3478 | 0.3411 |
+| roberta + flan-t5 | 0.3452 | 0.3202 | 0.3295 | 0.3247 | 0.3266 |
+| 三者 | 0.3467 | 0.3349 | 0.3336 | 0.3349 | 0.3349 |
+
+D-S − Statistic Gate 在 −0.001 到 +0.025 之间，12 组对比**全部不显著**
+（p = 0.17–0.87）。roberta + flan-t5 下 D-S 数值上略高（+0.016 ~ +0.025），
+但区间都跨 0。（这个脚本里的 conflict_aware 仍是原协议，没有搜 margin。）
+
+**人工标注输入的上限：关系评估器才是瓶颈，证据不足一维要用连乘。** 把 NLI 的
+关系概率换成数据集自带的人工投票分布（annotation oracle），其余协议不变
+（输出在 `outputs/metrics/cross_validation_oracle_controls/`）：
+
+```powershell
+python scripts/run_cross_validation.py `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --relations-template "data/processed/climate_fever_v2/{split}_relations.jsonl" `
+  --evaluator climate_fever_human_vote_distribution `
+  --single-evaluator climate_fever_human_vote_distribution `
+  --stat-gate sr_std max_product sr_std_uprod max_product_uprod `
+  --conflict-margins 0.05 0.1 0.2 0.3 0.5 1.0 `
+  --out-dir outputs/metrics/cross_validation_oracle_controls
+```
+
+| 方法 | Accuracy | Macro-F1 | D-S − 它 | 95% CI | p |
+| --- | --- | --- | --- | --- | --- |
+| Statistic Gate（`max_product_uprod`） | 0.8409 | **0.8520** | −0.0232 | [−0.0439, −0.0030] | 0.023 |
+| **D-S** | 0.8263 | 0.8288 | — | — | — |
+| Statistic Gate（`sr_std_uprod`） | 0.8101 | 0.8172 | +0.0115 | [−0.0157, +0.0385] | 0.416 |
+| Statistic Gate（`max_product`） | 0.7695 | 0.7789 | +0.0499 | [+0.0275, +0.0724] | < 0.001 |
+| Statistic Gate（`sr_std`） | 0.7386 | 0.7425 | +0.0863 | [+0.0579, +0.1152] | < 0.001 |
+| conflict_aware（调充分） | 0.7208 | 0.7201 | +0.1086 | [+0.0681, +0.1486] | < 0.001 |
+| Weighted Average / Single Evaluator | 0.5795 | 0.4993 | +0.3295 | [+0.2923, +0.3652] | < 0.001 |
+| Majority Vote | 0.4740 | 0.4098 | +0.4190 | [+0.3783, +0.4604] | < 0.001 |
+
+> **这不是模型性能。** 金标准本身就是由这些人工投票按规则合成的（至少一篇
+> 支持且其余不确定 → 支持；全部不确定 → 证据不足；既有支持又有反驳 → 冲突）。
+> 这张表回答的只是：**关系输入足够准时，各种聚合方式能把标注规则还原到什么
+> 程度**。不能与任何 NLI / LLM 评估器的结果并列报告。
+
+三点读法：
+
+1. **瓶颈在关系评估器。** 同一批方法，输入从 NLI 换成人工投票，Macro-F1 从
+   0.35 左右升到 0.72–0.85。NLI 输入下「D-S / Statistic Gate / 调充分的
+   conflict_aware 互相不显著」，是因为差异被评估器的噪声淹没了。
+2. **两维判定框架在输入准确时显著优于其余方法。** 横轴用连乘的 Statistic Gate
+   比调充分的 conflict_aware 高 +0.097 ~ +0.132（p < 0.001），D-S 比它高
+   +0.109；对朴素 baseline 高 +0.33 以上。
+3. **起作用的是「连乘」，不是 Dempster 规则。** 横轴用平均时 Statistic Gate
+   显著低于 D-S（−0.050、−0.086）；换成连乘后一个与 D-S 打平、一个**显著
+   高于** D-S（+0.023）。由上面的恒等式，`m_theta` 本来就是连乘除以
+   `1 − K_doc`。连乘对应的语义是「**所有**文档都说不清才算证据不足，只要有
+   一篇给出明确意见就不算」，这正是标注规则；平均会被说不清的文档稀释。
+   NLI 输入下连乘与平均没有可见差别（四个变体全部打平）。
+
+**能写进论文的：**
+
+1. 显式区分「证据不足」与「文档冲突」的方法都远好于朴素聚合，这一条稳：
+   D-S 对三个朴素 baseline +0.10，p < 0.001，5 个分折种子、三种评估器设定
+   下都成立；
+2. **Dempster 融合没有带来超过同一判定框架下简单统计量的四分类收益**：NLI
+   输入下四个 Statistic Gate 变体与 D-S 全部打平（单 / 双 / 三评估器、估计
+   可靠性、5 个种子）；人工标注输入下，横轴用连乘的变体与 D-S 打平或更好；
+3. 两维判定框架对调充分的 conflict_aware 的优势，NLI 输入下**不显著**
+   （Δ ≈ +0.01 ~ +0.03），人工标注输入下**显著**（+0.10 ~ +0.13）；
+4. 「证据不足」这一维应当用连乘而不是平均（人工标注输入下差 0.05–0.09，
+   显著）。
+
+**不能再写的：**「D-S 融合机制显著优于 baseline」「+0.046 来自融合机制」
+「对 conflict_aware 5/5 种子显著」「可靠性折扣是 D-S 独有的优势」。
+
+D-S 若要在准确率上体现独立价值，需要**文档级**可靠性确有差异的数据（本数据
+全为 1.0）—— 这是待做的实验，不是已有结论。
+
+### 五、m_theta / K_doc 作为检测分数不优于简单统计量
+
+原实验 3 里 baseline 的冲突分数 `1 - |s - r|` 把「全都说不清」当成冲突，
+AUROC 低于随机。这里把一组定义合理的简单统计量**事先全部列出、全部报告**
+（定义见 `src/rag_ds/experiments/detection_proxies.py`），逐一与 D-S 分数做
+配对自助 AUROC 比较。分数都与阈值无关，直接在全体 616 条上算：
+
+```powershell
+python scripts/run_detection_proxies.py `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --relations-template "outputs/ragchecker_v2/{split}_relations_{evaluator}_probs.jsonl" `
+  --model-run-template "outputs/ragchecker_v2/{split}_model_run_{evaluator}_probs.json" `
+  --evaluator refchecker_nli --out-dir outputs/metrics/detection_proxies
+```
+
+**冲突识别**（正类 `conflicting`，154 条）：
+
+| 分数 | AUROC | AUPRC | K_doc − 它 | 95% CI | p |
+| --- | --- | --- | --- | --- | --- |
+| **K_doc**（D-S） | 0.6063 | 0.3831 | — | — | — |
+| `1 - \|s̄ - r̄\|`（原实验用的代理） | 0.4634 | 0.2229 | +0.1430 | [+0.0533, +0.2346] | 0.002 |
+| `min(s̄, r̄)` | 0.5950 | 0.3681 | +0.0113 | [−0.0138, +0.0370] | 0.381 |
+| `s̄ × r̄` | 0.5962 | 0.3741 | +0.0101 | [+0.0006, +0.0195] | 0.041 |
+| 最强支持 × 最强反驳 | 0.6116 | 0.3827 | −0.0052 | [−0.0164, +0.0052] | 0.340 |
+| `min(最强支持, 最强反驳)` | 0.5971 | 0.3777 | +0.0092 | [−0.0192, +0.0378] | 0.510 |
+| 各文档 `s - r` 的标准差 | 0.6268 | 0.4031 | −0.0205 | [−0.0594, +0.0170] | 0.292 |
+
+**证据不足识别**（正类 `insufficient`，154 条）：
+
+| 分数 | AUROC | AUPRC | m_theta − 它 | 95% CI | p |
+| --- | --- | --- | --- | --- | --- |
+| **m_theta**（D-S） | 0.6213 | 0.3083 | — | — | — |
+| 平均 `p_unknown` | 0.6144 | 0.3065 | +0.0069 | [−0.0008, +0.0150] | 0.076 |
+| 最小 `p_unknown` | 0.6275 | 0.3137 | −0.0062 | [−0.0151, +0.0023] | 0.155 |
+| `p_unknown` 连乘 | 0.6222 | 0.3087 | −0.0009 | [−0.0025, +0.0008] | 0.303 |
+
+`K_doc` 只显著赢了原来那个过弱的代理，和 `s̄ × r̄`（CI 下界 +0.0006，边缘）；
+与其余统计量打平，数值上最高的反而是 `s - r` 的标准差。`m_theta` 与三个简单
+统计量全部打平，与 `p_unknown` 连乘只差 0.001 —— 由上面的恒等式可知这是必然的。
+**检测分数本身不是 D-S 的优势**；原实验 3「唯一站得住的优势」一说撤回。
+
+### 六、v2 嵌套消融：两个判定维度各自显著有用
+
+原消融只在 v1 的 80 条上做过，离散版与连续版对 theta 门控结论相反。这里用与
+主实验相同的分折、种子与网格，每个变体在每折内层**各自重搜剩下那一维**的
+阈值（沿用完整方法的阈值会低估消融变体），616 条汇总后与 `full` 配对检验：
+
+```powershell
+python scripts/run_cv_ablation.py `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --relations-template "outputs/ragchecker_v2/{split}_relations_{evaluator}_probs.jsonl" `
+  --model-run-template "outputs/ragchecker_v2/{split}_model_run_{evaluator}_probs.json" `
+  --evaluator refchecker_nli --out-dir outputs/metrics/cross_validation_ablation
+```
+
+| 变体 | Accuracy | Macro-F1 | Δ vs full | 95% CI | p |
+| --- | --- | --- | --- | --- | --- |
+| full | 0.3750 | 0.3535 | — | — | — |
+| no_theta_gate | 0.3360 | 0.2725 | **−0.0810** | [−0.1068, −0.0547] | < 0.001 |
+| no_doc_conflict_gate | 0.3636 | 0.2999 | **−0.0537** | [−0.0854, −0.0222] | 0.001 |
+| no_two_dimensional_gate | 0.3247 | 0.2146 | **−0.1389** | [−0.1770, −0.1011] | < 0.001 |
+
+`full` 与主实验的 D-S 逐条一致、各折阈值相同（有测试钉住），所以这里的 Δ 就是
+相对论文主表那个方法的变化。`no_reliability` 没有跑：数据集可靠性全为 1.0，
+去折扣是恒等变换。
+
+三组对照合起来的读法：**两个判定维度都必不可少（本节），但用 D-S 还是用简单
+统计量来算这两个维度，在这份数据上没有区别（「四」「五」）。** 论文的贡献应
+落在「证据不足 / 文档冲突」两维证据状态诊断这个框架上，D-S 是它的一种有原则、
+可解释的实现，而不是准确率来源。
+
+### 七、选择性回答：对新对照只剩一个不稳定的趋势
+
+「三」里 D-S 的置信度在 `class_conditional` 口径下显著优于朴素 baseline。同一
+分析换成补充对照的结果重做（Statistic Gate 的置信度与 D-S 同口径：判哪一类
+就取那一类对应的平均分、横轴统计量或冲突统计量）：
+
+```powershell
+python scripts/selective_answer_analysis.py --profile controls
+```
+
+输出在 `outputs/metrics/selective_answer_controls/`。`class_conditional` 口径下
+D-S 减去对手（2000 次配对自助，`*` = 95% 区间不跨 0；ΔAUROC > 0、ΔAURC < 0
+表示 D-S 占优）：
+
+| 设定 | 对手 | ΔAUROC | 95% CI | ΔAURC | 95% CI |
+| --- | --- | --- | --- | --- | --- |
+| 单评估器 | Statistic Gate（`max_product`） | +0.036 | [−0.000, +0.075] | +0.005 | [−0.009, +0.020] |
+| | Statistic Gate（`sr_std`） | +0.043 | [−0.003, +0.088] | +0.000 | [−0.029, +0.029] |
+| | Statistic Gate（`max_product_uprod`） | +0.039\* | [+0.002, +0.079] | +0.010 | [−0.007, +0.027] |
+| | Statistic Gate（`sr_std_uprod`） | +0.036 | [−0.009, +0.079] | −0.014 | [−0.046, +0.018] |
+| | conflict_aware（调充分） | **+0.118\*** | [+0.065, +0.170] | −0.019 | [−0.058, +0.022] |
+| | weighted_average | **+0.098\*** | [+0.028, +0.163] | **−0.054\*** | [−0.096, −0.013] |
+| 双评估器 | Statistic Gate（`max_product`） | +0.061\* | [+0.001, +0.122] | +0.013 | [−0.017, +0.042] |
+| | Statistic Gate（`sr_std`） | +0.055 | [−0.007, +0.118] | −0.011 | [−0.048, +0.028] |
+| | Statistic Gate（`max_product_uprod`） | +0.004 | [−0.049, +0.057] | +0.007 | [−0.018, +0.032] |
+| | Statistic Gate（`sr_std_uprod`） | +0.013 | [−0.046, +0.070] | −0.012 | [−0.050, +0.021] |
+| | conflict_aware（调充分） | +0.045 | [−0.013, +0.106] | +0.028 | [−0.017, +0.073] |
+| | weighted_average | **+0.093\*** | [+0.018, +0.163] | −0.023 | [−0.072, +0.022] |
+
+- 单评估器下，D-S 置信度对「判错」的排序能力（AUROC）对四个 Statistic Gate
+  **方向一致**（+0.036 ~ +0.043），但区间下界都贴着 0。两个带 `*` 的下界只有
+  +0.001 ~ +0.002：只跑两个变体时同一组对比的下界是 −0.002 与 −0.000，
+  换一条重采样随机序列「显著」就翻转，**不能当作显著**。
+- 双评估器下，对横轴用连乘的两个变体已经打平（+0.004、+0.013）。
+- 弃答后的准确率收益（AURC）对四个 Statistic Gate 全部不显著。
+- `max_signal` 口径下 D-S 对 Statistic Gate 没有优势，双评估器下对
+  `max_product` 版显著更差（ΔAUROC = −0.030）。
+- Statistic Gate 的置信度定义是这次补充实验里新定的（没有先例可循），换一种
+  定义可能改变这组数字。
+
+这是目前唯一能看到 D-S 可能有独立价值的地方（融合后的质量作为置信度，排序
+判错的 claim 略好），但只是**不稳定的趋势**，论文里只能写成「值得在更大数据
+上检验的观察」，不能写成结论。
 
 ## 目录说明
 

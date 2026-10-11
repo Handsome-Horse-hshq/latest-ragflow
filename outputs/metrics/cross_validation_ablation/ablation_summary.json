@@ -1,0 +1,668 @@
+{
+  "dataset_name": "rag-ds-climate-fever-balanced-v2",
+  "evaluators": [
+    "refchecker_nli"
+  ],
+  "n_folds": 5,
+  "fold_seed": 42,
+  "claim_count": 616,
+  "macro_labels": [
+    "supported",
+    "refuted",
+    "insufficient",
+    "conflicting"
+  ],
+  "variants": [
+    "full",
+    "no_theta_gate",
+    "no_doc_conflict_gate",
+    "no_two_dimensional_gate"
+  ],
+  "folds": [
+    {
+      "fold": 0,
+      "test_size": 124,
+      "inner_size": 492,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.879107,
+          "document_conflict_threshold": 0.134548,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.134548,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.683009,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.36265980265980263,
+        "no_theta_gate": 0.28149763743295847,
+        "no_doc_conflict_gate": 0.29862824414415545,
+        "no_two_dimensional_gate": 0.2132765882765883
+      }
+    },
+    {
+      "fold": 1,
+      "test_size": 124,
+      "inner_size": 492,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.8651,
+          "document_conflict_threshold": 0.031369,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.031369,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.8651,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.3970336575718786,
+        "no_theta_gate": 0.3004247175588639,
+        "no_doc_conflict_gate": 0.31757739552721365,
+        "no_two_dimensional_gate": 0.2177820796460177
+      }
+    },
+    {
+      "fold": 2,
+      "test_size": 124,
+      "inner_size": 492,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.879107,
+          "document_conflict_threshold": 0.123459,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.123459,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.69252,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.3725101020302505,
+        "no_theta_gate": 0.28882368976458056,
+        "no_doc_conflict_gate": 0.30027839692290187,
+        "no_two_dimensional_gate": 0.21511997177134792
+      }
+    },
+    {
+      "fold": 3,
+      "test_size": 124,
+      "inner_size": 492,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.841319,
+          "document_conflict_threshold": 0.13498,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.13498,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.841319,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.39005772322845494,
+        "no_theta_gate": 0.29371882212791306,
+        "no_doc_conflict_gate": 0.3136260022969487,
+        "no_two_dimensional_gate": 0.21691449976806673
+      }
+    },
+    {
+      "fold": 4,
+      "test_size": 120,
+      "inner_size": 496,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.690561,
+          "document_conflict_threshold": 0.027638,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.027638,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.690561,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.3590997833778845,
+        "no_theta_gate": 0.2816037121458808,
+        "no_doc_conflict_gate": 0.29528919810303667,
+        "no_two_dimensional_gate": 0.20998043052837573
+      }
+    }
+  ],
+  "reports": {
+    "full": {
+      "method": "full",
+      "accuracy": 0.375,
+      "macro_f1": 0.35351592988920666,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.5490196078431373,
+          "recall": 0.18181818181818182,
+          "f1": 0.2731707317073171,
+          "support": 154
+        },
+        {
+          "label": "refuted",
+          "precision": 0.35135135135135137,
+          "recall": 0.6753246753246753,
+          "f1": 0.4622222222222222,
+          "support": 154
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.35294117647058826,
+          "recall": 0.38961038961038963,
+          "f1": 0.37037037037037035,
+          "support": 154
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.3939393939393939,
+          "recall": 0.2532467532467532,
+          "f1": 0.308300395256917,
+          "support": 154
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          28,
+          44,
+          59,
+          23,
+          0
+        ],
+        [
+          4,
+          104,
+          25,
+          21,
+          0
+        ],
+        [
+          7,
+          71,
+          60,
+          16,
+          0
+        ],
+        [
+          12,
+          77,
+          26,
+          39,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 616
+    },
+    "no_theta_gate": {
+      "method": "no_theta_gate",
+      "accuracy": 0.336038961038961,
+      "macro_f1": 0.27251979847114616,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.5256410256410257,
+          "recall": 0.2662337662337662,
+          "f1": 0.35344827586206895,
+          "support": 154
+        },
+        {
+          "label": "refuted",
+          "precision": 0.28929384965831434,
+          "recall": 0.8246753246753247,
+          "f1": 0.42833052276559863,
+          "support": 154
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 154
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.3939393939393939,
+          "recall": 0.2532467532467532,
+          "f1": 0.308300395256917,
+          "support": 154
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          41,
+          90,
+          0,
+          23,
+          0
+        ],
+        [
+          6,
+          127,
+          0,
+          21,
+          0
+        ],
+        [
+          15,
+          123,
+          0,
+          16,
+          0
+        ],
+        [
+          16,
+          99,
+          0,
+          39,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 616
+    },
+    "no_doc_conflict_gate": {
+      "method": "no_doc_conflict_gate",
+      "accuracy": 0.36363636363636365,
+      "macro_f1": 0.29985325784940264,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.45555555555555555,
+          "recall": 0.2662337662337662,
+          "f1": 0.3360655737704918,
+          "support": 154
+        },
+        {
+          "label": "refuted",
+          "precision": 0.35276073619631904,
+          "recall": 0.7467532467532467,
+          "f1": 0.4791666666666667,
+          "support": 154
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.34,
+          "recall": 0.44155844155844154,
+          "f1": 0.384180790960452,
+          "support": 154
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 154
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          41,
+          45,
+          68,
+          0,
+          0
+        ],
+        [
+          10,
+          115,
+          29,
+          0,
+          0
+        ],
+        [
+          12,
+          74,
+          68,
+          0,
+          0
+        ],
+        [
+          27,
+          92,
+          35,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 616
+    },
+    "no_two_dimensional_gate": {
+      "method": "no_two_dimensional_gate",
+      "accuracy": 0.3246753246753247,
+      "macro_f1": 0.21464036500268385,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.47540983606557374,
+          "recall": 0.37662337662337664,
+          "f1": 0.42028985507246375,
+          "support": 154
+        },
+        {
+          "label": "refuted",
+          "precision": 0.2874493927125506,
+          "recall": 0.922077922077922,
+          "f1": 0.4382716049382716,
+          "support": 154
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 154
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 154
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          58,
+          96,
+          0,
+          0,
+          0
+        ],
+        [
+          12,
+          142,
+          0,
+          0,
+          0
+        ],
+        [
+          20,
+          134,
+          0,
+          0,
+          0
+        ],
+        [
+          32,
+          122,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 616
+    }
+  },
+  "intervals": {
+    "full": {
+      "method": "full",
+      "metric": "macro_f1",
+      "observed": 0.35351592988920666,
+      "ci_low": 0.3144615055313449,
+      "ci_high": 0.39324593682929415,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    "no_theta_gate": {
+      "method": "no_theta_gate",
+      "metric": "macro_f1",
+      "observed": 0.27251979847114616,
+      "ci_low": 0.23918426559784342,
+      "ci_high": 0.3050850866082993,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    "no_doc_conflict_gate": {
+      "method": "no_doc_conflict_gate",
+      "metric": "macro_f1",
+      "observed": 0.29985325784940264,
+      "ci_low": 0.2689612254327043,
+      "ci_high": 0.33126783558595135,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    "no_two_dimensional_gate": {
+      "method": "no_two_dimensional_gate",
+      "metric": "macro_f1",
+      "observed": 0.21464036500268385,
+      "ci_low": 0.19106349159626762,
+      "ci_high": 0.2384595208952614,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    }
+  },
+  "comparisons_vs_full": [
+    {
+      "method_a": "no_theta_gate",
+      "method_b": "full",
+      "metric": "macro_f1",
+      "observed_a": 0.27251979847114616,
+      "observed_b": 0.35351592988920666,
+      "observed_delta": -0.0809961314180605,
+      "ci_low": -0.10684389526462079,
+      "ci_high": -0.05472329160635092,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "no_doc_conflict_gate",
+      "method_b": "full",
+      "metric": "macro_f1",
+      "observed_a": 0.29985325784940264,
+      "observed_b": 0.35351592988920666,
+      "observed_delta": -0.053662672039804016,
+      "ci_low": -0.08537005573167106,
+      "ci_high": -0.02215382774241842,
+      "p_value": 0.0008,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "no_two_dimensional_gate",
+      "method_b": "full",
+      "metric": "macro_f1",
+      "observed_a": 0.21464036500268385,
+      "observed_b": 0.35351592988920666,
+      "observed_delta": -0.1388755648865228,
+      "ci_low": -0.17700786078714803,
+      "ci_high": -0.10114966804420528,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    }
+  ]
+}

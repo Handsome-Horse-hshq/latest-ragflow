@@ -10,6 +10,10 @@
 压成一个低分或一个平局，无法与「谁都说不清楚」区分开。第四个方法用显式
 规则补上四类输出空间，是把「输出空间差异」与「融合机制差异」分开的公平
 对照。
+
+另有 **Statistic Gate**（:mod:`rag_ds.baselines.stat_gate`）：判定规则与 D-S
+的二维门控完全相同，只把两个坐标轴换成不做证据组合的简单统计量，用来把
+「两维判定框架」与「Dempster 融合」的贡献分开。
 """
 
 from rag_ds.baselines.config import (
@@ -37,11 +41,22 @@ from rag_ds.baselines.runner import (
     write_baseline_jsonl,
 )
 from rag_ds.baselines.single_evaluator import predict_single_evaluator
+from rag_ds.baselines.stat_gate import (
+    STAT_GATE_VARIANTS,
+    ConflictStatistic,
+    InsufficiencyStatistic,
+    StatGateScores,
+    StatGateVariant,
+    decide_stat_gate,
+    stat_gate_method_name,
+    stat_gate_scores,
+)
 from rag_ds.baselines.weighted_average import predict_weighted_average
 
 __all__ = [
     "BASELINE_CSV_COLUMNS",
     "BASELINE_SCORE_SUM_TOLERANCE",
+    "STAT_GATE_VARIANTS",
     "BaselineConfig",
     "BaselineDecisionReason",
     "BaselineMethod",
@@ -49,9 +64,14 @@ __all__ = [
     "BaselinePrediction",
     "BaselineRunSummary",
     "BaselineThresholds",
+    "ConflictStatistic",
+    "InsufficiencyStatistic",
     "MissingBaselineEvaluatorError",
+    "StatGateScores",
+    "StatGateVariant",
     "cast_vote",
     "decide_baseline_state",
+    "decide_stat_gate",
     "load_baseline_config",
     "predict_conflict_aware",
     "predict_majority_vote",
@@ -59,6 +79,8 @@ __all__ = [
     "predict_weighted_average",
     "run_baselines",
     "run_baselines_from_config",
+    "stat_gate_method_name",
+    "stat_gate_scores",
     "write_baseline_csv",
     "write_baseline_jsonl",
 ]
