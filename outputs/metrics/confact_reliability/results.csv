@@ -1,0 +1,7 @@
+﻿reliability,method,accuracy,macro_f1,auroc_margin,undetermined,ds_undefined,predicted_supported
+none,ds,0.505226,0.456721,0.528913,2,2,148
+none,weighted_average,0.519164,0.459997,0.525507,0,0,141
+none,majority_vote,0.411150,0.400599,0.516908,46,0,126
+credibility,ds,0.533101,0.479125,0.552343,1,1,142
+credibility,weighted_average,0.526132,0.475715,0.534895,0,0,147
+credibility,majority_vote,0.411150,0.400599,0.516908,46,0,126

@@ -6,6 +6,7 @@ conflict,conflicting,mean_product,0.596222,0.374115,0.419907,+0.010120,+0.000618
 conflict,conflicting,max_product,0.611570,0.382667,0.424920,-0.005229,-0.016415,+0.005172,0.3396,False
 conflict,conflicting,min_max,0.597121,0.377658,0.413333,+0.009220,-0.019171,+0.037754,0.5100,False
 conflict,conflicting,sr_std,0.626834,0.403056,0.437383,-0.020492,-0.059417,+0.017049,0.2920,False
+conflict,conflicting,document_count,0.500000,0.250000,0.400000,+0.106342,+0.053246,+0.160554,0.0000,True
 insufficiency,insufficient,m_theta,0.621325,0.308275,0.449400,,,,,
 insufficiency,insufficient,mean_unknown,0.614438,0.306451,0.443350,+0.006887,-0.000849,+0.015021,0.0764,False
 insufficiency,insufficient,min_unknown,0.627537,0.313667,0.448336,-0.006212,-0.015095,+0.002277,0.1552,False

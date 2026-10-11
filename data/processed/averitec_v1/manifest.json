@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "dataset_name": "rag-ds-averitec-balanced-v1",
+  "source": {
+    "name": "AVeriTeC",
+    "homepage": "https://huggingface.co/chenxwh/AVeriTeC",
+    "download_url": "https://huggingface.co/chenxwh/AVeriTeC/resolve/2ca9dee23a2a6fa64c5bd918e0cd28ed0aa09031/data/train.json",
+    "paper_url": "https://arxiv.org/abs/2305.13117",
+    "citation": "Schlichtkrull, Guo and Vlachos (2023), AVeriTeC: A Dataset for Real-world Claim Verification with Evidence from the Web, NeurIPS Datasets and Benchmarks",
+    "license_note": "AVeriTeC is released under CC-BY-NC-4.0: non-commercial use with attribution.",
+    "raw_file": "averitec/train.json",
+    "raw_sha256": "ae5eda7c42ddf1695ef185a7ba1bc716928f5adf57103e4f78aae5f9afe00f9c",
+    "raw_records": 3068,
+    "extra_raw_files": [
+      {
+        "path": "averitec/dev.json",
+        "sha256": "499793726b4a5406780928a3d9dedc48d6dd53de778f22437d129cacdb08e300",
+        "records": 500
+      }
+    ]
+  },
+  "random_seed": 42,
+  "per_class": 230,
+  "split_per_class": {
+    "train": 138,
+    "validation": 46,
+    "test": 46
+  },
+  "label_mapping": {
+    "Supported": "supported",
+    "Refuted": "refuted",
+    "Not Enough Evidence": "insufficient",
+    "Conflicting Evidence/Cherrypicking": "conflicting"
+  },
+  "relation_predictions_kind": "none",
+  "relation_predictions_warning": "AVeriTeC has no evidence-level stance annotations, so no annotation-oracle relation predictions are registered. Relation predictions for this dataset only exist as model outputs with their own model-run manifests.",
+  "splits": {
+    "train": {
+      "samples": {
+        "path": "train.jsonl",
+        "sha256": "90914d58363d4e4cbee543e0665ed9a2729eb48f56cfcb7ee9ce251ce34f2d6a",
+        "records": 552
+      },
+      "provenance": {
+        "path": "train_provenance.jsonl",
+        "sha256": "18d3bd14642c03cc445b0ca675c51cc2a67bcbffb563c7de4409162e198c62a4",
+        "records": 552
+      },
+      "label_counts": {
+        "conflicting": 138,
+        "refuted": 138,
+        "insufficient": 138,
+        "supported": 138
+      }
+    },
+    "validation": {
+      "samples": {
+        "path": "validation.jsonl",
+        "sha256": "7edfa67f81a261bdc040a1b600502e50bb8cb2006d125b6ebb7b0e49247341d8",
+        "records": 184
+      },
+      "provenance": {
+        "path": "validation_provenance.jsonl",
+        "sha256": "4256a7430d34cb25d12b33ceafbd3c370f03818db215507f575450b5f27dd1c8",
+        "records": 184
+      },
+      "label_counts": {
+        "refuted": 46,
+        "conflicting": 46,
+        "supported": 46,
+        "insufficient": 46
+      }
+    },
+    "test": {
+      "samples": {
+        "path": "test.jsonl",
+        "sha256": "e64a987d48efbc39909d1e39e3afefda7fcebe5560c48f7198780259476cf4d6",
+        "records": 184
+      },
+      "provenance": {
+        "path": "test_provenance.jsonl",
+        "sha256": "5636d39817cab4b11528e8e4895fa1282963daf1bc147b80b443ba57ba89688c",
+        "records": 184
+      },
+      "label_counts": {
+        "conflicting": 46,
+        "supported": 46,
+        "insufficient": 46,
+        "refuted": 46
+      }
+    }
+  }
+}

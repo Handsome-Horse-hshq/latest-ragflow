@@ -28,7 +28,7 @@ import tempfile
 from collections import defaultdict
 from pathlib import Path
 
-from rag_ds.baselines.stat_gate import STAT_GATE_VARIANTS
+from rag_ds.baselines.stat_gate import ALL_STAT_GATE_VARIANTS
 from rag_ds.data_io import load_relation_predictions, load_samples
 from rag_ds.dataset_manifest import (
     DatasetManifestError,
@@ -70,7 +70,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--stat-gate",
         nargs="+",
         default=[],
-        choices=list(STAT_GATE_VARIANTS),
+        choices=list(ALL_STAT_GATE_VARIANTS),
         help="加入不用 D-S 的两维判定对照组（同 run_cross_validation.py）",
     )
     parser.add_argument(
@@ -149,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
                 n_folds=args.n_folds,
                 seed=seed,
                 grid_steps=args.grid_steps,
-                stat_gate_statistics=[STAT_GATE_VARIANTS[s] for s in args.stat_gate],
+                stat_gate_statistics=[ALL_STAT_GATE_VARIANTS[s] for s in args.stat_gate],
                 conflict_margins=args.conflict_margins,
             )
         except (PipelineError, ValueError) as error:

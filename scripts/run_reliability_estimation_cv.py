@@ -47,7 +47,7 @@ from pathlib import Path
 from rag_ds.baselines.models import BaselineThresholds
 from rag_ds.baselines.single_evaluator import predict_single_evaluator
 from rag_ds.baselines.stat_gate import (
-    STAT_GATE_VARIANTS,
+    ALL_STAT_GATE_VARIANTS,
     StatGateVariant,
     decide_stat_gate,
     stat_gate_scores,
@@ -121,7 +121,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--stat-gate",
         nargs="+",
         default=[],
-        choices=list(STAT_GATE_VARIANTS),
+        choices=list(ALL_STAT_GATE_VARIANTS),
         help="加入不用 D-S 的两维判定对照组，使用同一份估计出来的可靠性作权重",
     )
     parser.add_argument("--overwrite", action="store_true")
@@ -466,7 +466,7 @@ def main(argv: list[str] | None = None) -> int:
         samples, predictions, args.evaluator, args.single_evaluator,
         n_folds=args.n_folds, seed=args.seed, grid_steps=args.grid_steps,
         estimator=args.estimator,
-        stat_gate_statistics=tuple(STAT_GATE_VARIANTS[s] for s in args.stat_gate),
+        stat_gate_statistics=tuple(ALL_STAT_GATE_VARIANTS[s] for s in args.stat_gate),
     )
 
     by_method: dict[str, list] = defaultdict(list)

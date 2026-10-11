@@ -78,6 +78,16 @@
           "best_threshold": 0.06571257850981212,
           "positive_count": 154,
           "negative_count": 462
+        },
+        {
+          "score_name": "document_count",
+          "positive_label": "conflicting",
+          "auroc": 0.5,
+          "auprc": 0.25,
+          "best_f1": 0.4,
+          "best_threshold": 5.0,
+          "positive_count": 154,
+          "negative_count": 462
         }
       ],
       "comparisons": [
@@ -161,6 +171,20 @@
           "ci_low": -0.0594170403587444,
           "ci_high": 0.017048968347669557,
           "p_value": 0.292,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "document_count",
+          "auroc_reference": 0.6063417102378141,
+          "auroc_rival": 0.5,
+          "observed_delta": 0.10634171023781414,
+          "ci_low": 0.053246470212799046,
+          "ci_high": 0.16055372807017543,
+          "p_value": 0.0,
           "n_resamples": 5000,
           "seed": 42,
           "sample_count": 616
@@ -257,5 +281,6 @@
         }
       ]
     }
-  }
+  },
+  "conflict_auroc_by_document_count": []
 }

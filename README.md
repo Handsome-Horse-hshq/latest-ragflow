@@ -21,6 +21,13 @@
 朴素 baseline 的优势应归功于「证据不足 + 文档冲突」两维判定框架，而不是
 Dempster 融合本身；当前瓶颈在关系评估器。详见「四」到「七」。
 
+**2026-10-11 至 10-12 补了两个新数据集**：AVeriTeC（标签由事实核查员人工判定，
+920 条）上，控制住「证据篇数」这个混杂因素之后，三条结论与 CLIMATE-FEVER 完全
+一致；不控制时冲突一维的成绩主要来自「冲突类 claim 配了更多证据」，是假象。
+CONFACT（文档来源可信度确有差异，287 条）上，文档级可靠性折扣方向为正但不
+显著，且与简单加权打平 —— 不过那里 NLI 的倾向判断接近随机，只算弱证据。
+LLM 直接判四类的脚本已就绪，尚未运行。详见「八」「九」「十」。
+
 第一版正式数据 `data/processed/climate_fever_v1/` 已从 CLIMATE-FEVER 构建完成
 （400 条、四类各 100、train/validation/test = 240/80/80）；v2 扩到 616 条
 （四类各 154，train/validation/test = 368/124/124）。两个数据集自带的
@@ -1812,6 +1819,7 @@ python scripts/run_detection_proxies.py `
 | 最强支持 × 最强反驳 | 0.6116 | 0.3827 | −0.0052 | [−0.0164, +0.0052] | 0.340 |
 | `min(最强支持, 最强反驳)` | 0.5971 | 0.3777 | +0.0092 | [−0.0192, +0.0378] | 0.510 |
 | 各文档 `s - r` 的标准差 | 0.6268 | 0.4031 | −0.0205 | [−0.0594, +0.0170] | 0.292 |
+| 证据篇数（混杂因素对照） | 0.5000 | 0.2500 | +0.1063 | [+0.0532, +0.1606] | < 0.001 |
 
 **证据不足识别**（正类 `insufficient`，154 条）：
 
@@ -1826,6 +1834,9 @@ python scripts/run_detection_proxies.py `
 与其余统计量打平，数值上最高的反而是 `s - r` 的标准差。`m_theta` 与三个简单
 统计量全部打平，与 `p_unknown` 连乘只差 0.001 —— 由上面的恒等式可知这是必然的。
 **检测分数本身不是 D-S 的优势**；原实验 3「唯一站得住的优势」一说撤回。
+
+「证据篇数」一行是混杂因素对照：CLIMATE-FEVER 每条 claim 固定 5 篇，篇数没有
+任何信息（AUROC 恒为 0.5）。证据篇数不固定的数据集上情况完全不同，见「八」。
 
 ### 六、v2 嵌套消融：两个判定维度各自显著有用
 
@@ -1900,6 +1911,235 @@ D-S 减去对手（2000 次配对自助，`*` = 95% 区间不跨 0；ΔAUROC > 0
 这是目前唯一能看到 D-S 可能有独立价值的地方（融合后的质量作为置信度，排序
 判错的 claim 略好），但只是**不稳定的趋势**，论文里只能写成「值得在更大数据
 上检验的观察」，不能写成结论。
+
+### 八、第二个数据集 AVeriTeC：结论可以推广，但必须先控制「证据篇数」
+
+CLIMATE-FEVER 的 claim 标签由逐条证据的多数票按规则合成，两维判定在结构上
+复刻了这条规则。AVeriTeC（Schlichtkrull et al., NeurIPS 2023 D&B）的四类判定
+由事实核查员直接给出，用来检验「两维判定有效是不是只因为贴合了造标签的方式」。
+
+**数据。** 官方 train + dev（CC-BY-NC-4.0），去重后四类各取 230 条，共 920 条
+（`data/processed/averitec_v1/`，`src/rag_ds/datasets/averitec.py`）。与
+CLIMATE-FEVER 有三处不同：
+
+| | CLIMATE-FEVER v2 | AVeriTeC v1 |
+| --- | --- | --- |
+| 证据 | Wikipedia 句子 | 问答对，每个 (问题, 答案) 当一篇文档；「没查到」的答案保留 |
+| 每条 claim 的证据篇数 | 固定 5 篇 | 1–16 篇，平均约 3 篇 |
+| 逐条证据的立场标注 | 有（annotation oracle） | **没有**，清单里 `relation_predictions_kind` 为 `none` |
+
+另外 `Conflicting Evidence/Cherrypicking` 把「断章取义」也算在内，并不总是文档
+互相矛盾。
+
+```powershell
+# 原始文件（固定到一个仓库版本，地址见 rag_ds.datasets.averitec.AVERITEC_DOWNLOAD_URLS）
+curl -L -o data/raw/averitec/train.json <train 的地址>
+curl -L -o data/raw/averitec/dev.json   <dev 的地址>
+python scripts/prepare_averitec.py
+
+# 每个 split：导出 → NLI（与 CLIMATE-FEVER 同一个模型）→ 摄取
+python scripts/export_ragchecker_input.py --manifest data/processed/averitec_v1/manifest.json `
+  --split test --out outputs/ragchecker_averitec/test_checking_inputs.json
+.venv-refchecker\Scripts\python.exe scripts/run_refchecker_nli_chunked.py `
+  --input outputs/ragchecker_averitec/test_checking_inputs.json `
+  --output outputs/ragchecker_averitec/test_checking_outputs_probs.json --emit-probabilities
+python scripts/ingest_ragchecker.py --manifest data/processed/averitec_v1/manifest.json --split test `
+  --outputs outputs/ragchecker_averitec/test_checking_outputs_probs.json --use-probabilities `
+  --evaluator refchecker_nli --checker-name ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli `
+  --out-dir outputs/ragchecker_averitec
+```
+
+2790 个 (claim, 文档) 组合，NLI 标签分布：Neutral 约 78%、Contradiction 约 13%、
+Entailment 约 8.5%（CLIMATE-FEVER 上 Entailment 只有 3.5%）。之后的交叉验证、
+消融、检测与种子稳健性都是「四」「五」「六」里的同一批脚本，只换 `--manifest`
+与两个路径模板，输出在 `outputs/metrics/averitec_*`。
+
+**先看不加控制的结果**（920 条，5 折嵌套交叉验证）：
+
+| 方法 | Accuracy | Macro-F1 | D-S − 它 | 95% CI | p |
+| --- | --- | --- | --- | --- | --- |
+| Statistic Gate（`max_product`） | 0.4185 | 0.4020 | −0.0077 | [−0.0312, +0.0162] | 0.527 |
+| Statistic Gate（`max_product_uprod`） | 0.4120 | 0.3945 | −0.0003 | [−0.0225, +0.0221] | 0.972 |
+| **D-S** | 0.4076 | **0.3942** | — | — | — |
+| Statistic Gate（`sr_std`） | 0.3891 | 0.3808 | +0.0134 | [−0.0174, +0.0447] | 0.396 |
+| Statistic Gate（`sr_std_uprod`） | 0.3804 | 0.3716 | +0.0226 | [−0.0076, +0.0527] | 0.146 |
+| conflict_aware（调充分） | 0.3533 | 0.3373 | **+0.0570** | [+0.0249, +0.0884] | 0.001 |
+| Weighted Average / Single Evaluator | 0.3500 | 0.2716 | +0.1227 | [+0.0902, +0.1545] | < 0.001 |
+| Majority Vote | 0.3402 | 0.2571 | +0.1371 | [+0.1046, +0.1698] | < 0.001 |
+
+5 个分折种子下 D-S 对调充分的 conflict_aware 全部显著（Δ 均值 +0.0537），对四个
+Statistic Gate 全部不显著。嵌套消融：
+
+| 变体 | Macro-F1 | Δ vs full | 95% CI | p |
+| --- | --- | --- | --- | --- |
+| full | 0.3942 | — | — | — |
+| no_theta_gate | 0.3307 | **−0.0635** | [−0.0914, −0.0357] | < 0.001 |
+| no_doc_conflict_gate | 0.3270 | **−0.0672** | [−0.0921, −0.0409] | < 0.001 |
+| no_two_dimensional_gate | 0.2445 | **−0.1498** | [−0.1836, −0.1154] | < 0.001 |
+
+到这里看上去比 CLIMATE-FEVER 更好：两维判定显著优于调充分的 conflict_aware。
+**但这一条是假象。**
+
+**混杂因素：证据篇数。** AVeriTeC 里冲突类 claim 平均有 3.95 篇证据，其余三类
+只有 2.6–3.0 篇（标注员为有争议的 claim 找了更多证据）。而 `K_doc = 1 − ∏(1 − K_i)`
+会随文档数累积变大。检测实验（`outputs/metrics/averitec_detection_proxies/`）：
+
+| 识别冲突的分数 | AUROC | K_doc − 它 | 95% CI |
+| --- | --- | --- | --- |
+| **证据篇数本身**（`document_count`） | **0.7141** | −0.0311 | [−0.0688, +0.0068] |
+| K_doc（D-S） | 0.6830 | — | — |
+| 各文档 `s − r` 的标准差 | 0.6681 | +0.0149 | [−0.0056, +0.0360] |
+| 最强支持 × 最强反驳 | 0.6189 | +0.0640 | [+0.0382, +0.0887] |
+| `min(最强支持, 最强反驳)` | 0.6075 | +0.0755 | [+0.0429, +0.1079] |
+| `s̄ × r̄` | 0.5794 | +0.1036 | [+0.0732, +0.1319] |
+| `min(s̄, r̄)` | 0.5761 | +0.1068 | [+0.0707, +0.1423] |
+
+`K_doc` 在这里显著赢了大多数简单统计量（CLIMATE-FEVER 上是打平），但**完全不看
+文档内容、只数有几篇**就有 0.714，比它还高。在篇数相同的 claim 内部重新比
+（`conflict_auroc_by_document_count`），`K_doc` 的领先就消失了：
+
+| 证据篇数 | claim | 其中冲突 | K_doc | `s − r` 标准差 | 最强支持 × 最强反驳 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 157 | 11 | 0.500 | 0.500 | 0.506 |
+| 2 | 285 | 40 | 0.584 | 0.565 | 0.576 |
+| 3 | 200 | 57 | 0.623 | 0.656 | 0.636 |
+| 4 | 128 | 50 | 0.552 | 0.524 | 0.540 |
+| 5 | 63 | 31 | 0.579 | 0.627 | 0.601 |
+
+四分类上同样如此。把 Statistic Gate 的纵轴直接换成「证据篇数」（`--stat-gate
+doc_count`，混杂因素对照，不是冲突统计量；输出在
+`outputs/metrics/averitec_cross_validation_doc_count/`）：
+
+| 方法 | Macro-F1 | D-S − 它 | 95% CI | p |
+| --- | --- | --- | --- | --- |
+| **只数篇数**（`doc_count`） | **0.4387** | −0.0445 | [−0.0748, −0.0141] | 0.005 |
+| 只数篇数 + 连乘（`doc_count_uprod`） | 0.4332 | −0.0389 | [−0.0687, −0.0091] | 0.010 |
+| D-S | 0.3942 | — | — | — |
+
+各折选出的规则都是「证据 ≥ 3 篇就判冲突」。它**显著高于 D-S**。也就是说，上面
+「两维判定显著优于 conflict_aware」「去掉冲突门控掉 0.067」里，冲突这一维的
+贡献主要来自数据集的这个特点，不能当作识别冲突的证据。「证据不足」一维不受
+影响：篇数对识别证据不足没有信息（AUROC 0.514），`m_theta` 与三个简单统计量
+打平（0.645 对 0.642–0.645）。
+
+**控制篇数之后。** `--first-documents K`：只保留证据至少 K 篇的 claim，每条只用
+原始顺序里的前 K 篇，于是所有 claim 篇数相同（不需要重新推理；输出在
+`outputs/metrics/averitec_cross_validation_first2/` 与 `…_first3/`）：
+
+| | K = 2（763 条） | K = 3（478 条） |
+| --- | --- | --- |
+| D-S Macro-F1 | 0.2956 | 0.3362 |
+| 四个 Statistic Gate | 0.298–0.308 | 0.328–0.356 |
+| conflict_aware（调充分） | 0.2781 | 0.2964 |
+| 朴素 baseline | 0.180–0.214 | 0.198–0.206 |
+| D-S − Statistic Gate | −0.013 ~ −0.003，均不显著 | −0.020 ~ +0.008，均不显著 |
+| D-S − conflict_aware（调充分） | +0.0175，CI [−0.020, +0.054]，p = 0.372 | +0.0399，CI [−0.009, +0.089]，p = 0.109 |
+| D-S − 朴素 baseline | +0.082 ~ +0.116，p < 0.001 | +0.130 ~ +0.138，p < 0.001 |
+
+篇数控制住之后，AVeriTeC 与 CLIMATE-FEVER 的模式**完全一致**：
+
+1. 显式区分「证据不足」与「文档冲突」的方法都显著优于朴素聚合 —— 在标签由人工
+   判定、而不是规则合成的数据上同样成立；
+2. D-S 与同框架的简单统计量打平；
+3. 两维判定对调充分的 conflict_aware 的优势不显著。
+
+**必须写进论文的两点。** 第一，证据篇数不固定的数据集上，任何会随篇数累积的
+冲突分数都要与「只数篇数」对照，否则会把数据集的采集特点当成方法的能力。
+第二，截断到前 K 篇会丢证据（冲突的那一篇可能排在后面），K = 2 / K = 3 的绝对
+分数因此偏低，它们是**对照**，不是 AVeriTeC 上的最好成绩。
+
+### 九、CONFACT：文档可靠性确有差异，折扣仍然没有显著效果
+
+前面所有数据的文档可靠性都是 1.0。CONFACT（Ge et al., IJCAI 2025）的 HumC 子集
+给每条 claim 配了约 12 篇互相冲突的网页，并附带 Media Bias/Fact Check 对 6100
+家媒体的可信度分级，用来检验 D-S 的**文档级**可靠性折扣。
+
+**数据与处理**（`src/rag_ds/datasets/confact.py`）：
+
+- 287 条 claim，标签只有两类（Refuted 236、Supported 51），所以检验的是**倾向
+  判断**，不是四类证据状态；
+- 原始数据是 pickle。`pickle.load` 会执行文件里指定的任意可调用对象，这里用
+  拒绝导入任何类的 Unpickler 读取，只接受内置容器、字符串与数字；
+- 网页中位数约 940 词，NLI 一次只能看 512 个词元：每篇网页切成 120 词的重叠
+  窗口，取与 claim 的 TF-IDF 余弦相似度最高的一段。3464 篇里 872 篇内容为空，
+  余下 2592 篇；
+- 可信度 → 可靠性用**事先定好**的映射：high 1.0、medium 0.6、low 0.2，没有
+  评级的 0.6。2592 篇里 high 765、medium 409、low 89、无评级 1329；
+- 上游仓库没有声明许可证：原始文件、处理后的样本与含网页段落的 NLI 输入输出
+  **都不入库**，只有不含原文的指标在 `outputs/metrics/confact_reliability/`。
+
+```powershell
+python scripts/prepare_confact.py
+python scripts/run_confact_reliability.py export
+.venv-refchecker\Scripts\python.exe scripts/run_refchecker_nli_chunked.py `
+  --input outputs/ragchecker_confact/checking_inputs.json `
+  --output outputs/ragchecker_confact/checking_outputs_probs.json --emit-probabilities
+python scripts/run_confact_reliability.py analyse
+```
+
+倾向只看支持与反驳哪边大（D-S 用 `m_support − m_refute`，加权平均用加权后的
+`s̄ − r̄`），没有要调的阈值，直接在 287 条上评估。AUROC 把这个差当连续分数，
+不受两类比例影响：
+
+| 文档可靠性 | 方法 | Accuracy | Macro-F1 | AUROC | 未定 |
+| --- | --- | --- | --- | --- | --- |
+| 全为 1 | D-S | 0.5052 | 0.4567 | 0.5289 | 2 |
+| 全为 1 | 加权平均 | 0.5192 | 0.4600 | 0.5255 | 0 |
+| 按可信度 | D-S | 0.5331 | 0.4791 | 0.5523 | 1 |
+| 按可信度 | 加权平均 | 0.5261 | 0.4757 | 0.5349 | 0 |
+| — | 多数票 | 0.4111 | 0.4006 | 0.5169 | 46 |
+
+| 比较（5000 次配对自助） | Δ Macro-F1 | 95% CI | Δ AUROC | 95% CI |
+| --- | --- | --- | --- | --- |
+| D-S：按可信度 − 全为 1 | +0.0224 | [−0.010, +0.057] | +0.0234 | [−0.023, +0.069] |
+| 加权平均：按可信度 − 全为 1 | +0.0157 | [−0.006, +0.041] | +0.0094 | [−0.004, +0.023] |
+| 按可信度：D-S − 加权平均 | +0.0034 | [−0.018, +0.025] | +0.0174 | [−0.021, +0.055] |
+| 全为 1：D-S − 加权平均 | −0.0033 | [−0.028, +0.024] | +0.0034 | [−0.018, +0.024] |
+
+敏感性扫描（low ∈ {0, 0.2, 0.4} × 无评级 ∈ {0.4, 0.6, 0.8, 1.0}，共 12 组，全部
+在 `sensitivity.csv`）：D-S 的 Macro-F1 在 0.436–0.492、AUROC 在 0.507–0.561
+之间；加权平均在 0.452–0.483 与 0.520–0.545 之间。
+
+**结论，以及它为什么只是弱证据：**
+
+1. 加入可靠性后两个方法的数字都往好的方向动（D-S +0.022、加权平均 +0.016），
+   但**都不显著**；
+2. 同一份可靠性下，D-S 的折扣与把可靠性当权重的加权平均**打平**（+0.003）；
+3. 所有方法的 AUROC 只有 0.52–0.56，接近随机。NLI 在「整页网页里挑出的一段」
+   上基本判断不出倾向，可靠性再怎么加权也救不回来 —— 这个实验**检验不出**
+   折扣有没有用，不能读成「折扣没用」；
+4. 低可信度的文档只占 3.4%（89 篇），可靠性的差异本身就小。
+
+**D-S 在高冲突下的数值问题在这里第一次真实出现。** 不做折扣时 `K_doc` 的中位数
+是 0.63，287 条里 82 条超过 0.99、11 条超过 0.999999（NLI 的输出很极端：139 个
+组合 `p_support > 0.999`，115 个 `p_refute > 0.999`）。其中 2 条近乎完全冲突，
+Dempster 归一化的分母接近 0，`ds` 子包按设计报错而不是返回不可靠的数；实验里
+记为 `undetermined`（算判错）并在 `ds_undefined` 列标出。按可信度折扣后 `K_doc`
+中位数降到 0.30，这样的 claim 减到 1 条 —— 折扣确实缓解了高冲突，只是没有
+转化成显著的准确率收益。
+
+### 十、LLM 直接判四类（脚本就绪，尚未运行）
+
+审稿人最可能问的对照：把 claim 和全部证据一次性交给大模型，让它直接输出四类
+之一。`scripts/run_llm_judge.py` 已写好并有测试覆盖，支持 DeepSeek（只用标准库，
+JSON 输出模式）与 Anthropic（SDK，结构化输出）两个接口；零样本、不调阈值，判完
+后与嵌套交叉验证的逐条预测做配对自助检验。
+
+密钥读自环境变量 `DEEPSEEK_API_KEY`，没有时读项目根目录 `.env` 里的同名行
+（`.env` 在 `.gitignore` 里）。脚本只在发请求时使用密钥，不打印、不写进任何输出。
+
+```powershell
+python scripts/run_llm_judge.py --provider deepseek --dry-run `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --out-dir outputs/llm_judge/climate_fever_v2/deepseek-v4-pro
+
+python scripts/run_llm_judge.py --provider deepseek `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --out-dir outputs/llm_judge/climate_fever_v2/deepseek-v4-pro `
+  --compare-with outputs/metrics/cross_validation_controls/cv_predictions.csv
+```
+
+**截至目前没有任何 LLM 判四类的结果**，论文里不能引用。
 
 ## 目录说明
 

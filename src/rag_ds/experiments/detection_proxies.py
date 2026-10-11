@@ -23,7 +23,15 @@
 ``max_product``             最强支持 × 最强反驳（Statistic Gate 的一个纵轴）
 ``min_max``                 ``min(最强支持, 最强反驳)``
 ``sr_std``                  各条关系 ``s - r`` 的加权标准差（Statistic Gate 的另一个纵轴）
+``document_count``          证据篇数本身 —— 不是冲突统计量，是**混杂因素对照**
 ==========================  ==================================================
+
+``document_count`` 为什么必须在表里：``K_doc = 1 - ∏(1 - K_i)`` 会随文档数
+累积变大。如果某个数据集里冲突类 claim 恰好配了更多证据（AVeriTeC 就是这样：
+冲突类平均 3.95 篇，其余 2.6–3.0 篇），``K_doc`` 就能靠「数篇数」得分。篇数
+固定的数据集（CLIMATE-FEVER 恒为 5 篇）上它的 AUROC 恒为 0.5。
+:func:`conflict_auroc_by_document_count` 在篇数相同的 claim 内部重新比较，
+把这个因素控制掉。
 
 证据不足（正类 ``insufficient``，参照 ``m_theta``）：
 
@@ -62,6 +70,7 @@ __all__ = [
     "ClaimDetectionScores",
     "DetectionComparison",
     "compare_detection",
+    "conflict_auroc_by_document_count",
     "detection_scores",
 ]
 
@@ -72,6 +81,7 @@ CONFLICT_PROXIES: tuple[str, ...] = (
     "max_product",
     "min_max",
     "sr_std",
+    "document_count",
 )
 INSUFFICIENCY_PROXIES: tuple[str, ...] = (
     "mean_unknown",
@@ -91,6 +101,8 @@ class ClaimDetectionScores(BaseModel):
     #: 完全冲突时质量未定义，与 :mod:`rag_ds.experiments.comparison` 一致记为 0。
     m_theta: float = Field(ge=0.0, le=1.0)
     k_doc: float = Field(ge=0.0, le=1.0)
+    #: 该 claim 的证据文档篇数。
+    document_count: int = Field(ge=0)
     conflict: dict[str, float]
     insufficiency: dict[str, float]
 
@@ -127,7 +139,7 @@ def detection_scores(
             (s.sample_id, s.claim_id): s
             for s in stat_gate_scores(samples, predictions, statistic)
         }
-        for statistic in ConflictStatistic
+        for statistic in (ConflictStatistic.SUPPORT_REFUTE_STD, ConflictStatistic.MAX_PRODUCT)
     }
 
     check_samples(list(samples))
@@ -157,6 +169,7 @@ def detection_scores(
                     gold_label=sample.gold_state.value,  # type: ignore[union-attr]
                     m_theta=diagnostic.m_theta or 0.0,
                     k_doc=diagnostic.k_doc,
+                    document_count=len(sample.contexts),
                     conflict={
                         "one_minus_abs_margin": 1.0 - abs(mean_s - mean_r),
                         "min_mean": min(mean_s, mean_r),
@@ -164,6 +177,7 @@ def detection_scores(
                         "max_product": product.conflict,
                         "min_max": min(max(support, default=0.0), max(refute, default=0.0)),
                         "sr_std": std.conflict,
+                        "document_count": float(len(sample.contexts)),
                     },
                     insufficiency={
                         "mean_unknown": std.score_unknown,
@@ -173,6 +187,59 @@ def detection_scores(
                 )
             )
     return rows
+
+
+def conflict_auroc_by_document_count(
+    rows: Sequence[ClaimDetectionScores],
+    *,
+    statistics: Sequence[str] = ("sr_std", "max_product"),
+    min_claims: int = 40,
+    min_per_class: int = 8,
+) -> list[dict[str, float | int]]:
+    """在证据篇数相同的 claim 内部，比较各分数识别冲突的 AUROC。
+
+    篇数相同的组里「数篇数」不再有任何信息，剩下的差别才属于分数本身。
+    组太小或某一类太少时 AUROC 的噪声很大，直接跳过不报。
+
+    Args:
+        rows: :func:`detection_scores` 的输出。
+        statistics: 与 ``K_doc`` 并排比较的对照统计量名。
+        min_claims: 一个篇数组至少要有多少条 claim。
+        min_per_class: 组内冲突与非冲突各至少多少条。
+
+    Returns:
+        每个保留下来的篇数一行：篇数、claim 数、冲突条数，以及 ``k_doc`` 和
+        各对照统计量的 AUROC。所有 claim 篇数相同时返回空列表。
+    """
+    counts = sorted({r.document_count for r in rows})
+    if len(counts) < 2:
+        return []
+    positive = EvidenceState.CONFLICTING.value
+    table: list[dict[str, float | int]] = []
+    for count in counts:
+        group = [r for r in rows if r.document_count == count]
+        is_positive = [r.gold_label == positive for r in group]
+        positives = sum(is_positive)
+        if (
+            len(group) < min_claims
+            or positives < min_per_class
+            or len(group) - positives < min_per_class
+        ):
+            continue
+        row: dict[str, float | int] = {
+            "document_count": count,
+            "claims": len(group),
+            "conflicting": positives,
+            "k_doc": detection_report(
+                [r.k_doc for r in group], is_positive, "k_doc", positive
+            ).auroc,
+        }
+        for name in statistics:
+            row[name] = detection_report(
+                [r.conflict[name] for r in group], is_positive, name, positive
+            ).auroc
+        table.append(row)
+    return table
 
 
 class DetectionComparison(BaseModel):

@@ -42,6 +42,8 @@ from rag_ds.baselines.runner import (
 )
 from rag_ds.baselines.single_evaluator import predict_single_evaluator
 from rag_ds.baselines.stat_gate import (
+    ALL_STAT_GATE_VARIANTS,
+    STAT_GATE_CONTROLS,
     STAT_GATE_VARIANTS,
     ConflictStatistic,
     InsufficiencyStatistic,
@@ -56,6 +58,8 @@ from rag_ds.baselines.weighted_average import predict_weighted_average
 __all__ = [
     "BASELINE_CSV_COLUMNS",
     "BASELINE_SCORE_SUM_TOLERANCE",
+    "ALL_STAT_GATE_VARIANTS",
+    "STAT_GATE_CONTROLS",
     "STAT_GATE_VARIANTS",
     "BaselineConfig",
     "BaselineDecisionReason",

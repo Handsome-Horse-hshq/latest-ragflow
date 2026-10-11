@@ -15,7 +15,7 @@ from rag_ds.dataset_manifest import DatasetManifest, load_dataset_manifest, veri
 from rag_ds.model_runs import verify_model_run_artifacts
 from rag_ds.schemas import RAGSample, RelationPrediction
 
-__all__ = ["ALL_SPLITS", "load_verified_dataset"]
+__all__ = ["ALL_SPLITS", "load_verified_dataset", "restrict_to_first_documents"]
 
 ALL_SPLITS: tuple[str, ...] = ("train", "validation", "test")
 
@@ -64,3 +64,44 @@ def load_verified_dataset(
                 )
             predictions.extend(load_relation_predictions(relations))
     return manifest, samples, predictions
+
+
+def restrict_to_first_documents(
+    samples: Sequence[RAGSample],
+    predictions: Sequence[RelationPrediction],
+    count: int,
+) -> tuple[list[RAGSample], list[RelationPrediction]]:
+    """把每条样本的证据篇数统一成 ``count``：不足的样本丢弃，多出的文档截掉。
+
+    用途是**控制「证据篇数」这个混杂因素**。篇数不固定的数据集上，某一类 claim
+    可能恰好配了更多证据（AVeriTeC 的冲突类平均 3.95 篇，其余 2.6–3.0 篇），
+    会随篇数变大的分数就能靠「数篇数」得分。统一篇数之后，剩下的差别才属于
+    分数本身。
+
+    保留的是每条样本**原始顺序里的前** ``count`` 篇，不做任何挑选；关系预测
+    同步只留这些文档的。
+
+    Args:
+        samples: 样本。
+        predictions: 关系预测。
+        count: 统一后的篇数，须为正整数。
+
+    Returns:
+        ``(保留并截断后的样本, 对应的关系预测)``。
+
+    Raises:
+        ValueError: ``count`` 不是正整数，或没有任何样本达到这个篇数。
+    """
+    if count < 1:
+        raise ValueError(f"count 必须是正整数，收到 {count}")
+    kept: list[RAGSample] = []
+    kept_docs: set[tuple[str, str]] = set()
+    for sample in samples:
+        if len(sample.contexts) < count:
+            continue
+        contexts = list(sample.contexts[:count])
+        kept.append(sample.model_copy(update={"contexts": tuple(contexts)}))
+        kept_docs.update((sample.sample_id, chunk.doc_id) for chunk in contexts)
+    if not kept:
+        raise ValueError(f"没有任何样本的证据达到 {count} 篇")
+    return kept, [p for p in predictions if (p.sample_id, p.doc_id) in kept_docs]

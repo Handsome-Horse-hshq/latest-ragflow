@@ -48,10 +48,13 @@ import tempfile
 from collections import defaultdict
 from pathlib import Path
 
-from rag_ds.baselines.stat_gate import STAT_GATE_VARIANTS
+from rag_ds.baselines.stat_gate import ALL_STAT_GATE_VARIANTS
 from rag_ds.dataset_manifest import DatasetManifestError
 from rag_ds.experiments import run_nested_cross_validation
-from rag_ds.experiments.data_loading import load_verified_dataset
+from rag_ds.experiments.data_loading import (
+    load_verified_dataset,
+    restrict_to_first_documents,
+)
 from rag_ds.experiments.export import write_predictions_csv
 from rag_ds.integrity import PipelineError
 from rag_ds.metrics import (
@@ -101,7 +104,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--stat-gate",
         nargs="+",
         default=[],
-        choices=list(STAT_GATE_VARIANTS),
+        choices=list(ALL_STAT_GATE_VARIANTS),
         help="加入不用 D-S 的两维判定对照组，可给多个纵轴统计量",
     )
     parser.add_argument(
@@ -110,6 +113,15 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="conflict_aware 的平衡度候选；给出时三个参数一起搜",
+    )
+    parser.add_argument(
+        "--first-documents",
+        type=int,
+        default=None,
+        help=(
+            "只保留证据至少有这么多篇的 claim，并且每条只用前这么多篇；"
+            "用来控制「证据篇数」这个混杂因素"
+        ),
     )
     parser.add_argument("--out-dir", type=Path, default=None)
     parser.add_argument("--overwrite", action="store_true")
@@ -153,6 +165,10 @@ def main(argv: list[str] | None = None) -> int:
             args.evaluator,
             args.model_run_template,
         )
+        if args.first_documents is not None:
+            samples, predictions = restrict_to_first_documents(
+                samples, predictions, args.first_documents
+            )
         result = run_nested_cross_validation(
             samples,
             predictions,
@@ -160,7 +176,7 @@ def main(argv: list[str] | None = None) -> int:
             n_folds=args.n_folds,
             seed=args.seed,
             grid_steps=args.grid_steps,
-            stat_gate_statistics=[STAT_GATE_VARIANTS[s] for s in args.stat_gate],
+            stat_gate_statistics=[ALL_STAT_GATE_VARIANTS[s] for s in args.stat_gate],
             conflict_margins=args.conflict_margins,
         )
     except (
@@ -256,6 +272,11 @@ def main(argv: list[str] | None = None) -> int:
         ]
     if args.conflict_margins is not None:
         summary["conflict_margins"] = list(args.conflict_margins)
+    if args.first_documents is not None:
+        summary["first_documents"] = args.first_documents
+        summary["gold_label_counts"] = {
+            label: truth.count(label) for label in GOLD_LABELS
+        }
     _atomic_write_json(summary_path, summary)
 
     print("嵌套交叉验证完成。")
@@ -263,6 +284,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  评估器   {', '.join(args.evaluator)}")
     print(f"  折数     {result.n_folds}（分折种子 {result.seed}）")
     print(f"  评估点   {result.claim_count} 条 claim（每条恰好被预测一次）")
+    if args.first_documents is not None:
+        counts = "，".join(f"{label} {truth.count(label)}" for label in GOLD_LABELS)
+        print(f"  篇数控制 只保留证据 ≥ {args.first_documents} 篇的 claim，各用前 "
+              f"{args.first_documents} 篇（{counts}）")
     print()
     print("  各折选出的阈值：")
     print(f"    {'折':<4}{'test':>6}{'inner':>7}{'theta':>11}{'K_doc':>11}{'baseline':>10}{'innerF1':>9}")

@@ -34,6 +34,7 @@ from rag_ds.experiments.detection_proxies import (
     ClaimDetectionScores,
     DetectionComparison,
     compare_detection,
+    conflict_auroc_by_document_count,
     detection_scores,
 )
 from rag_ds.experiments.reliability_sensitivity import (
@@ -76,6 +77,7 @@ __all__ = [
     "apply_document_reliability",
     "collect_predictions",
     "compare_detection",
+    "conflict_auroc_by_document_count",
     "detection_scores",
     "make_stratified_folds",
     "oracle_reliability_from_provenance",

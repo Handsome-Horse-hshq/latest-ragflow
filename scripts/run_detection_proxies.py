@@ -33,7 +33,11 @@ from pathlib import Path
 
 from rag_ds.dataset_manifest import DatasetManifestError
 from rag_ds.experiments.data_loading import load_verified_dataset
-from rag_ds.experiments.detection_proxies import compare_detection, detection_scores
+from rag_ds.experiments.detection_proxies import (
+    compare_detection,
+    conflict_auroc_by_document_count,
+    detection_scores,
+)
 from rag_ds.integrity import PipelineError
 from rag_ds.metrics import DEFAULT_RESAMPLES, DEFAULT_SEED
 from rag_ds.model_runs import ModelRunError
@@ -106,6 +110,8 @@ def main(argv: list[str] | None = None) -> int:
     results = compare_detection(
         rows, n_resamples=args.resamples, seed=args.bootstrap_seed
     )
+    # 证据篇数不固定的数据集：在篇数相同的 claim 内部再比一次，控制掉「数篇数」。
+    by_count = conflict_auroc_by_document_count(rows)
 
     def _write_summary(handle) -> None:
         json.dump(
@@ -117,6 +123,7 @@ def main(argv: list[str] | None = None) -> int:
                     task: json.loads(result.model_dump_json())
                     for task, result in results.items()
                 },
+                "conflict_auroc_by_document_count": by_count,
             },
             handle,
             ensure_ascii=False,
@@ -168,6 +175,16 @@ def main(argv: list[str] | None = None) -> int:
                     f"{item.ci_high:>+10.4f}{item.p_value:>8.3f}   {verdict}"
                 )
             print(line)
+    if by_count:
+        print()
+        print("  conflict：证据篇数相同的 claim 内部的 AUROC（控制掉「数篇数」）")
+        columns = [key for key in by_count[0] if key not in ("document_count", "claims", "conflicting")]
+        print(f"    {'篇数':<6}{'claim':>7}{'冲突':>6}" + "".join(f"{c:>14}" for c in columns))
+        for row in by_count:
+            print(
+                f"    {row['document_count']:<6}{row['claims']:>7}{row['conflicting']:>6}"
+                + "".join(f"{row[c]:>14.4f}" for c in columns)
+            )
     print()
     print(f"  输出 {summary_path}")
     print(f"       {table_path}")

@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "dataset_name": "rag-ds-averitec-balanced-v1",
+  "split": "test",
+  "relation_predictions_kind": "model_prediction",
+  "evaluator": "refchecker_nli",
+  "producer": "refchecker-nli",
+  "producer_version": null,
+  "extractor_name": null,
+  "checker_name": "ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli",
+  "samples": {
+    "path": "test.jsonl",
+    "sha256": "e64a987d48efbc39909d1e39e3afefda7fcebe5560c48f7198780259476cf4d6",
+    "records": 184
+  },
+  "relation_predictions": {
+    "path": "test_relations_refchecker_nli_probs.jsonl",
+    "sha256": "1856d47cea5a5a5c07a0b662cb796c7d432cfb32005dbc0522b7c900a7e31489",
+    "records": 533
+  },
+  "source_output": {
+    "path": "outputs/ragchecker_averitec/test_checking_outputs_probs.json",
+    "sha256": "ea29524963edb25ff38d340942e3afa7976d4aed15d41fab74577ca9dbaee655"
+  },
+  "label_mapping": {
+    "entailment": [
+      0.9,
+      0.05,
+      0.05
+    ],
+    "contradiction": [
+      0.05,
+      0.9,
+      0.05
+    ],
+    "neutral": [
+      0.05,
+      0.05,
+      0.9
+    ]
+  },
+  "label_mapping_source": "continuous_probabilities",
+  "calibration_path": null,
+  "multi_claim_policy": "mixture",
+  "evaluator_reliability": 1.0,
+  "created_at": "2026-10-11T08:20:26+00:00"
+}

@@ -50,7 +50,8 @@ class SplitArtifacts(_FrozenModel):
     """一个数据划分的样本、annotation-oracle 关系和类别分布。"""
 
     samples: ArtifactDigest
-    relation_predictions: ArtifactDigest
+    #: 数据集没有逐条证据的人工立场标注时为 ``None``（例如 AVeriTeC）。
+    relation_predictions: ArtifactDigest | None = None
     provenance: ArtifactDigest
     label_counts: dict[EvidenceState, int]
 
@@ -77,6 +78,8 @@ class DatasetSource(_FrozenModel):
     raw_file: NonEmptyStr
     raw_sha256: Sha256
     raw_records: int = Field(ge=1)
+    #: 原始数据不止一个文件时，其余文件的路径（相对 ``data/raw``）与摘要。
+    extra_raw_files: tuple[ArtifactDigest, ...] | None = None
 
 
 class DatasetManifest(_FrozenModel):
@@ -89,7 +92,11 @@ class DatasetManifest(_FrozenModel):
     per_class: int = Field(ge=1)
     split_per_class: dict[SplitKey, int]
     label_mapping: dict[NonEmptyStr, EvidenceState]
-    relation_predictions_kind: Literal["annotation_oracle"] = "annotation_oracle"
+    #: ``none``：数据集不带 annotation-oracle 关系，各 split 的
+    #: ``relation_predictions`` 必须全部为 ``None``。
+    relation_predictions_kind: Literal["annotation_oracle", "none"] = (
+        "annotation_oracle"
+    )
     relation_predictions_warning: NonEmptyStr
     splits: dict[SplitKey, SplitArtifacts]
 
@@ -102,6 +109,11 @@ class DatasetManifest(_FrozenModel):
             raise ValueError("split_per_class 之和必须等于 per_class")
         if any(count < 0 for count in self.split_per_class.values()):
             raise ValueError("split_per_class 不能包含负数")
+        has_oracle = [s.relation_predictions is not None for s in self.splits.values()]
+        if self.relation_predictions_kind == "none" and any(has_oracle):
+            raise ValueError("relation_predictions_kind 为 none 时不应登记 oracle 关系")
+        if self.relation_predictions_kind == "annotation_oracle" and not all(has_oracle):
+            raise ValueError("annotation_oracle 数据集的每个 split 都必须登记 oracle 关系")
         return self
 
 
@@ -171,6 +183,11 @@ def verify_split_artifacts(
     manifest_file = Path(manifest_path).resolve()
     manifest = load_dataset_manifest(manifest_file)
     split = manifest.splits[split_name]
+    if split.relation_predictions is None:
+        raise DatasetManifestError(
+            f"数据集 {manifest.dataset_name!r} 没有登记 annotation-oracle 关系；"
+            "模型产出的关系请配合 model-run 清单使用"
+        )
     registered_samples = _verify_artifact(manifest_file.parent, split.samples)
     registered_predictions = _verify_artifact(
         manifest_file.parent, split.relation_predictions
@@ -215,7 +232,8 @@ def write_dataset_manifest(
     temp_path = Path(temp_name)
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
-            handle.write(manifest.model_dump_json(indent=2))
+            # exclude_none：可选字段没填时不写出，已有数据集重建后的清单逐字不变。
+            handle.write(manifest.model_dump_json(indent=2, exclude_none=True))
             handle.write("\n")
         os.replace(temp_path, target)
     except BaseException:

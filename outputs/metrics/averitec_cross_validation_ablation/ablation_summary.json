@@ -1,0 +1,668 @@
+{
+  "dataset_name": "rag-ds-averitec-balanced-v1",
+  "evaluators": [
+    "refchecker_nli"
+  ],
+  "n_folds": 5,
+  "fold_seed": 42,
+  "claim_count": 920,
+  "macro_labels": [
+    "supported",
+    "refuted",
+    "insufficient",
+    "conflicting"
+  ],
+  "variants": [
+    "full",
+    "no_theta_gate",
+    "no_doc_conflict_gate",
+    "no_two_dimensional_gate"
+  ],
+  "folds": [
+    {
+      "fold": 0,
+      "test_size": 184,
+      "inner_size": 736,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.699756,
+          "document_conflict_threshold": 0.016692,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.002418,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.699756,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.3952813228710177,
+        "no_theta_gate": 0.3221874877564017,
+        "no_doc_conflict_gate": 0.3300357641437474,
+        "no_two_dimensional_gate": 0.24106280193236718
+      }
+    },
+    {
+      "fold": 1,
+      "test_size": 184,
+      "inner_size": 736,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.737864,
+          "document_conflict_threshold": 0.001538,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.001538,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.737864,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.3971271504848482,
+        "no_theta_gate": 0.3321374775837975,
+        "no_doc_conflict_gate": 0.32973106748061376,
+        "no_two_dimensional_gate": 0.25059622374272295
+      }
+    },
+    {
+      "fold": 2,
+      "test_size": 184,
+      "inner_size": 736,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.710398,
+          "document_conflict_threshold": 0.002086,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.002086,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.710398,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.40359229313087575,
+        "no_theta_gate": 0.32882542720612207,
+        "no_doc_conflict_gate": 0.3277788353724194,
+        "no_two_dimensional_gate": 0.2409565580618212
+      }
+    },
+    {
+      "fold": 3,
+      "test_size": 184,
+      "inner_size": 736,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.678854,
+          "document_conflict_threshold": 0.002439,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.002439,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.678854,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.39342783630853134,
+        "no_theta_gate": 0.33711074643504885,
+        "no_doc_conflict_gate": 0.3217996461074318,
+        "no_two_dimensional_gate": 0.24639652979809418
+      }
+    },
+    {
+      "fold": 4,
+      "test_size": 184,
+      "inner_size": 736,
+      "thresholds": {
+        "full": {
+          "theta_threshold": 0.645844,
+          "document_conflict_threshold": 0.002279,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_theta_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 0.002279,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_doc_conflict_gate": {
+          "theta_threshold": 0.645844,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "no_two_dimensional_gate": {
+          "theta_threshold": 1.0,
+          "document_conflict_threshold": 1.0,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": {
+        "full": 0.419204532137897,
+        "no_theta_gate": 0.33555262809771585,
+        "no_doc_conflict_gate": 0.33930728604680593,
+        "no_two_dimensional_gate": 0.24333751044277357
+      }
+    }
+  ],
+  "reports": {
+    "full": {
+      "method": "full",
+      "accuracy": 0.4076086956521739,
+      "macro_f1": 0.3942423314752795,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.575,
+          "recall": 0.2,
+          "f1": 0.2967741935483871,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.5166666666666667,
+          "recall": 0.4043478260869565,
+          "f1": 0.45365853658536587,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.3430493273542601,
+          "recall": 0.6652173913043479,
+          "f1": 0.4526627218934911,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.3878504672897196,
+          "recall": 0.36086956521739133,
+          "f1": 0.3738738738738739,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          46,
+          15,
+          120,
+          49,
+          0
+        ],
+        [
+          7,
+          93,
+          86,
+          44,
+          0
+        ],
+        [
+          6,
+          33,
+          153,
+          38,
+          0
+        ],
+        [
+          21,
+          39,
+          87,
+          83,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "no_theta_gate": {
+      "method": "no_theta_gate",
+      "accuracy": 0.3858695652173913,
+      "macro_f1": 0.33070301090550985,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.5208333333333334,
+          "recall": 0.43478260869565216,
+          "f1": 0.47393364928909953,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.32661290322580644,
+          "recall": 0.7043478260869566,
+          "f1": 0.4462809917355372,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.40086206896551724,
+          "recall": 0.4043478260869565,
+          "f1": 0.4025974025974026,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          100,
+          78,
+          0,
+          52,
+          0
+        ],
+        [
+          20,
+          162,
+          0,
+          48,
+          0
+        ],
+        [
+          24,
+          167,
+          0,
+          39,
+          0
+        ],
+        [
+          48,
+          89,
+          0,
+          93,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "no_doc_conflict_gate": {
+      "method": "no_doc_conflict_gate",
+      "accuracy": 0.3869565217391304,
+      "macro_f1": 0.3270304213937226,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.44642857142857145,
+          "recall": 0.32608695652173914,
+          "f1": 0.3768844221105528,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.4271186440677966,
+          "recall": 0.5478260869565217,
+          "f1": 0.48,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.33916849015317285,
+          "recall": 0.6739130434782609,
+          "f1": 0.4512372634643377,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          75,
+          28,
+          127,
+          0,
+          0
+        ],
+        [
+          17,
+          126,
+          87,
+          0,
+          0
+        ],
+        [
+          21,
+          54,
+          155,
+          0,
+          0
+        ],
+        [
+          55,
+          87,
+          88,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "no_two_dimensional_gate": {
+      "method": "no_two_dimensional_gate",
+      "accuracy": 0.36195652173913045,
+      "macro_f1": 0.2444709995006064,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.45918367346938777,
+          "recall": 0.5869565217391305,
+          "f1": 0.5152671755725191,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.31629392971246006,
+          "recall": 0.8608695652173913,
+          "f1": 0.46261682242990654,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          135,
+          95,
+          0,
+          0,
+          0
+        ],
+        [
+          32,
+          198,
+          0,
+          0,
+          0
+        ],
+        [
+          40,
+          190,
+          0,
+          0,
+          0
+        ],
+        [
+          87,
+          143,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    }
+  },
+  "intervals": {
+    "full": {
+      "method": "full",
+      "metric": "macro_f1",
+      "observed": 0.3942423314752795,
+      "ci_low": 0.36167773347015925,
+      "ci_high": 0.4265002160789214,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "no_theta_gate": {
+      "method": "no_theta_gate",
+      "metric": "macro_f1",
+      "observed": 0.33070301090550985,
+      "ci_low": 0.3040326995266339,
+      "ci_high": 0.3555402831151244,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "no_doc_conflict_gate": {
+      "method": "no_doc_conflict_gate",
+      "metric": "macro_f1",
+      "observed": 0.3270304213937226,
+      "ci_low": 0.3017462039344354,
+      "ci_high": 0.3514000225320866,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "no_two_dimensional_gate": {
+      "method": "no_two_dimensional_gate",
+      "metric": "macro_f1",
+      "observed": 0.2444709995006064,
+      "ci_low": 0.22686051164651908,
+      "ci_high": 0.26130952380952377,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    }
+  },
+  "comparisons_vs_full": [
+    {
+      "method_a": "no_theta_gate",
+      "method_b": "full",
+      "metric": "macro_f1",
+      "observed_a": 0.33070301090550985,
+      "observed_b": 0.3942423314752795,
+      "observed_delta": -0.06353932056976963,
+      "ci_low": -0.091401881766764,
+      "ci_high": -0.03568325529061511,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "no_doc_conflict_gate",
+      "method_b": "full",
+      "metric": "macro_f1",
+      "observed_a": 0.3270304213937226,
+      "observed_b": 0.3942423314752795,
+      "observed_delta": -0.06721191008155686,
+      "ci_low": -0.09210436039205533,
+      "ci_high": -0.04088236083248603,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "no_two_dimensional_gate",
+      "method_b": "full",
+      "metric": "macro_f1",
+      "observed_a": 0.2444709995006064,
+      "observed_b": 0.3942423314752795,
+      "observed_delta": -0.14977133197467307,
+      "ci_low": -0.18358426921384627,
+      "ci_high": -0.1154087878637699,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    }
+  ]
+}

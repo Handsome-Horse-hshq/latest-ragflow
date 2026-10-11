@@ -31,11 +31,26 @@ data/processed/*
 !data/processed/climate_fever_v1/**
 !data/processed/climate_fever_v2/
 !data/processed/climate_fever_v2/**
+# AVeriTeC（CC-BY-NC-4.0：非商业使用并注明出处，见 data/raw/averitec/SOURCE.md）：
+# 原始文件、处理后的数据集与 outputs/ragchecker_averitec/ 都入库。
+!data/raw/averitec/
+!data/raw/averitec/**
+!data/processed/averitec_v1/
+!data/processed/averitec_v1/**
 # 仍然不入库：断点续跑的中间进度与原子写入的临时文件。
 # 例外：作废的 flan-t5 输出（含一个 partial 文件）作为缺陷证据保留，见其 README.txt。
 outputs/**/*.partial.jsonl
+outputs/**/*.partial.json
 !outputs/ragchecker_v2/_invalid_flan_t5_sum_logprob/*.partial.jsonl
 outputs/**/*.tmp
+# CONFACT 的上游仓库没有声明许可证，带它原文的文件一律不入库：原始文件与处理后
+# 的样本已被上面的 data/ 规则排除，这里再排除含网页段落的 NLI 输入输出。
+# 不含原文的指标（outputs/metrics/confact_reliability/）照常入库。
+outputs/ragchecker_confact/
+
+# 本地密钥：只放在这台机器上，永远不入库。
+.env
+.env.*
 
 # 编辑器
 .vscode/

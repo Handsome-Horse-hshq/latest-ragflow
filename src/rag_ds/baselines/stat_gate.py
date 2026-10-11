@@ -68,6 +68,8 @@ from rag_ds.schemas import (
 )
 
 __all__ = [
+    "ALL_STAT_GATE_VARIANTS",
+    "STAT_GATE_CONTROLS",
     "STAT_GATE_VARIANTS",
     "ConflictStatistic",
     "InsufficiencyStatistic",
@@ -86,6 +88,9 @@ class ConflictStatistic(str, Enum):
     SUPPORT_REFUTE_STD = "sr_std"
     #: 折扣后的最强支持 × 最强反驳。
     MAX_PRODUCT = "max_product"
+    #: **不是冲突统计量**：``1 - 1 / 证据篇数``，只用于混杂因素对照（见
+    #: :data:`STAT_GATE_CONTROLS`）。
+    DOCUMENT_COUNT = "doc_count"
 
 
 class InsufficiencyStatistic(str, Enum):
@@ -129,8 +134,30 @@ STAT_GATE_VARIANTS: dict[str, StatGateVariant] = {
     for variant in (
         StatGateVariant(conflict=conflict, insufficiency=insufficiency)
         for insufficiency in InsufficiencyStatistic
-        for conflict in ConflictStatistic
+        for conflict in (ConflictStatistic.SUPPORT_REFUTE_STD, ConflictStatistic.MAX_PRODUCT)
     )
+}
+
+#: 混杂因素对照：纵轴换成「证据篇数」，完全不看文档之间是否矛盾。
+#:
+#: 证据篇数不固定的数据集上，冲突类 claim 可能恰好配了更多证据（AVeriTeC：
+#: 冲突类平均 3.95 篇，其余 2.6–3.0 篇）。会随篇数变大的冲突分数（``K_doc``、
+#: ``max_product``）因此可以靠「数篇数」得分。这两个变体量出「只数篇数」能
+#: 拿到多少：真正的冲突统计量超出它的部分，才是识别冲突的贡献。
+STAT_GATE_CONTROLS: dict[str, StatGateVariant] = {
+    variant.name: variant
+    for variant in (
+        StatGateVariant(
+            conflict=ConflictStatistic.DOCUMENT_COUNT, insufficiency=insufficiency
+        )
+        for insufficiency in InsufficiencyStatistic
+    )
+}
+
+#: 命令行可以选的全部变体：四个正式变体加两个对照。
+ALL_STAT_GATE_VARIANTS: dict[str, StatGateVariant] = {
+    **STAT_GATE_VARIANTS,
+    **STAT_GATE_CONTROLS,
 }
 
 
@@ -202,10 +229,13 @@ def _claim_scores(
         mean = sum(w * m for w, m in zip(weights, margins)) / total
         variance = sum(w * (m - mean) ** 2 for w, m in zip(weights, margins)) / total
         conflict = math.sqrt(max(variance, 0.0))
-    else:
+    elif variant.conflict is ConflictStatistic.MAX_PRODUCT:
         conflict = max(w * p.p_support for w, p in zip(weights, predictions)) * max(
             w * p.p_refute for w, p in zip(weights, predictions)
         )
+    else:
+        # 混杂因素对照：只看有几篇文档（多评估器时同一篇文档只算一次）。
+        conflict = 1.0 - 1.0 / len({p.doc_id for p in predictions})
 
     return StatGateScores(
         sample_id=sample.sample_id,
