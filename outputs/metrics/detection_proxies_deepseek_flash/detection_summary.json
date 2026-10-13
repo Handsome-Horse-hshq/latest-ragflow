@@ -1,0 +1,286 @@
+{
+  "dataset_name": "rag-ds-climate-fever-balanced-v2",
+  "evaluators": [
+    "deepseek_flash"
+  ],
+  "claim_count": 616,
+  "tasks": {
+    "conflict": {
+      "positive_label": "conflicting",
+      "reference": "k_doc",
+      "reports": [
+        {
+          "score_name": "k_doc",
+          "positive_label": "conflicting",
+          "auroc": 0.6521968291448811,
+          "auprc": 0.43738202975285556,
+          "best_f1": 0.43773584905660373,
+          "best_threshold": 0.043693749999999976,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "one_minus_abs_margin",
+          "positive_label": "conflicting",
+          "auroc": 0.4516430539157812,
+          "auprc": 0.21534401378603327,
+          "best_f1": 0.41054091539528437,
+          "best_threshold": 0.548,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "min_mean",
+          "positive_label": "conflicting",
+          "auroc": 0.702331759149941,
+          "auprc": 0.4513350763282311,
+          "best_f1": 0.4878048780487805,
+          "best_threshold": 0.044000000000000004,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "mean_product",
+          "positive_label": "conflicting",
+          "auroc": 0.6341710237814134,
+          "auprc": 0.3835430097890158,
+          "best_f1": 0.43761301989150087,
+          "best_threshold": 0.00232,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "max_product",
+          "positive_label": "conflicting",
+          "auroc": 0.6570810142238714,
+          "auprc": 0.43825939552461063,
+          "best_f1": 0.44771241830065356,
+          "best_threshold": 0.0035000000000000005,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "min_max",
+          "positive_label": "conflicting",
+          "auroc": 0.6637010175971214,
+          "auprc": 0.41624867023640627,
+          "best_f1": 0.46710526315789475,
+          "best_threshold": 0.07,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "sr_std",
+          "positive_label": "conflicting",
+          "auroc": 0.6253443526170799,
+          "auprc": 0.37687874097781543,
+          "best_f1": 0.4440842787682334,
+          "best_threshold": 0.02,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "document_count",
+          "positive_label": "conflicting",
+          "auroc": 0.5,
+          "auprc": 0.25,
+          "best_f1": 0.4,
+          "best_threshold": 5.0,
+          "positive_count": 154,
+          "negative_count": 462
+        }
+      ],
+      "comparisons": [
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "one_minus_abs_margin",
+          "auroc_reference": 0.6521968291448811,
+          "auroc_rival": 0.4516430539157812,
+          "observed_delta": 0.2005537752290999,
+          "ci_low": 0.11008326919039957,
+          "ci_high": 0.2917962423064464,
+          "p_value": 0.0,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "min_mean",
+          "auroc_reference": 0.6521968291448811,
+          "auroc_rival": 0.702331759149941,
+          "observed_delta": -0.05013493000505986,
+          "ci_low": -0.09064938684503898,
+          "ci_high": -0.008751393534002339,
+          "p_value": 0.0156,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "mean_product",
+          "auroc_reference": 0.6521968291448811,
+          "auroc_rival": 0.6341710237814134,
+          "observed_delta": 0.01802580536346765,
+          "ci_low": 0.0075836680053548156,
+          "ci_high": 0.028749533407988026,
+          "p_value": 0.0008,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "max_product",
+          "auroc_reference": 0.6521968291448811,
+          "auroc_rival": 0.6570810142238714,
+          "observed_delta": -0.004884185078990355,
+          "ci_low": -0.02307957057569865,
+          "ci_high": 0.01324679548781027,
+          "p_value": 0.598,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "min_max",
+          "auroc_reference": 0.6521968291448811,
+          "auroc_rival": 0.6637010175971214,
+          "observed_delta": -0.011504188452240327,
+          "ci_low": -0.05046113842278466,
+          "ci_high": 0.029561818260207318,
+          "p_value": 0.5816,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "sr_std",
+          "auroc_reference": 0.6521968291448811,
+          "auroc_rival": 0.6253443526170799,
+          "observed_delta": 0.026852476527801206,
+          "ci_low": 0.0011272118874773307,
+          "ci_high": 0.0528163497828098,
+          "p_value": 0.0388,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "document_count",
+          "auroc_reference": 0.6521968291448811,
+          "auroc_rival": 0.5,
+          "observed_delta": 0.15219682914488109,
+          "ci_low": 0.10107802109996078,
+          "ci_high": 0.2027617016956036,
+          "p_value": 0.0,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        }
+      ]
+    },
+    "insufficiency": {
+      "positive_label": "insufficient",
+      "reference": "m_theta",
+      "reports": [
+        {
+          "score_name": "m_theta",
+          "positive_label": "insufficient",
+          "auroc": 0.7857986169674481,
+          "auprc": 0.5639694196032512,
+          "best_f1": 0.5905292479108636,
+          "best_threshold": 0.6286053486628345,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "mean_unknown",
+          "positive_label": "insufficient",
+          "auroc": 0.7871338618091864,
+          "auprc": 0.5589723401418962,
+          "best_f1": 0.5872576177285319,
+          "best_threshold": 0.9040000000000001,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "min_unknown",
+          "positive_label": "insufficient",
+          "auroc": 0.7841471299263508,
+          "auprc": 0.5189325915988565,
+          "best_f1": 0.5871559633027522,
+          "best_threshold": 0.88,
+          "positive_count": 154,
+          "negative_count": 462
+        },
+        {
+          "score_name": "unknown_product",
+          "positive_label": "insufficient",
+          "auroc": 0.7861570247933884,
+          "auprc": 0.5632079379868274,
+          "best_f1": 0.5888888888888889,
+          "best_threshold": 0.603612,
+          "positive_count": 154,
+          "negative_count": 462
+        }
+      ],
+      "comparisons": [
+        {
+          "positive_label": "insufficient",
+          "reference": "m_theta",
+          "rival": "mean_unknown",
+          "auroc_reference": 0.7857986169674481,
+          "auroc_rival": 0.7871338618091864,
+          "observed_delta": -0.0013352448417383034,
+          "ci_low": -0.0068462659184115315,
+          "ci_high": 0.0034007708413905657,
+          "p_value": 0.6292,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "insufficient",
+          "reference": "m_theta",
+          "rival": "min_unknown",
+          "auroc_reference": 0.7857986169674481,
+          "auroc_rival": 0.7841471299263508,
+          "observed_delta": 0.0016514870410972993,
+          "ci_low": -0.012822094298245656,
+          "ci_high": 0.01578722495193352,
+          "p_value": 0.834,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        },
+        {
+          "positive_label": "insufficient",
+          "reference": "m_theta",
+          "rival": "unknown_product",
+          "auroc_reference": 0.7857986169674481,
+          "auroc_rival": 0.7861570247933884,
+          "observed_delta": -0.00035840782594032117,
+          "ci_low": -0.0017433899405694397,
+          "ci_high": 0.0010335676086579149,
+          "p_value": 0.6272,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 616
+        }
+      ]
+    }
+  },
+  "conflict_auroc_by_document_count": []
+}

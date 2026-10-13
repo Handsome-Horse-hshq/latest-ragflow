@@ -1,0 +1,255 @@
+{
+  "dataset_name": "rag-ds-averitec-balanced-v1",
+  "method": "llm_judge",
+  "provider": "deepseek",
+  "requested_model": "deepseek-flash",
+  "effort": "default",
+  "fallbacks_enabled": false,
+  "prompt_sha256": "aee9a7ccf00d8fbcba9bf39a88cd1b44a9cd18fff5968d2b81d03e5fd7869598",
+  "is_subset": false,
+  "claim_count": 920,
+  "report": {
+    "method": "llm_judge",
+    "accuracy": 0.6206521739130435,
+    "macro_f1": 0.5861363151363501,
+    "macro_labels": [
+      "supported",
+      "refuted",
+      "insufficient",
+      "conflicting"
+    ],
+    "per_class": [
+      {
+        "label": "supported",
+        "precision": 0.6622222222222223,
+        "recall": 0.6478260869565218,
+        "f1": 0.654945054945055,
+        "support": 230
+      },
+      {
+        "label": "refuted",
+        "precision": 0.6351351351351351,
+        "recall": 0.8173913043478261,
+        "f1": 0.714828897338403,
+        "support": 230
+      },
+      {
+        "label": "insufficient",
+        "precision": 0.5591715976331361,
+        "recall": 0.8217391304347826,
+        "f1": 0.6654929577464789,
+        "support": 230
+      },
+      {
+        "label": "conflicting",
+        "precision": 0.7377049180327869,
+        "recall": 0.1956521739130435,
+        "f1": 0.30927835051546393,
+        "support": 230
+      },
+      {
+        "label": "undetermined",
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    ],
+    "labels": [
+      "supported",
+      "refuted",
+      "insufficient",
+      "conflicting",
+      "undetermined"
+    ],
+    "matrix": [
+      [
+        149,
+        14,
+        62,
+        5,
+        0
+      ],
+      [
+        4,
+        188,
+        33,
+        5,
+        0
+      ],
+      [
+        9,
+        26,
+        189,
+        6,
+        0
+      ],
+      [
+        63,
+        68,
+        54,
+        45,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "sample_count": 920
+  },
+  "interval": {
+    "method": "llm_judge",
+    "metric": "macro_f1",
+    "observed": 0.5861363151363501,
+    "ci_low": 0.5543322194015035,
+    "ci_high": 0.61684339936312,
+    "n_resamples": 5000,
+    "seed": 42,
+    "sample_count": 920
+  },
+  "predicted_label_counts": {
+    "refuted": 296,
+    "insufficient": 338,
+    "conflicting": 61,
+    "supported": 225
+  },
+  "refusals": 0,
+  "served_models": {
+    "deepseek-flash": 920
+  },
+  "input_tokens": 466454,
+  "output_tokens": 1209441,
+  "compared_with": "outputs\\metrics\\averitec_cross_validation_deepseek_flash_controls\\cv_predictions.csv",
+  "comparisons": [
+    {
+      "method_a": "llm_judge",
+      "method_b": "conflict_aware",
+      "metric": "macro_f1",
+      "observed_a": 0.5861363151363501,
+      "observed_b": 0.47334321957347314,
+      "observed_delta": 0.11279309556287698,
+      "ci_low": 0.07435629206544458,
+      "ci_high": 0.15289678422659103,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "ds",
+      "metric": "macro_f1",
+      "observed_a": 0.5861363151363501,
+      "observed_b": 0.5780528970618177,
+      "observed_delta": 0.00808341807453239,
+      "ci_low": -0.02142183030401834,
+      "ci_high": 0.03989963182006662,
+      "p_value": 0.6096,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "majority_vote",
+      "metric": "macro_f1",
+      "observed_a": 0.5861363151363501,
+      "observed_b": 0.32985625392214724,
+      "observed_delta": 0.2562800612142029,
+      "ci_low": 0.22250526437350038,
+      "ci_high": 0.29207711313080775,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "single_evaluator",
+      "metric": "macro_f1",
+      "observed_a": 0.5861363151363501,
+      "observed_b": 0.36529287449860237,
+      "observed_delta": 0.22084344063774775,
+      "ci_low": 0.18740253771780924,
+      "ci_high": 0.25587065216587446,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_max_product",
+      "metric": "macro_f1",
+      "observed_a": 0.5861363151363501,
+      "observed_b": 0.5986808019942274,
+      "observed_delta": -0.012544486857877235,
+      "ci_low": -0.043092349136964914,
+      "ci_high": 0.018232193934458185,
+      "p_value": 0.4224,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_max_product_uprod",
+      "metric": "macro_f1",
+      "observed_a": 0.5861363151363501,
+      "observed_b": 0.5885376346810871,
+      "observed_delta": -0.0024013195447369906,
+      "ci_low": -0.031231963092857806,
+      "ci_high": 0.02716421529771862,
+      "p_value": 0.8812,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_sr_std",
+      "metric": "macro_f1",
+      "observed_a": 0.5861363151363501,
+      "observed_b": 0.5141953923464089,
+      "observed_delta": 0.07194092278994124,
+      "ci_low": 0.033490029440589875,
+      "ci_high": 0.1113461634627756,
+      "p_value": 0.0008,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_sr_std_uprod",
+      "metric": "macro_f1",
+      "observed_a": 0.5861363151363501,
+      "observed_b": 0.4867525590351677,
+      "observed_delta": 0.09938375610118244,
+      "ci_low": 0.06660228027713777,
+      "ci_high": 0.13496995493244318,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "weighted_average",
+      "metric": "macro_f1",
+      "observed_a": 0.5861363151363501,
+      "observed_b": 0.36529287449860237,
+      "observed_delta": 0.22084344063774775,
+      "ci_low": 0.18740253771780924,
+      "ci_high": 0.25587065216587446,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    }
+  ]
+}

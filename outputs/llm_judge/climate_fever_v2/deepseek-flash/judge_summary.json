@@ -1,0 +1,255 @@
+{
+  "dataset_name": "rag-ds-climate-fever-balanced-v2",
+  "method": "llm_judge",
+  "provider": "deepseek",
+  "requested_model": "deepseek-flash",
+  "effort": "default",
+  "fallbacks_enabled": false,
+  "prompt_sha256": "aee9a7ccf00d8fbcba9bf39a88cd1b44a9cd18fff5968d2b81d03e5fd7869598",
+  "is_subset": false,
+  "claim_count": 616,
+  "report": {
+    "method": "llm_judge",
+    "accuracy": 0.4788961038961039,
+    "macro_f1": 0.4555173510287426,
+    "macro_labels": [
+      "supported",
+      "refuted",
+      "insufficient",
+      "conflicting"
+    ],
+    "per_class": [
+      {
+        "label": "supported",
+        "precision": 0.5604395604395604,
+        "recall": 0.33116883116883117,
+        "f1": 0.4163265306122449,
+        "support": 154
+      },
+      {
+        "label": "refuted",
+        "precision": 0.6611570247933884,
+        "recall": 0.5194805194805194,
+        "f1": 0.5818181818181818,
+        "support": 154
+      },
+      {
+        "label": "insufficient",
+        "precision": 0.3732590529247911,
+        "recall": 0.8701298701298701,
+        "f1": 0.5224171539961013,
+        "support": 154
+      },
+      {
+        "label": "conflicting",
+        "precision": 0.6666666666666666,
+        "recall": 0.19480519480519481,
+        "f1": 0.3015075376884422,
+        "support": 154
+      },
+      {
+        "label": "undetermined",
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    ],
+    "labels": [
+      "supported",
+      "refuted",
+      "insufficient",
+      "conflicting",
+      "undetermined"
+    ],
+    "matrix": [
+      [
+        51,
+        7,
+        86,
+        10,
+        0
+      ],
+      [
+        4,
+        80,
+        66,
+        4,
+        0
+      ],
+      [
+        8,
+        11,
+        134,
+        1,
+        0
+      ],
+      [
+        28,
+        23,
+        73,
+        30,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "sample_count": 616
+  },
+  "interval": {
+    "method": "llm_judge",
+    "metric": "macro_f1",
+    "observed": 0.4555173510287426,
+    "ci_low": 0.41496219998011624,
+    "ci_high": 0.4948146243360416,
+    "n_resamples": 5000,
+    "seed": 42,
+    "sample_count": 616
+  },
+  "predicted_label_counts": {
+    "insufficient": 359,
+    "refuted": 121,
+    "supported": 91,
+    "conflicting": 45
+  },
+  "refusals": 0,
+  "served_models": {
+    "deepseek-flash": 616
+  },
+  "input_tokens": 311892,
+  "output_tokens": 874013,
+  "compared_with": "outputs\\metrics\\cross_validation_controls\\cv_predictions.csv",
+  "comparisons": [
+    {
+      "method_a": "llm_judge",
+      "method_b": "conflict_aware",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.337404377076752,
+      "observed_delta": 0.11811297395199055,
+      "ci_low": 0.0744837875476772,
+      "ci_high": 0.16098083405712538,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "ds",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.35351592988920666,
+      "observed_delta": 0.10200142113953592,
+      "ci_low": 0.054915506746851195,
+      "ci_high": 0.14735726510516078,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "majority_vote",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.2495992974199598,
+      "observed_delta": 0.2059180536087828,
+      "ci_low": 0.1644195841762019,
+      "ci_high": 0.24725486206539093,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "single_evaluator",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.2512399058800755,
+      "observed_delta": 0.20427744514866708,
+      "ci_low": 0.16315724617355526,
+      "ci_high": 0.24518810346147335,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_max_product",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.35345777562758696,
+      "observed_delta": 0.10205957540115562,
+      "ci_low": 0.052895159059458186,
+      "ci_high": 0.15077817536866378,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_max_product_uprod",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.3659280959257545,
+      "observed_delta": 0.0895892551029881,
+      "ci_low": 0.039977778549941,
+      "ci_high": 0.13908970582704433,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_sr_std",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.35190104413726137,
+      "observed_delta": 0.10361630689148121,
+      "ci_low": 0.056259455533944125,
+      "ci_high": 0.14963908231456247,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_sr_std_uprod",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.3481348606513911,
+      "observed_delta": 0.10738249037735148,
+      "ci_low": 0.058571510031060814,
+      "ci_high": 0.15354223667264805,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "weighted_average",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.2512399058800755,
+      "observed_delta": 0.20427744514866708,
+      "ci_low": 0.16315724617355526,
+      "ci_high": 0.24518810346147335,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+﻿task,positive_label,score,auroc,auprc,best_f1,delta_reference_minus_score,delta_ci_low,delta_ci_high,p_value,significant
+conflict,conflicting,k_doc,0.652197,0.437382,0.437736,,,,,
+conflict,conflicting,one_minus_abs_margin,0.451643,0.215344,0.410541,+0.200554,+0.110083,+0.291796,0.0000,True
+conflict,conflicting,min_mean,0.702332,0.451335,0.487805,-0.050135,-0.090649,-0.008751,0.0156,True
+conflict,conflicting,mean_product,0.634171,0.383543,0.437613,+0.018026,+0.007584,+0.028750,0.0008,True
+conflict,conflicting,max_product,0.657081,0.438259,0.447712,-0.004884,-0.023080,+0.013247,0.5980,False
+conflict,conflicting,min_max,0.663701,0.416249,0.467105,-0.011504,-0.050461,+0.029562,0.5816,False
+conflict,conflicting,sr_std,0.625344,0.376879,0.444084,+0.026852,+0.001127,+0.052816,0.0388,True
+conflict,conflicting,document_count,0.500000,0.250000,0.400000,+0.152197,+0.101078,+0.202762,0.0000,True
+insufficiency,insufficient,m_theta,0.785799,0.563969,0.590529,,,,,
+insufficiency,insufficient,mean_unknown,0.787134,0.558972,0.587258,-0.001335,-0.006846,+0.003401,0.6292,False
+insufficiency,insufficient,min_unknown,0.784147,0.518933,0.587156,+0.001651,-0.012822,+0.015787,0.8340,False
+insufficiency,insufficient,unknown_product,0.786157,0.563208,0.588889,-0.000358,-0.001743,+0.001034,0.6272,False

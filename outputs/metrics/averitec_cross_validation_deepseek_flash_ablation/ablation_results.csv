@@ -1,0 +1,5 @@
+﻿variant,accuracy,macro_f1,macro_f1_ci_low,macro_f1_ci_high,delta_vs_full,delta_ci_low,delta_ci_high,p_value,significant
+full,0.584783,0.578053,0.545552,0.609839,,,,,
+no_theta_gate,0.468478,0.434486,0.406908,0.461283,-0.143567,-0.168446,-0.118543,0.0000,True
+no_doc_conflict_gate,0.532609,0.457454,0.432958,0.481318,-0.120599,-0.143803,-0.095877,0.0000,True
+no_two_dimensional_gate,0.423913,0.318767,0.300827,0.337221,-0.259286,-0.290951,-0.225686,0.0000,True

@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "dataset_name": "rag-ds-averitec-balanced-v1",
+  "split": "validation",
+  "relation_predictions_kind": "model_prediction",
+  "evaluator": "deepseek_flash",
+  "producer": "llm-relation-checker",
+  "producer_version": null,
+  "extractor_name": null,
+  "checker_name": "deepseek-flash",
+  "samples": {
+    "path": "validation.jsonl",
+    "sha256": "7edfa67f81a261bdc040a1b600502e50bb8cb2006d125b6ebb7b0e49247341d8",
+    "records": 184
+  },
+  "relation_predictions": {
+    "path": "validation_relations_deepseek_flash_probs.jsonl",
+    "sha256": "47b4d4e8f6fda2a582209024b8394ce08445a90a752d09eb31020d54715e6c54",
+    "records": 558
+  },
+  "source_output": {
+    "path": "outputs/ragchecker_averitec/validation_checking_outputs_deepseek_flash.json",
+    "sha256": "5fff9ef35462b2db332cf42a777f465d3059cb2044d4b52714909d410c329920"
+  },
+  "label_mapping": {
+    "entailment": [
+      0.9,
+      0.05,
+      0.05
+    ],
+    "contradiction": [
+      0.05,
+      0.9,
+      0.05
+    ],
+    "neutral": [
+      0.05,
+      0.05,
+      0.9
+    ]
+  },
+  "label_mapping_source": "continuous_probabilities",
+  "calibration_path": null,
+  "multi_claim_policy": "mixture",
+  "evaluator_reliability": 1.0,
+  "created_at": "2026-10-13T00:55:23+00:00"
+}

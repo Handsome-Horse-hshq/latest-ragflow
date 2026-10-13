@@ -164,7 +164,7 @@ def main(argv: list[str] | None = None) -> int:
         positives = result.reports[0].positive_count
         print()
         print(f"  {task}：正类 {result.positive_label}（{positives} 条），参照 {result.reference}")
-        print(f"    {'分数':<24}{'AUROC':>8}{'AUPRC':>8}{'参照−它':>10}{'CI 下界':>10}{'CI 上界':>10}{'p':>8}   结论")
+        print(f"    {'分数':<24}{'AUROC':>8}{'AUPRC':>8}{'参照-它':>10}{'CI 下界':>10}{'CI 上界':>10}{'p':>8}   结论")
         for report in result.reports:
             item = by_rival.get(report.score_name)
             line = f"    {report.score_name:<24}{report.auroc:>8.4f}{report.auprc:>8.4f}"

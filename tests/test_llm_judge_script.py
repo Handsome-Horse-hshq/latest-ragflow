@@ -281,3 +281,22 @@ def test_prompt_digest_tracks_the_prompt(monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.setattr(judge, "SYSTEM_PROMPT", judge.SYSTEM_PROMPT + " ")
 
     assert judge.prompt_digest() != before
+
+
+class TestSummaryName:
+    """同一批结果换一份交叉验证预测比较时，汇总写到另一个文件，不覆盖原来的。"""
+
+    BASE = ["--manifest", "m.json", "--out-dir", "out"]
+
+    def test_default_keeps_the_original_file_name(self) -> None:
+        assert judge._parse_args(self.BASE).summary_name == "judge_summary.json"
+
+    def test_another_name_is_accepted(self) -> None:
+        args = judge._parse_args([*self.BASE, "--summary-name", "judge_summary_vs_llm.json"])
+
+        assert args.summary_name == "judge_summary_vs_llm.json"
+
+    @pytest.mark.parametrize("name", ["../escape.json", "sub/dir.json", "summary.txt"])
+    def test_paths_and_other_extensions_are_refused(self, name: str) -> None:
+        with pytest.raises(SystemExit):
+            judge._parse_args([*self.BASE, "--summary-name", name])

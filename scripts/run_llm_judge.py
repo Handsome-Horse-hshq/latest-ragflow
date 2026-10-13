@@ -159,9 +159,17 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="交叉验证的 cv_predictions.csv；给出时与其中每个方法做配对自助检验",
     )
+    parser.add_argument(
+        "--summary-name",
+        default="judge_summary.json",
+        help="汇总文件名（写在 --out-dir 下）。同一批结果要与另一份交叉验证预测比较时，"
+        "换一个名字重跑即可，已判完的不会重新调用 API",
+    )
     parser.add_argument("--resamples", type=int, default=DEFAULT_RESAMPLES)
     parser.add_argument("--bootstrap-seed", type=int, default=DEFAULT_SEED)
     args = parser.parse_args(argv)
+    if Path(args.summary_name).name != args.summary_name or not args.summary_name.endswith(".json"):
+        parser.error("--summary-name 只能是一个 .json 文件名，不能带目录")
     if args.model is None:
         args.model = DEFAULT_MODELS[args.provider]
     if args.provider == "anthropic":
@@ -534,7 +542,7 @@ def main(argv: list[str] | None = None) -> int:
     """命令行入口，返回进程退出码。"""
     args = _parse_args(argv)
     predictions_path = args.out_dir / "judge_predictions.jsonl"
-    summary_path = args.out_dir / "judge_summary.json"
+    summary_path = args.out_dir / args.summary_name
 
     manifest_path = args.manifest.resolve()
     try:
@@ -650,7 +658,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  token 用量：输入 {summary['input_tokens']}，输出 {summary['output_tokens']}")
     for item in summary.get("comparisons", []):
         significant = item["ci_low"] > 0 or item["ci_high"] < 0
-        print(f"  {METHOD_NAME} − {item['method_b']:<28}{item['observed_delta']:>+8.4f}"
+        print(f"  {METHOD_NAME} - {item['method_b']:<28}{item['observed_delta']:>+8.4f}"
               f"  [{item['ci_low']:+.4f}, {item['ci_high']:+.4f}]  p={item['p_value']:.3f}"
               f"  {'显著' if significant else '不显著'}")
     if args.limit is not None:

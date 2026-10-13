@@ -1,0 +1,209 @@
+{
+  "reference": "deepseek_flash",
+  "rival": "refchecker_nli",
+  "dataset_name": "rag-ds-climate-fever-balanced-v2",
+  "relation_level": {
+    "pair_count": 3080,
+    "pairs_with_unique_majority": 2142,
+    "majority_counts": {
+      "support": 663,
+      "refute": 581,
+      "unknown": 898
+    },
+    "evaluators": {
+      "deepseek_flash": {
+        "argmax_accuracy": 0.5546218487394958,
+        "argmax_counts": {
+          "support": 103,
+          "refute": 269,
+          "unknown": 1769,
+          "tie": 1
+        }
+      },
+      "refchecker_nli": {
+        "argmax_accuracy": 0.5298786181139122,
+        "argmax_counts": {
+          "support": 85,
+          "refute": 450,
+          "unknown": 1607,
+          "tie": 0
+        }
+      }
+    },
+    "argmax_agreement": 0.8074675324675324,
+    "auroc_comparisons": [
+      {
+        "positive_label": "support",
+        "reference": "deepseek_flash",
+        "rival": "refchecker_nli",
+        "auroc_reference": 0.8128887379573455,
+        "auroc_rival": 0.6467926537130689,
+        "observed_delta": 0.16609608424427658,
+        "ci_low": 0.13840652332361514,
+        "ci_high": 0.1943263687253679,
+        "p_value": 0.0,
+        "n_resamples": 5000,
+        "seed": 42,
+        "sample_count": 2142
+      },
+      {
+        "positive_label": "refute",
+        "reference": "deepseek_flash",
+        "rival": "refchecker_nli",
+        "auroc_reference": 0.7897619580546034,
+        "auroc_rival": 0.7695847910724072,
+        "observed_delta": 0.020177166982196182,
+        "ci_low": -0.006982564632072696,
+        "ci_high": 0.04600417287498215,
+        "p_value": 0.1348,
+        "n_resamples": 5000,
+        "seed": 42,
+        "sample_count": 2142
+      },
+      {
+        "positive_label": "unknown",
+        "reference": "deepseek_flash",
+        "rival": "refchecker_nli",
+        "auroc_reference": 0.7805161881709265,
+        "auroc_rival": 0.5946896998689478,
+        "observed_delta": 0.18582648830197868,
+        "ci_low": 0.15969280416488374,
+        "ci_high": 0.21209261401447999,
+        "p_value": 0.0,
+        "n_resamples": 5000,
+        "seed": 42,
+        "sample_count": 2142
+      }
+    ]
+  },
+  "reference_cv": "outputs\\metrics\\cross_validation_deepseek_flash_controls\\cv_predictions.csv",
+  "rival_cv": "outputs\\metrics\\cross_validation_controls\\cv_predictions.csv",
+  "decision_level": [
+    {
+      "method_a": "conflict_aware@deepseek_flash",
+      "method_b": "conflict_aware@refchecker_nli",
+      "metric": "macro_f1",
+      "observed_a": 0.31865842033583924,
+      "observed_b": 0.337404377076752,
+      "observed_delta": -0.018745956740912784,
+      "ci_low": -0.0600660572557451,
+      "ci_high": 0.02059940610999178,
+      "p_value": 0.3628,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "ds@deepseek_flash",
+      "method_b": "ds@refchecker_nli",
+      "metric": "macro_f1",
+      "observed_a": 0.5052754097108599,
+      "observed_b": 0.35351592988920666,
+      "observed_delta": 0.15175947982165328,
+      "ci_low": 0.09963101354276332,
+      "ci_high": 0.20111139333432326,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "majority_vote@deepseek_flash",
+      "method_b": "majority_vote@refchecker_nli",
+      "metric": "macro_f1",
+      "observed_a": 0.21708376033340165,
+      "observed_b": 0.2495992974199598,
+      "observed_delta": -0.03251553708655813,
+      "ci_low": -0.06368428301743306,
+      "ci_high": -0.0018543933514681699,
+      "p_value": 0.038,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "single_evaluator@deepseek_flash",
+      "method_b": "single_evaluator@refchecker_nli",
+      "metric": "macro_f1",
+      "observed_a": 0.2153112094842721,
+      "observed_b": 0.2512399058800755,
+      "observed_delta": -0.0359286963958034,
+      "ci_low": -0.06613096279748437,
+      "ci_high": -0.006303909036227351,
+      "p_value": 0.0216,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "stat_gate_max_product@deepseek_flash",
+      "method_b": "stat_gate_max_product@refchecker_nli",
+      "metric": "macro_f1",
+      "observed_a": 0.5275710243286679,
+      "observed_b": 0.35345777562758696,
+      "observed_delta": 0.1741132487010809,
+      "ci_low": 0.12232910975129402,
+      "ci_high": 0.2238073796018598,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "stat_gate_max_product_uprod@deepseek_flash",
+      "method_b": "stat_gate_max_product_uprod@refchecker_nli",
+      "metric": "macro_f1",
+      "observed_a": 0.5186786747356809,
+      "observed_b": 0.3659280959257545,
+      "observed_delta": 0.15275057880992637,
+      "ci_low": 0.10037912877300975,
+      "ci_high": 0.2023031508823132,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "stat_gate_sr_std@deepseek_flash",
+      "method_b": "stat_gate_sr_std@refchecker_nli",
+      "metric": "macro_f1",
+      "observed_a": 0.46178524034560936,
+      "observed_b": 0.35190104413726137,
+      "observed_delta": 0.109884196208348,
+      "ci_low": 0.06106873786868888,
+      "ci_high": 0.1567022010361402,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "stat_gate_sr_std_uprod@deepseek_flash",
+      "method_b": "stat_gate_sr_std_uprod@refchecker_nli",
+      "metric": "macro_f1",
+      "observed_a": 0.4536244720783385,
+      "observed_b": 0.3481348606513911,
+      "observed_delta": 0.1054896114269474,
+      "ci_low": 0.05523963460659209,
+      "ci_high": 0.1547817332249477,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "weighted_average@deepseek_flash",
+      "method_b": "weighted_average@refchecker_nli",
+      "metric": "macro_f1",
+      "observed_a": 0.2153112094842721,
+      "observed_b": 0.2512399058800755,
+      "observed_delta": -0.0359286963958034,
+      "ci_low": -0.06613096279748437,
+      "ci_high": -0.006303909036227351,
+      "p_value": 0.0216,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    }
+  ]
+}

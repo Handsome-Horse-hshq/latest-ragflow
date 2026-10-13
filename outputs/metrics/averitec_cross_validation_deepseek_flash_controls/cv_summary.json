@@ -1,0 +1,1344 @@
+{
+  "dataset_name": "rag-ds-averitec-balanced-v1",
+  "evaluators": [
+    "deepseek_flash"
+  ],
+  "n_folds": 5,
+  "fold_seed": 42,
+  "claim_count": 920,
+  "macro_labels": [
+    "supported",
+    "refuted",
+    "insufficient",
+    "conflicting"
+  ],
+  "folds": [
+    {
+      "fold": 0,
+      "test_size": 184,
+      "inner_size": 736,
+      "ds_thresholds": {
+        "theta_threshold": 0.574359,
+        "document_conflict_threshold": 0.166161,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.4,
+      "baseline_conflict_threshold": 0.04,
+      "conflict_aware_decision_threshold": 0.5,
+      "conflict_aware_margin": 0.5,
+      "stat_gate_thresholds": {
+        "stat_gate_sr_std": {
+          "theta_threshold": 0.9,
+          "document_conflict_threshold": 0.427865,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product": {
+          "theta_threshold": 0.9,
+          "document_conflict_threshold": 0.075,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_sr_std_uprod": {
+          "theta_threshold": 0.557685,
+          "document_conflict_threshold": 0.427865,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product_uprod": {
+          "theta_threshold": 0.557685,
+          "document_conflict_threshold": 0.075,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": 0.5860097196179915
+    },
+    {
+      "fold": 1,
+      "test_size": 184,
+      "inner_size": 736,
+      "ds_thresholds": {
+        "theta_threshold": 0.566527,
+        "document_conflict_threshold": 0.166161,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.45,
+      "baseline_conflict_threshold": 0.04,
+      "conflict_aware_decision_threshold": 0.3,
+      "conflict_aware_margin": 0.5,
+      "stat_gate_thresholds": {
+        "stat_gate_sr_std": {
+          "theta_threshold": 0.9,
+          "document_conflict_threshold": 0.238157,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product": {
+          "theta_threshold": 0.825,
+          "document_conflict_threshold": 0.085,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_sr_std_uprod": {
+          "theta_threshold": 0.72,
+          "document_conflict_threshold": 0.238157,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product_uprod": {
+          "theta_threshold": 0.539963,
+          "document_conflict_threshold": 0.085,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": 0.6028005149882085
+    },
+    {
+      "fold": 2,
+      "test_size": 184,
+      "inner_size": 736,
+      "ds_thresholds": {
+        "theta_threshold": 0.57398,
+        "document_conflict_threshold": 0.179938,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.45,
+      "baseline_conflict_threshold": 0.04,
+      "conflict_aware_decision_threshold": 0.3,
+      "conflict_aware_margin": 0.5,
+      "stat_gate_thresholds": {
+        "stat_gate_sr_std": {
+          "theta_threshold": 0.896,
+          "document_conflict_threshold": 0.246345,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product": {
+          "theta_threshold": 0.896,
+          "document_conflict_threshold": 0.0875,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_sr_std_uprod": {
+          "theta_threshold": 0.557685,
+          "document_conflict_threshold": 0.44,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product_uprod": {
+          "theta_threshold": 0.557685,
+          "document_conflict_threshold": 0.0875,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": 0.5877182078464483
+    },
+    {
+      "fold": 3,
+      "test_size": 184,
+      "inner_size": 736,
+      "ds_thresholds": {
+        "theta_threshold": 0.597345,
+        "document_conflict_threshold": 0.1639,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.45,
+      "baseline_conflict_threshold": 0.04,
+      "conflict_aware_decision_threshold": 0.3,
+      "conflict_aware_margin": 0.5,
+      "stat_gate_thresholds": {
+        "stat_gate_sr_std": {
+          "theta_threshold": 0.9,
+          "document_conflict_threshold": 0.222161,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product": {
+          "theta_threshold": 0.9,
+          "document_conflict_threshold": 0.075,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_sr_std_uprod": {
+          "theta_threshold": 0.57375,
+          "document_conflict_threshold": 0.428661,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product_uprod": {
+          "theta_threshold": 0.57375,
+          "document_conflict_threshold": 0.075,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": 0.5792617529404473
+    },
+    {
+      "fold": 4,
+      "test_size": 184,
+      "inner_size": 736,
+      "ds_thresholds": {
+        "theta_threshold": 0.571964,
+        "document_conflict_threshold": 0.086435,
+        "evaluator_conflict_threshold": 0.4,
+        "tie_tolerance": 1e-06
+      },
+      "baseline_decision_threshold": 0.45,
+      "baseline_conflict_threshold": 0.04,
+      "conflict_aware_decision_threshold": 0.3,
+      "conflict_aware_margin": 0.5,
+      "stat_gate_thresholds": {
+        "stat_gate_sr_std": {
+          "theta_threshold": 0.9,
+          "document_conflict_threshold": 0.248465,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product": {
+          "theta_threshold": 0.83,
+          "document_conflict_threshold": 0.085,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_sr_std_uprod": {
+          "theta_threshold": 0.548208,
+          "document_conflict_threshold": 0.248465,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        },
+        "stat_gate_max_product_uprod": {
+          "theta_threshold": 0.548208,
+          "document_conflict_threshold": 0.085,
+          "evaluator_conflict_threshold": 0.4,
+          "tie_tolerance": 1e-06
+        }
+      },
+      "inner_macro_f1": 0.5896602648689309
+    }
+  ],
+  "reports": {
+    "ds": {
+      "method": "ds",
+      "accuracy": 0.5847826086956521,
+      "macro_f1": 0.5780528970618177,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.6331658291457286,
+          "recall": 0.5478260869565217,
+          "f1": 0.5874125874125874,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.6553191489361702,
+          "recall": 0.6695652173913044,
+          "f1": 0.6623655913978495,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.5057803468208093,
+          "recall": 0.7608695652173914,
+          "f1": 0.6076388888888888,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.6148148148148148,
+          "recall": 0.36086956521739133,
+          "f1": 0.4547945205479452,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          126,
+          11,
+          73,
+          20,
+          0
+        ],
+        [
+          4,
+          154,
+          49,
+          22,
+          1
+        ],
+        [
+          19,
+          25,
+          175,
+          10,
+          1
+        ],
+        [
+          50,
+          45,
+          49,
+          83,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "weighted_average": {
+      "method": "weighted_average",
+      "accuracy": 0.4260869565217391,
+      "macro_f1": 0.36529287449860237,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.7590361445783133,
+          "recall": 0.27391304347826084,
+          "f1": 0.402555910543131,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.7432432432432432,
+          "recall": 0.4782608695652174,
+          "f1": 0.582010582010582,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.3178519593613933,
+          "recall": 0.9521739130434783,
+          "f1": 0.4766050054406964,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          63,
+          2,
+          165,
+          0,
+          0
+        ],
+        [
+          0,
+          110,
+          120,
+          0,
+          0
+        ],
+        [
+          2,
+          9,
+          219,
+          0,
+          0
+        ],
+        [
+          18,
+          27,
+          185,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "majority_vote": {
+      "method": "majority_vote",
+      "accuracy": 0.3934782608695652,
+      "macro_f1": 0.32985625392214724,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.796875,
+          "recall": 0.2217391304347826,
+          "f1": 0.3469387755102041,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.7398373983739838,
+          "recall": 0.39565217391304347,
+          "f1": 0.5155807365439093,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.30013642564802184,
+          "recall": 0.9565217391304348,
+          "f1": 0.4569055036344756,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          51,
+          2,
+          177,
+          0,
+          0
+        ],
+        [
+          0,
+          91,
+          139,
+          0,
+          0
+        ],
+        [
+          2,
+          8,
+          220,
+          0,
+          0
+        ],
+        [
+          11,
+          22,
+          197,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "single_evaluator": {
+      "method": "single_evaluator",
+      "accuracy": 0.4260869565217391,
+      "macro_f1": 0.36529287449860237,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.7590361445783133,
+          "recall": 0.27391304347826084,
+          "f1": 0.402555910543131,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.7432432432432432,
+          "recall": 0.4782608695652174,
+          "f1": 0.582010582010582,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.3178519593613933,
+          "recall": 0.9521739130434783,
+          "f1": 0.4766050054406964,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          63,
+          2,
+          165,
+          0,
+          0
+        ],
+        [
+          0,
+          110,
+          120,
+          0,
+          0
+        ],
+        [
+          2,
+          9,
+          219,
+          0,
+          0
+        ],
+        [
+          18,
+          27,
+          185,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "conflict_aware": {
+      "method": "conflict_aware",
+      "accuracy": 0.4771739130434783,
+      "macro_f1": 0.47334321957347314,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.7777777777777778,
+          "recall": 0.24347826086956523,
+          "f1": 0.3708609271523179,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.8015267175572519,
+          "recall": 0.45652173913043476,
+          "f1": 0.5817174515235457,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.36253776435045315,
+          "recall": 0.5217391304347826,
+          "f1": 0.42780748663101603,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.40932642487046633,
+          "recall": 0.6869565217391305,
+          "f1": 0.512987012987013,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          56,
+          2,
+          95,
+          77,
+          0
+        ],
+        [
+          0,
+          105,
+          73,
+          52,
+          0
+        ],
+        [
+          2,
+          9,
+          120,
+          99,
+          0
+        ],
+        [
+          14,
+          15,
+          43,
+          158,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "stat_gate_sr_std": {
+      "method": "stat_gate_sr_std",
+      "accuracy": 0.508695652173913,
+      "macro_f1": 0.5141953923464089,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.5485436893203883,
+          "recall": 0.49130434782608695,
+          "f1": 0.518348623853211,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.5842696629213483,
+          "recall": 0.45217391304347826,
+          "f1": 0.5098039215686274,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.6094420600858369,
+          "recall": 0.6173913043478261,
+          "f1": 0.6133909287257019,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.3694915254237288,
+          "recall": 0.47391304347826085,
+          "f1": 0.41523809523809524,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          113,
+          9,
+          30,
+          75,
+          3
+        ],
+        [
+          4,
+          104,
+          38,
+          84,
+          0
+        ],
+        [
+          39,
+          19,
+          142,
+          27,
+          3
+        ],
+        [
+          50,
+          46,
+          23,
+          109,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "stat_gate_max_product": {
+      "method": "stat_gate_max_product",
+      "accuracy": 0.6065217391304348,
+      "macro_f1": 0.5986808019942274,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.6213991769547325,
+          "recall": 0.6565217391304348,
+          "f1": 0.638477801268499,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.6349809885931559,
+          "recall": 0.7260869565217392,
+          "f1": 0.6774847870182555,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.5445205479452054,
+          "recall": 0.691304347826087,
+          "f1": 0.6091954022988506,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.7043478260869566,
+          "recall": 0.3521739130434783,
+          "f1": 0.46956521739130436,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          151,
+          12,
+          49,
+          15,
+          3
+        ],
+        [
+          5,
+          167,
+          43,
+          15,
+          0
+        ],
+        [
+          32,
+          33,
+          159,
+          4,
+          2
+        ],
+        [
+          55,
+          51,
+          41,
+          81,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "stat_gate_sr_std_uprod": {
+      "method": "stat_gate_sr_std_uprod",
+      "accuracy": 0.49130434782608695,
+      "macro_f1": 0.4867525590351677,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.5730337078651685,
+          "recall": 0.4434782608695652,
+          "f1": 0.5,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.5428571428571428,
+          "recall": 0.4956521739130435,
+          "f1": 0.5181818181818182,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.5124223602484472,
+          "recall": 0.717391304347826,
+          "f1": 0.5978260869565217,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.35678391959798994,
+          "recall": 0.30869565217391304,
+          "f1": 0.331002331002331,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          102,
+          9,
+          69,
+          48,
+          2
+        ],
+        [
+          3,
+          114,
+          46,
+          65,
+          2
+        ],
+        [
+          25,
+          23,
+          165,
+          15,
+          2
+        ],
+        [
+          48,
+          64,
+          42,
+          71,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    },
+    "stat_gate_max_product_uprod": {
+      "method": "stat_gate_max_product_uprod",
+      "accuracy": 0.5956521739130435,
+      "macro_f1": 0.5885376346810871,
+      "macro_labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting"
+      ],
+      "per_class": [
+        {
+          "label": "supported",
+          "precision": 0.6341463414634146,
+          "recall": 0.5652173913043478,
+          "f1": 0.5977011494252874,
+          "support": 230
+        },
+        {
+          "label": "refuted",
+          "precision": 0.6558704453441295,
+          "recall": 0.7043478260869566,
+          "f1": 0.6792452830188679,
+          "support": 230
+        },
+        {
+          "label": "insufficient",
+          "precision": 0.5057803468208093,
+          "recall": 0.7608695652173914,
+          "f1": 0.6076388888888888,
+          "support": 230
+        },
+        {
+          "label": "conflicting",
+          "precision": 0.7043478260869566,
+          "recall": 0.3521739130434783,
+          "f1": 0.46956521739130436,
+          "support": 230
+        },
+        {
+          "label": "undetermined",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      ],
+      "labels": [
+        "supported",
+        "refuted",
+        "insufficient",
+        "conflicting",
+        "undetermined"
+      ],
+      "matrix": [
+        [
+          130,
+          10,
+          74,
+          15,
+          1
+        ],
+        [
+          3,
+          162,
+          48,
+          15,
+          2
+        ],
+        [
+          21,
+          29,
+          175,
+          4,
+          1
+        ],
+        [
+          51,
+          46,
+          49,
+          81,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "sample_count": 920
+    }
+  },
+  "intervals": {
+    "ds": {
+      "method": "ds",
+      "metric": "macro_f1",
+      "observed": 0.5780528970618177,
+      "ci_low": 0.5455522889990118,
+      "ci_high": 0.6098393985794591,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "weighted_average": {
+      "method": "weighted_average",
+      "metric": "macro_f1",
+      "observed": 0.36529287449860237,
+      "ci_low": 0.3384246545051844,
+      "ci_high": 0.39152826184939304,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "majority_vote": {
+      "method": "majority_vote",
+      "metric": "macro_f1",
+      "observed": 0.32985625392214724,
+      "ci_low": 0.30233641466478256,
+      "ci_high": 0.35695547905709946,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "single_evaluator": {
+      "method": "single_evaluator",
+      "metric": "macro_f1",
+      "observed": 0.36529287449860237,
+      "ci_low": 0.3384246545051844,
+      "ci_high": 0.39152826184939304,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "conflict_aware": {
+      "method": "conflict_aware",
+      "metric": "macro_f1",
+      "observed": 0.47334321957347314,
+      "ci_low": 0.4404686025262363,
+      "ci_high": 0.5052630463108931,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "stat_gate_sr_std": {
+      "method": "stat_gate_sr_std",
+      "metric": "macro_f1",
+      "observed": 0.5141953923464089,
+      "ci_low": 0.48135773552344985,
+      "ci_high": 0.5452205277003122,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "stat_gate_max_product": {
+      "method": "stat_gate_max_product",
+      "metric": "macro_f1",
+      "observed": 0.5986808019942274,
+      "ci_low": 0.566243551805811,
+      "ci_high": 0.6306525568996804,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "stat_gate_sr_std_uprod": {
+      "method": "stat_gate_sr_std_uprod",
+      "metric": "macro_f1",
+      "observed": 0.4867525590351677,
+      "ci_low": 0.4539648394584281,
+      "ci_high": 0.5173271345423307,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    "stat_gate_max_product_uprod": {
+      "method": "stat_gate_max_product_uprod",
+      "metric": "macro_f1",
+      "observed": 0.5885376346810871,
+      "ci_low": 0.5554799720157199,
+      "ci_high": 0.619654902256278,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    }
+  },
+  "comparisons": [
+    {
+      "method_a": "ds",
+      "method_b": "weighted_average",
+      "metric": "macro_f1",
+      "observed_a": 0.5780528970618177,
+      "observed_b": 0.36529287449860237,
+      "observed_delta": 0.21276002256321536,
+      "ci_low": 0.17983655684558453,
+      "ci_high": 0.24492944369653458,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "ds",
+      "method_b": "majority_vote",
+      "metric": "macro_f1",
+      "observed_a": 0.5780528970618177,
+      "observed_b": 0.32985625392214724,
+      "observed_delta": 0.2481966431396705,
+      "ci_low": 0.21350588208217808,
+      "ci_high": 0.28188758063044217,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "ds",
+      "method_b": "single_evaluator",
+      "metric": "macro_f1",
+      "observed_a": 0.5780528970618177,
+      "observed_b": 0.36529287449860237,
+      "observed_delta": 0.21276002256321536,
+      "ci_low": 0.17983655684558453,
+      "ci_high": 0.24492944369653458,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "ds",
+      "method_b": "conflict_aware",
+      "metric": "macro_f1",
+      "observed_a": 0.5780528970618177,
+      "observed_b": 0.47334321957347314,
+      "observed_delta": 0.10470967748834459,
+      "ci_low": 0.06928517800923284,
+      "ci_high": 0.13997964183210598,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "ds",
+      "method_b": "stat_gate_sr_std",
+      "metric": "macro_f1",
+      "observed_a": 0.5780528970618177,
+      "observed_b": 0.5141953923464089,
+      "observed_delta": 0.06385750471540885,
+      "ci_low": 0.029342054047155175,
+      "ci_high": 0.09842574858341702,
+      "p_value": 0.0008,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "ds",
+      "method_b": "stat_gate_max_product",
+      "metric": "macro_f1",
+      "observed_a": 0.5780528970618177,
+      "observed_b": 0.5986808019942274,
+      "observed_delta": -0.020627904932409624,
+      "ci_low": -0.04240580680250572,
+      "ci_high": 0.0012991511575491943,
+      "p_value": 0.064,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "ds",
+      "method_b": "stat_gate_sr_std_uprod",
+      "metric": "macro_f1",
+      "observed_a": 0.5780528970618177,
+      "observed_b": 0.4867525590351677,
+      "observed_delta": 0.09130033802665005,
+      "ci_low": 0.06402263461665425,
+      "ci_high": 0.11981755546865003,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "ds",
+      "method_b": "stat_gate_max_product_uprod",
+      "metric": "macro_f1",
+      "observed_a": 0.5780528970618177,
+      "observed_b": 0.5885376346810871,
+      "observed_delta": -0.01048473761926938,
+      "ci_low": -0.026089812048426197,
+      "ci_high": 0.004853190631500803,
+      "p_value": 0.1736,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    }
+  ],
+  "stat_gate": [
+    "sr_std",
+    "max_product",
+    "sr_std_uprod",
+    "max_product_uprod"
+  ],
+  "framework_comparisons": [
+    {
+      "method_a": "stat_gate_max_product",
+      "method_b": "conflict_aware",
+      "metric": "macro_f1",
+      "observed_a": 0.5986808019942274,
+      "observed_b": 0.47334321957347314,
+      "observed_delta": 0.1253375824207542,
+      "ci_low": 0.08839270976637315,
+      "ci_high": 0.16101466974334971,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "stat_gate_max_product_uprod",
+      "method_b": "conflict_aware",
+      "metric": "macro_f1",
+      "observed_a": 0.5885376346810871,
+      "observed_b": 0.47334321957347314,
+      "observed_delta": 0.11519441510761397,
+      "ci_low": 0.07937084574725811,
+      "ci_high": 0.15084250467339277,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "stat_gate_sr_std",
+      "method_b": "conflict_aware",
+      "metric": "macro_f1",
+      "observed_a": 0.5141953923464089,
+      "observed_b": 0.47334321957347314,
+      "observed_delta": 0.040852172772935735,
+      "ci_low": 0.005145982013439632,
+      "ci_high": 0.0773123665935102,
+      "p_value": 0.0264,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    },
+    {
+      "method_a": "stat_gate_sr_std_uprod",
+      "method_b": "conflict_aware",
+      "metric": "macro_f1",
+      "observed_a": 0.4867525590351677,
+      "observed_b": 0.47334321957347314,
+      "observed_delta": 0.013409339461694536,
+      "ci_low": -0.02304234776989239,
+      "ci_high": 0.050014624670565555,
+      "p_value": 0.482,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 920
+    }
+  ],
+  "conflict_margins": [
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    1.0
+  ]
+}

@@ -26,7 +26,16 @@ Dempster 融合本身；当前瓶颈在关系评估器。详见「四」到「�
 一致；不控制时冲突一维的成绩主要来自「冲突类 claim 配了更多证据」，是假象。
 CONFACT（文档来源可信度确有差异，287 条）上，文档级可靠性折扣方向为正但不
 显著，且与简单加权打平 —— 不过那里 NLI 的倾向判断接近随机，只算弱证据。
-LLM 直接判四类的脚本已就绪，尚未运行。详见「八」「九」「十」。
+详见「八」「九」。
+
+**2026-10-12 至 10-13 把关系评估器换成大模型（DeepSeek V4.1 Flash），部分结论
+随之改变**：下游一个字不改，D-S 的 Macro-F1 从 0.35 / 0.39 升到 0.51 / 0.58
+（CLIMATE-FEVER / AVeriTeC），证实瓶颈在关系评估器；两维判定对调充分的
+conflict_aware 的优势从不显著变成显著（+0.19 / +0.10，5 个种子全部显著，AVeriTeC
+控制证据篇数后仍显著）；D-S 仍不优于同框架里最好的简单统计量（`max_product`
+略高）。同一个大模型零样本直接判四类是 0.46 / 0.59：在 CLIMATE-FEVER 上显著低于
+两维判定，在 AVeriTeC 上与它打平，并且很少判「冲突」（召回率约 0.20）。只有一个
+模型、一份提示词、各跑一遍。详见「十」。
 
 第一版正式数据 `data/processed/climate_fever_v1/` 已从 CLIMATE-FEVER 构建完成
 （400 条、四类各 100、train/validation/test = 240/80/80）；v2 扩到 616 条
@@ -1593,6 +1602,10 @@ oracle 的 Cohen's κ = +0.002（随机水平）：
 
 ### 四、Dempster 融合本身没有带来四分类增益
 
+> **2026-10-13 补充**：本节的数字都来自 NLI 关系概率。换成大模型的关系概率后，
+> 「D-S 不优于最好的 Statistic Gate」不变，但「两维判定对调充分的 conflict_aware
+> 不显著」变成了显著，四个 Statistic Gate 之间也不再打平，见「十」。
+
 「D-S 显著优于聚合类 baseline」里混着三件事：能输出 `conflicting`（输出空间）、
 先分「证据不足 / 文档冲突」再看方向的**两维判定框架**、以及用 Dempster 融合
 算这两个维度的分数。`conflict_aware` 只分离了第一件，而且它本身没有调充分。
@@ -1795,6 +1808,10 @@ D-S 若要在准确率上体现独立价值，需要**文档级**可靠性确有
 
 ### 五、m_theta / K_doc 作为检测分数不优于简单统计量
 
+> **2026-10-13 补充**：换成大模型的关系概率后，本节结论在 CLIMATE-FEVER 上不变；
+> AVeriTeC 上 K_doc 成为 AUROC 最高的冲突分数，并显著高于「只数证据篇数」，
+> 见「十」。
+
 原实验 3 里 baseline 的冲突分数 `1 - |s - r|` 把「全都说不清」当成冲突，
 AUROC 低于随机。这里把一组定义合理的简单统计量**事先全部列出、全部报告**
 （定义见 `src/rag_ds/experiments/detection_proxies.py`），逐一与 D-S 分数做
@@ -1913,6 +1930,10 @@ D-S 减去对手（2000 次配对自助，`*` = 95% 区间不跨 0；ΔAUROC > 0
 上检验的观察」，不能写成结论。
 
 ### 八、第二个数据集 AVeriTeC：结论可以推广，但必须先控制「证据篇数」
+
+> **2026-10-13 补充**：本节用的是 NLI 关系概率。换成大模型后，下面三条结论里的
+> 第 3 条变了：控制证据篇数之后，两维判定对调充分的 conflict_aware 仍然显著更好，
+> 见「十」。
 
 CLIMATE-FEVER 的 claim 标签由逐条证据的多数票按规则合成，两维判定在结构上
 复刻了这条规则。AVeriTeC（Schlichtkrull et al., NeurIPS 2023 D&B）的四类判定
@@ -2118,28 +2139,302 @@ Dempster 归一化的分母接近 0，`ds` 子包按设计报错而不是返回�
 中位数降到 0.30，这样的 claim 减到 1 条 —— 折扣确实缓解了高冲突，只是没有
 转化成显著的准确率收益。
 
-### 十、LLM 直接判四类（脚本就绪，尚未运行）
+### 十、换成大模型：直接判四类，以及给两维判定当关系评估器
 
-审稿人最可能问的对照：把 claim 和全部证据一次性交给大模型，让它直接输出四类
-之一。`scripts/run_llm_judge.py` 已写好并有测试覆盖，支持 DeepSeek（只用标准库，
-JSON 输出模式）与 Anthropic（SDK，结构化输出）两个接口；零样本、不调阈值，判完
-后与嵌套交叉验证的逐条预测做配对自助检验。
+前面九节的关系概率都来自 NLI 小模型，「瓶颈在关系评估器」一直只有人工标注的
+上限分析作证据。2026-10-12 至 10-13 用 DeepSeek V4.1 Flash（接口里的模型名
+`deepseek-flash`，思考默认开启、JSON 输出模式、温度等其余参数都用默认值）补了
+两组实验，同一个模型、两种用法：
+
+- **直接判四类**（`scripts/run_llm_judge.py`）：把 claim 和它的全部证据一次性
+  交给模型，直接输出四类之一。零样本，没有任何阈值，不看标签。这是审稿人最
+  可能要的强对照。
+- **当关系评估器**（`scripts/run_llm_relations.py`）：与 NLI 路径完全同构 ——
+  每个（claim，文档）组合单独发一个请求，模型**一次只看一篇文档**，写出
+  `entailment / neutral / contradiction` 三个概率。输出与 NLI 推理脚本同形，
+  用 `ingest_ragchecker.py --use-probabilities` 摄取后，D-S、Statistic Gate、
+  conflict_aware、朴素聚合、嵌套交叉验证、消融、检测、种子稳健性全部沿用
+  「四」到「八」的同一批脚本，一个字不改。
+
+```powershell
+# 关系评估器：每个 split 一次；中断后原样重跑即可续跑（进度在 <output>.pairs.jsonl）
+python scripts/run_llm_relations.py --concurrency 10 `
+  --input outputs/ragchecker_v2/test_checking_inputs.json `
+  --output outputs/ragchecker_v2/test_checking_outputs_deepseek_flash.json
+python scripts/ingest_ragchecker.py --manifest data/processed/climate_fever_v2/manifest.json `
+  --split test --outputs outputs/ragchecker_v2/test_checking_outputs_deepseek_flash.json `
+  --use-probabilities --evaluator deepseek_flash --checker-name deepseek-flash `
+  --out-dir outputs/ragchecker_v2
+python scripts/run_cross_validation.py `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --relations-template "outputs/ragchecker_v2/{split}_relations_{evaluator}_probs.jsonl" `
+  --model-run-template "outputs/ragchecker_v2/{split}_model_run_{evaluator}_probs.json" `
+  --evaluator deepseek_flash --single-evaluator deepseek_flash `
+  --stat-gate sr_std max_product sr_std_uprod max_product_uprod `
+  --conflict-margins 0.05 0.1 0.2 0.3 0.5 1.0 `
+  --out-dir outputs/metrics/cross_validation_deepseek_flash_controls
+
+# 直接判四类；--summary-name 让同一批结果再与另一份交叉验证预测配对，不重新调用 API
+python scripts/run_llm_judge.py --provider deepseek --model deepseek-flash --max-tokens 16000 `
+  --manifest data/processed/climate_fever_v2/manifest.json `
+  --out-dir outputs/llm_judge/climate_fever_v2/deepseek-flash `
+  --compare-with outputs/metrics/cross_validation_deepseek_flash_controls/cv_predictions.csv `
+  --summary-name judge_summary_vs_deepseek_flash.json
+```
 
 密钥读自环境变量 `DEEPSEEK_API_KEY`，没有时读项目根目录 `.env` 里的同名行
 （`.env` 在 `.gitignore` 里）。脚本只在发请求时使用密钥，不打印、不写进任何输出。
 
-```powershell
-python scripts/run_llm_judge.py --provider deepseek --dry-run `
-  --manifest data/processed/climate_fever_v2/manifest.json `
-  --out-dir outputs/llm_judge/climate_fever_v2/deepseek-v4-pro
+**规模与开销。** 关系评估 5870 个组合（CLIMATE-FEVER 3080、AVeriTeC 2790），
+输入 179 万、输出 320 万词元；判四类 1536 条 claim，输入 78 万、输出 208 万词元
+（输出含思考）。实际作答的模型全部是 `deepseek-flash`，没有拒答。关系评估的
+请求数是判四类的 3.8 倍，按标价折算的开销约 1.6 倍。
 
-python scripts/run_llm_judge.py --provider deepseek `
-  --manifest data/processed/climate_fever_v2/manifest.json `
-  --out-dir outputs/llm_judge/climate_fever_v2/deepseek-v4-pro `
-  --compare-with outputs/metrics/cross_validation_controls/cv_predictions.csv
-```
+输出位置：关系文件与谱系在 `outputs/ragchecker_v2/`、`outputs/ragchecker_averitec/`
+下带 `deepseek_flash` 的文件；指标在 `outputs/metrics/*deepseek_flash*`；判四类在
+`outputs/llm_judge/<数据集>/deepseek-flash/`。
 
-**截至目前没有任何 LLM 判四类的结果**，论文里不能引用。
+#### 关系这一层：argmax 几乎没变，概率的排序好了很多
+
+CLIMATE-FEVER 带人工逐篇标注。在人工多数票唯一的 2142 个组合上（支持 663、
+反驳 581、不确定 898）比较两个评估器
+（`scripts/compare_relation_inputs.py --with-oracle`，输出
+`outputs/metrics/relation_input_comparison/summary.json`）：
+
+| | NLI（RoBERTa-large） | 大模型 | 大模型 − NLI | 95% CI |
+| --- | --- | --- | --- | --- |
+| argmax 准确率 | 0.5299 | 0.5546 | — | — |
+| AUROC：支持 | 0.6468 | 0.8129 | +0.1661 | [+0.1384, +0.1943] |
+| AUROC：反驳 | 0.7696 | 0.7898 | +0.0202 | [−0.0070, +0.0460] |
+| AUROC：不确定 | 0.5947 | 0.7805 | +0.1858 | [+0.1597, +0.2121] |
+
+大模型比 NLI 更保守：全部 3080 个组合里 85% 判成 Neutral（NLI 是 77%），判成
+Contradiction 的从 19% 降到 11%，Entailment 都不到 4%；两者 argmax 的一致率 81%，
+只看「取最大的那一类」几乎看不出差别。差别在概率的**排序**上：一篇人工
+判为支持的文档，大模型即使仍把它归为 Neutral，给它的支持概率也明显高于别的
+文档。D-S 与各个统计量用的正是这些连续值，所以下游的变化比 argmax 准确率
+暗示的大得多。**只报 argmax 准确率会严重低估评估器的差别。**
+
+大模型的概率是**口头写出**的（谱系里记为 `probability_source: verbalized`），
+比 softmax 粗：CLIMATE-FEVER 的 3080 个组合只有 167 种不同的三元组，AVeriTeC 的
+2790 个组合只有 201 种。
+
+#### 四分类：两维判定整体大幅上升，对 conflict_aware 的优势变得显著
+
+5 折嵌套交叉验证，分折种子 42，协议与「四」「八」逐项相同，只换关系输入。
+「NLI 时」一列是同一方法在 NLI 关系概率下的 Macro-F1。
+
+**CLIMATE-FEVER v2（616 条）**
+
+| 方法 | Accuracy | Macro-F1 | NLI 时 | D-S − 它 | 95% CI | p |
+| --- | --- | --- | --- | --- | --- | --- |
+| Statistic Gate（`max_product`） | 0.5341 | **0.5276** | 0.3535 | −0.0223 | [−0.0436, −0.0013] | 0.038 |
+| Statistic Gate（`max_product_uprod`） | 0.5211 | 0.5187 | 0.3659 | −0.0134 | [−0.0311, +0.0039] | 0.130 |
+| **D-S** | 0.5097 | 0.5053 | 0.3535 | — | — | — |
+| Statistic Gate（`sr_std`） | 0.4773 | 0.4618 | 0.3519 | +0.0435 | [+0.0111, +0.0755] | 0.008 |
+| 大模型直接判四类（零样本） | 0.4789 | 0.4555 | — | +0.0498 | [+0.0082, +0.0901] | 0.020 |
+| Statistic Gate（`sr_std_uprod`） | 0.4643 | 0.4536 | 0.3481 | +0.0517 | [+0.0214, +0.0816] | < 0.001 |
+| conflict_aware（调充分） | 0.3685 | 0.3187 | 0.3374 | **+0.1866** | [+0.1425, +0.2312] | < 0.001 |
+| Majority Vote | 0.3149 | 0.2171 | 0.2496 | +0.2882 | [+0.2419, +0.3329] | < 0.001 |
+| Weighted Average / Single Evaluator | 0.3149 | 0.2153 | 0.2512 | +0.2900 | [+0.2431, +0.3354] | < 0.001 |
+
+**AVeriTeC（920 条）**
+
+| 方法 | Accuracy | Macro-F1 | NLI 时 | D-S − 它 | 95% CI | p |
+| --- | --- | --- | --- | --- | --- | --- |
+| Statistic Gate（`max_product`） | 0.6065 | **0.5987** | 0.4020 | −0.0206 | [−0.0424, +0.0013] | 0.064 |
+| Statistic Gate（`max_product_uprod`） | 0.5957 | 0.5885 | 0.3945 | −0.0105 | [−0.0261, +0.0049] | 0.174 |
+| 大模型直接判四类（零样本） | 0.6207 | 0.5861 | — | −0.0081 | [−0.0399, +0.0214] | 0.610 |
+| **D-S** | 0.5848 | 0.5781 | 0.3942 | — | — | — |
+| Statistic Gate（`sr_std`） | 0.5087 | 0.5142 | 0.3808 | +0.0639 | [+0.0293, +0.0984] | 0.001 |
+| Statistic Gate（`sr_std_uprod`） | 0.4913 | 0.4868 | 0.3716 | +0.0913 | [+0.0640, +0.1198] | < 0.001 |
+| conflict_aware（调充分） | 0.4772 | 0.4733 | 0.3373 | **+0.1047** | [+0.0693, +0.1400] | < 0.001 |
+| Weighted Average / Single Evaluator | 0.4261 | 0.3653 | 0.2716 | +0.2128 | [+0.1798, +0.2449] | < 0.001 |
+| Majority Vote | 0.3935 | 0.3299 | 0.2571 | +0.2482 | [+0.2135, +0.2819] | < 0.001 |
+
+同一个方法换关系输入前后的逐条配对比较
+（`scripts/compare_relation_inputs.py`，输出在 `outputs/metrics/relation_input_comparison/`
+与 `outputs/metrics/averitec_relation_input_comparison/`）：
+
+| 大模型 − NLI（Δ Macro-F1） | CLIMATE-FEVER | 95% CI | AVeriTeC | 95% CI |
+| --- | --- | --- | --- | --- |
+| D-S | +0.1518 | [+0.0996, +0.2011] | +0.1838 | [+0.1457, +0.2229] |
+| Statistic Gate（`max_product`） | +0.1741 | [+0.1223, +0.2238] | +0.1967 | [+0.1587, +0.2351] |
+| conflict_aware（调充分） | −0.0187 | [−0.0601, +0.0206] | +0.1361 | [+0.1008, +0.1710] |
+| Weighted Average | −0.0359 | [−0.0661, −0.0063] | +0.0937 | [+0.0694, +0.1198] |
+
+评估器变强，受益的是两维判定：四个 Statistic Gate 与 D-S 在两个数据集上都显著上升
+（+0.11 ~ +0.20）。聚合类方法在 AVeriTeC 上也显著上升（+0.07 ~ +0.14），在
+CLIMATE-FEVER 上却没有受益 —— 原因见下面「conflict_aware 为什么不升反降」。
+
+5 个分折种子，**全部报告**（`outputs/metrics/cv_seed_robustness_deepseek_flash_controls.csv`
+与 `averitec_cv_seed_robustness_deepseek_flash_controls.csv`）。D-S 的 Macro-F1 在
+CLIMATE-FEVER 上是 0.505–0.524，在 AVeriTeC 上是 0.568–0.587：
+
+| D-S − 对手 | CLIMATE-FEVER：Δ 均值 | Δ 范围 | 显著 | AVeriTeC：Δ 均值 | Δ 范围 | 显著 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Statistic Gate（`max_product`） | −0.0171 | [−0.0223, −0.0098] | 1/5 | −0.0243 | [−0.0342, −0.0153] | 2/5 |
+| Statistic Gate（`max_product_uprod`） | −0.0136 | [−0.0218, −0.0060] | 2/5 | −0.0111 | [−0.0178, −0.0042] | 1/5 |
+| Statistic Gate（`sr_std`） | +0.0534 | [+0.0435, +0.0650] | 5/5 | +0.0658 | [+0.0579, +0.0724] | 5/5 |
+| Statistic Gate（`sr_std_uprod`） | +0.0553 | [+0.0469, +0.0684] | 5/5 | +0.0923 | [+0.0854, +0.0993] | 5/5 |
+| conflict_aware（调充分） | +0.1864 | [+0.1807, +0.1938] | 5/5 | +0.1076 | [+0.0982, +0.1172] | 5/5 |
+| Weighted Average / Single Evaluator | +0.2979 | [+0.2895, +0.3085] | 5/5 | +0.2140 | [+0.2022, +0.2248] | 5/5 |
+| Majority Vote | +0.2967 | [+0.2882, +0.3067] | 5/5 | +0.2488 | [+0.2379, +0.2568] | 5/5 |
+
+四点读法：
+
+1. **瓶颈确实在关系评估器。** 下游一个字不改，只把 NLI 换成大模型，D-S 的
+   Macro-F1 在两个数据集上分别涨了约 0.15 和 0.18；CLIMATE-FEVER 上离人工标注
+   输入的上限（0.829）仍然很远。
+2. **两维判定对调充分的 conflict_aware 的优势，从不显著变成又大又稳。** NLI 输入
+   时 D-S 对它的差距在 CLIMATE-FEVER 上是 +0.016（p = 0.41，0/5 个种子显著），
+   在 AVeriTeC 上控制篇数后是 +0.018（p = 0.37）；换成大模型后是 +0.19 与 +0.10，
+   两个数据集、5 个种子全部显著。不用 D-S 的 Statistic Gate 也一样：CLIMATE-FEVER
+   上四个变体全部显著高于 conflict_aware（+0.14 ~ +0.21）；AVeriTeC 上三个显著
+   （+0.04 ~ +0.13），`sr_std_uprod` 不显著（+0.013，p = 0.48）。
+3. **D-S 仍然不是两维框架里最好的实现。** `max_product` 两个变体在两个数据集、
+   全部 5 个种子上的点估计都高于 D-S（均值差 0.011–0.024），各有 1–2 个种子显著。
+   「四」的结论 —— 功劳属于两维判定框架，不属于 Dempster 规则 —— 不变。
+4. **冲突一维用哪个统计量开始有区别了。** NLI 输入时四个 Statistic Gate 与 D-S
+   互相打平；现在 D-S（`K_doc`）比标准差型的两个 `sr_std` 变体高 0.05–0.09，
+   5 个种子全部显著，乘积型的 `max_product` 又略高于 D-S。
+
+**conflict_aware 为什么不升反降，以及这个差距该怎么读。** 换成大模型后，CLIMATE-FEVER
+上朴素聚合显著变差（约 −0.03），conflict_aware 也没有提升（−0.019，不显著）。
+原因在它们共用的判定规则
+（「统一判定规则」一节）：三个平均分里 `unknown` 最高就判 `insufficient`，这一步
+没有可调的阈值。大模型给大多数文档很高的 Neutral 概率，平均之后 `unknown`
+几乎总是最高 —— 616 条里 Weighted Average 把 563 条判成 `insufficient`；
+conflict_aware 只判了 8 条 `supported`、37 条 `refuted`，其余 571 条都落在
+`insufficient`（354）和 `conflicting`（217）。两维判定没有这个问题：证据够不够由
+一个**单独的分数加可调阈值**决定，支持还是反驳只在两个方向之间比。所以这里的
++0.10 ~ +0.19 量出来的是「证据不足一维要单独设阈值、不能和支持反驳放在一起取
+最大」的价值，是框架层面的结论；它与 Dempster 规则无关（`sr_std` 版 Statistic Gate
+的横轴就是平均 `p_unknown` 加阈值，同样显著高于 conflict_aware）。conflict_aware 的
+规则是在这组实验之前定下的，没有为大模型改过。
+
+**嵌套消融**（`outputs/metrics/*cross_validation_deepseek_flash_ablation/`）：两个判定
+维度各自显著有用，幅度比 NLI 输入时更大（CLIMATE-FEVER 上 NLI 输入时是
+−0.081 / −0.054 / −0.139）。
+
+| 变体 | CLIMATE-FEVER：Macro-F1 | Δ vs full | 95% CI | AVeriTeC：Macro-F1 | Δ vs full | 95% CI |
+| --- | --- | --- | --- | --- | --- | --- |
+| full | 0.5053 | — | — | 0.5781 | — | — |
+| 去掉证据不足一维 | 0.3722 | −0.1331 | [−0.1578, −0.1066] | 0.4345 | −0.1436 | [−0.1684, −0.1185] |
+| 去掉文档冲突一维 | 0.4191 | −0.0862 | [−0.1129, −0.0582] | 0.4575 | −0.1206 | [−0.1438, −0.0959] |
+| 两维都去掉 | 0.2855 | −0.2197 | [−0.2560, −0.1812] | 0.3188 | −0.2593 | [−0.2910, −0.2257] |
+
+D-S 有 16 条（CLIMATE-FEVER）和 5 条（AVeriTeC）因为支持与反驳的信度恰好相等而
+落到 `undetermined`，按判错计；四个 Statistic Gate 各有 7–16 条。NLI 输入时一条
+都没有 —— 口头概率取值粗，才会出现精确平局。
+
+#### 检测：K_doc 在 AVeriTeC 上第一次超过「数篇数」，在 CLIMATE-FEVER 上仍不是最好
+
+与「五」同一套分数、同一个脚本（`outputs/metrics/detection_proxies_deepseek_flash/`、
+`outputs/metrics/averitec_detection_proxies_deepseek_flash/`）。冲突识别的 AUROC：
+
+| 分数 | CLIMATE-FEVER | K_doc − 它 | p | AVeriTeC | K_doc − 它 | p |
+| --- | --- | --- | --- | --- | --- | --- |
+| **K_doc**（D-S） | 0.6522 | — | — | **0.7781** | — | — |
+| `min_mean` | **0.7023** | −0.0501 | 0.016 | 0.7465 | +0.0317 | 0.099 |
+| `min_max` | 0.6637 | −0.0115 | 0.582 | 0.7561 | +0.0220 | 0.144 |
+| `max_product` | 0.6571 | −0.0049 | 0.598 | 0.7460 | +0.0321 | 0.022 |
+| `mean_product` | 0.6342 | +0.0180 | 0.001 | 0.6911 | +0.0870 | < 0.001 |
+| `sr_std` | 0.6253 | +0.0269 | 0.039 | 0.6986 | +0.0795 | < 0.001 |
+| 只数证据篇数 | 0.5000 | +0.1522 | < 0.001 | 0.7141 | +0.0640 | < 0.001 |
+
+NLI 输入时 K_doc 是 0.606 与 0.683。证据不足识别：`m_theta` 的 AUROC 是 0.786 与
+0.815（NLI 输入时 0.621 与 0.645），与平均 / 最小 / 连乘 `p_unknown` 三个统计量
+全部打平（差值都在 ±0.005 以内，均不显著）。
+
+- AVeriTeC 上 NLI 输入时「只数篇数」（0.714）高于 K_doc（0.683），是「八」里最
+  需要警惕的现象；换成大模型后 K_doc 升到 0.778，**显著高于**数篇数，也显著高于
+  `max_product` 与 `sr_std`，与 `min_mean`、`min_max` 打平。篇数相同的 claim 内部，
+  K_doc 的 AUROC 是 0.735（2 篇）、0.714（3 篇）、0.701（4 篇）、0.638（5 篇），
+  NLI 输入时对应 0.584、0.623、0.552、0.579。
+- CLIMATE-FEVER 上 `min_mean`（平均支持与平均反驳里较小的那个）显著高于 K_doc。
+  「K_doc 作为检测分数不优于简单统计量」在这个数据集上仍然成立。
+
+#### AVeriTeC 的证据篇数对照
+
+「八」的教训是 AVeriTeC 上任何结论都要先过「证据篇数」这一关，这里原样重做：
+
+| 设定 | D-S | `max_product` | conflict_aware（调充分） | D-S − conflict_aware | 95% CI | p |
+| --- | --- | --- | --- | --- | --- | --- |
+| 全部证据（920 条） | 0.5781 | 0.5987 | 0.4733 | +0.1047 | [+0.0693, +0.1400] | < 0.001 |
+| 只取前 2 篇（763 条） | 0.4539 | 0.4593 | 0.3967 | +0.0572 | [+0.0145, +0.0996] | 0.007 |
+| 只取前 3 篇（478 条） | 0.4823 | 0.4818 | 0.3625 | +0.1198 | [+0.0694, +0.1694] | < 0.001 |
+
+NLI 输入时后两行是 +0.018（p = 0.37）与 +0.040（p = 0.109）。**控制篇数之后，D-S
+对 conflict_aware 的优势仍然显著**，与 `max_product` 始终打平。`max_product` 两个
+变体对 conflict_aware 在两种截断下也都显著；`sr_std` 两个变体在前 3 篇时显著，
+前 2 篇时不显著（+0.020，p = 0.37）。
+
+冲突一维只数篇数的对照（`stat_gate_doc_count`，另两维照常用大模型的关系概率）是
+0.5667，D-S 比它高 0.0113（[−0.0202, +0.0433]，p = 0.47，**不显著**）。也就是说，
+在全部证据上，冲突一维带来的四分类增益仍然有相当一部分可以用篇数解释；检测
+AUROC 与前 K 篇截断才是 K_doc 确实读到了内容的证据。截断会丢证据，前 K 篇两行
+是对照，不是 AVeriTeC 上的最好成绩。
+
+#### 直接判四类与两维判定：同一个模型的两种用法
+
+| 数据集 | 方法 | Macro-F1 | supported | refuted | insufficient | conflicting |
+| --- | --- | --- | --- | --- | --- | --- |
+| CLIMATE-FEVER | 直接判四类 | 0.4555 | 0.416 | 0.582 | 0.522 | 0.302 |
+| CLIMATE-FEVER | D-S | 0.5053 | 0.567 | 0.559 | 0.534 | 0.361 |
+| CLIMATE-FEVER | Statistic Gate（`max_product`） | 0.5276 | 0.561 | 0.597 | 0.571 | 0.381 |
+| AVeriTeC | 直接判四类 | 0.5861 | 0.655 | 0.715 | 0.665 | 0.309 |
+| AVeriTeC | D-S | 0.5781 | 0.587 | 0.662 | 0.608 | 0.455 |
+| AVeriTeC | Statistic Gate（`max_product`） | 0.5987 | 0.638 | 0.677 | 0.609 | 0.470 |
+
+（后四列是各类 F1。）配对检验见上面两张主表的「大模型直接判四类」一行，以及
+`outputs/llm_judge/<数据集>/deepseek-flash/judge_summary_vs_deepseek_flash.json`：
+
+- CLIMATE-FEVER 上，两维判定显著高于直接判四类：D-S +0.050（p = 0.020），
+  `max_product` +0.072（p < 0.001）；两个 `sr_std` 变体与它打平；
+- AVeriTeC 上三者**打平**（直接判四类比 D-S 高 0.008，比 `max_product` 低 0.013，
+  都不显著）；
+- 对 NLI 输入的全部方法，直接判四类都显著更高（+0.09 ~ +0.33，
+  `judge_summary.json`）—— 一个零样本的大模型，胜过 NLI 小模型加任何聚合方式；
+- 直接判四类在两个数据集上都**很少判冲突**：`conflicting` 的召回率是 0.195 与
+  0.196（精确率 0.67 与 0.74），F1 只有 0.30 左右；两维判定的冲突召回率是
+  0.27–0.36，F1 0.36–0.47。AVeriTeC 上直接判四类在另外三类更强，两者相抵。
+
+这组比较**不能**读成「两维判定优于大模型直接判」。三个必须写明的不对等：
+
+1. 两维判定的阈值在带标签的数据上选（嵌套交叉验证的内层），直接判四类是零样本、
+   完全不看标签。给直接判四类加几条示例，结果很可能不同，这里没有做。
+2. CLIMATE-FEVER 的 claim 标签本来就是「逐篇证据投票再按规则合成」的，逐篇判断再
+   聚合的方法在结构上贴合造标签的方式（「八」开头说过）。标签由人直接判定的
+   AVeriTeC 上，两者打平 —— 后者才是更可信的比较。
+3. 两维判定每条 claim 要发「文档数」个请求，直接判四类只发一个。
+
+能说的是：**在同一个大模型上，逐篇判断加两维判定不比一次性直接判差，并且在
+「文档互相矛盾」这一类上明显更敏感**，同时给出可以检查的中间量（每篇文档的三个
+概率、证据不足与冲突两个分数）。
+
+#### 对前面结论的更新，与这组实验的限制
+
+| 前面的结论（NLI 输入） | 换成大模型后 |
+| --- | --- |
+| 瓶颈在关系评估器（「四」，只有人工上限作证据） | **证实**：只换评估器，D-S +0.15 / +0.18 |
+| 两维判定对调充分的 conflict_aware 不显著（「四」「八」） | **改变**：显著，+0.10 ~ +0.19，5/5 个种子；AVeriTeC 控制篇数后仍显著 |
+| D-S 与四个 Statistic Gate 打平（「四」） | **部分改变**：仍不优于 `max_product`（点估计略低）；显著优于 `sr_std` |
+| 两个判定维度各自显著有用（「六」） | **证实**，幅度更大 |
+| K_doc / m_theta 作检测分数不优于简单统计量（「五」） | CLIMATE-FEVER 上不变；AVeriTeC 上 K_doc 最高，但与 `min_mean`、`min_max` 不显著 |
+| AVeriTeC 上「只数篇数」胜过 K_doc（「八」） | **改变**：K_doc 的 AUROC 显著更高；四分类上数篇数的对照仍与 D-S 打平 |
+
+限制：
+
+- **一个模型、一份提示词、各跑一遍。** 采样温度用的是接口默认值，重跑不会逐条
+  相同；没有做提示词敏感性，也没有第二个大模型。`deepseek-v4-pro` 的判四类因
+  账户余额中断，只完成了 556 / 616 与 676 / 920 条（断点文件在
+  `outputs/llm_judge/<数据集>/deepseek-v4-pro/`，没有汇总），**不完整，不能引用**。
+- 口头概率取值粗，未做校准。
+- 多评估器（NLI + 大模型）、估计可靠性、选择性回答没有在大模型输入上重做；
+  CONFACT 也没有重跑。
+- 大模型可能在训练时见过这两个公开数据集。提示词要求只依据给出的文档，但无法
+  排除记忆的影响；直接判四类与关系评估器同样受此影响。
 
 ## 目录说明
 
@@ -2152,6 +2447,7 @@ python scripts/run_llm_judge.py --provider deepseek `
 - `tests/`：自动化测试。
 - `outputs/predictions/`：模型或评估器的预测输出。
 - `outputs/ragchecker/`：RAGChecker 的输入/输出、模型关系文件与谱系清单。
+- `outputs/llm_judge/`：大模型直接判四类的逐条结果与汇总。
 - `outputs/metrics/`：评估指标输出。
 - `outputs/figures/`：图表输出。
 

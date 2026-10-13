@@ -1,0 +1,327 @@
+{
+  "dataset_name": "rag-ds-averitec-balanced-v1",
+  "evaluators": [
+    "deepseek_flash"
+  ],
+  "claim_count": 920,
+  "tasks": {
+    "conflict": {
+      "positive_label": "conflicting",
+      "reference": "k_doc",
+      "reports": [
+        {
+          "score_name": "k_doc",
+          "positive_label": "conflicting",
+          "auroc": 0.7781190926275993,
+          "auprc": 0.5841894195066075,
+          "best_f1": 0.5485074626865671,
+          "best_threshold": 0.057275000000000076,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "one_minus_abs_margin",
+          "positive_label": "conflicting",
+          "auroc": 0.5132955261499684,
+          "auprc": 0.23206434290467587,
+          "best_f1": 0.42968750000000006,
+          "best_threshold": 0.26,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "min_mean",
+          "positive_label": "conflicting",
+          "auroc": 0.7464524259609326,
+          "auprc": 0.5399436103961668,
+          "best_f1": 0.5315614617940199,
+          "best_threshold": 0.041666666666666664,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "mean_product",
+          "positive_label": "conflicting",
+          "auroc": 0.6911058601134216,
+          "auprc": 0.46682992891108654,
+          "best_f1": 0.4758269720101782,
+          "best_threshold": 0.004096,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "max_product",
+          "positive_label": "conflicting",
+          "auroc": 0.7460270951480782,
+          "auprc": 0.5583508311926132,
+          "best_f1": 0.5257452574525745,
+          "best_threshold": 0.05,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "min_max",
+          "positive_label": "conflicting",
+          "auroc": 0.756137366099559,
+          "auprc": 0.529462940317285,
+          "best_f1": 0.5613207547169812,
+          "best_threshold": 0.08,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "sr_std",
+          "positive_label": "conflicting",
+          "auroc": 0.6986452425960932,
+          "auprc": 0.4363332664494518,
+          "best_f1": 0.5114942528735632,
+          "best_threshold": 0.05590169943749475,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "document_count",
+          "positive_label": "conflicting",
+          "auroc": 0.714080025204789,
+          "auprc": 0.39416893394539154,
+          "best_f1": 0.5056497175141242,
+          "best_threshold": 3.0,
+          "positive_count": 230,
+          "negative_count": 690
+        }
+      ],
+      "comparisons": [
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "one_minus_abs_margin",
+          "auroc_reference": 0.7781190926275993,
+          "auroc_rival": 0.5132955261499684,
+          "observed_delta": 0.26482356647763083,
+          "ci_low": 0.2110214095618288,
+          "ci_high": 0.3170278739897741,
+          "p_value": 0.0,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "min_mean",
+          "auroc_reference": 0.7781190926275993,
+          "auroc_rival": 0.7464524259609326,
+          "observed_delta": 0.03166666666666662,
+          "ci_low": -0.006256923913969814,
+          "ci_high": 0.06854996003197456,
+          "p_value": 0.0988,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "mean_product",
+          "auroc_reference": 0.7781190926275993,
+          "auroc_rival": 0.6911058601134216,
+          "observed_delta": 0.0870132325141777,
+          "ci_low": 0.051134400191004015,
+          "ci_high": 0.12207989992113355,
+          "p_value": 0.0,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "max_product",
+          "auroc_reference": 0.7781190926275993,
+          "auroc_rival": 0.7460270951480782,
+          "observed_delta": 0.03209199747952107,
+          "ci_low": 0.004719596723377406,
+          "ci_high": 0.05779229834452282,
+          "p_value": 0.0216,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "min_max",
+          "auroc_reference": 0.7781190926275993,
+          "auroc_rival": 0.756137366099559,
+          "observed_delta": 0.021981726528040313,
+          "ci_low": -0.008810258999605192,
+          "ci_high": 0.049986810867844955,
+          "p_value": 0.1436,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "sr_std",
+          "auroc_reference": 0.7781190926275993,
+          "auroc_rival": 0.6986452425960932,
+          "observed_delta": 0.07947385003150609,
+          "ci_low": 0.054077941856354284,
+          "ci_high": 0.10448206243205471,
+          "p_value": 0.0,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        },
+        {
+          "positive_label": "conflicting",
+          "reference": "k_doc",
+          "rival": "document_count",
+          "auroc_reference": 0.7781190926275993,
+          "auroc_rival": 0.714080025204789,
+          "observed_delta": 0.06403906742281029,
+          "ci_low": 0.03436252680191343,
+          "ci_high": 0.09354474548440084,
+          "p_value": 0.0,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        }
+      ]
+    },
+    "insufficiency": {
+      "positive_label": "insufficient",
+      "reference": "m_theta",
+      "reports": [
+        {
+          "score_name": "m_theta",
+          "positive_label": "insufficient",
+          "auroc": 0.8152614996849403,
+          "auprc": 0.5544701089397018,
+          "best_f1": 0.6200716845878136,
+          "best_threshold": 0.6046107792190962,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "mean_unknown",
+          "positive_label": "insufficient",
+          "auroc": 0.8201480781348456,
+          "auprc": 0.5664049194882931,
+          "best_f1": 0.6305609284332688,
+          "best_threshold": 0.8733333333333334,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "min_unknown",
+          "positive_label": "insufficient",
+          "auroc": 0.8182199117832388,
+          "auprc": 0.557781842723192,
+          "best_f1": 0.6194690265486725,
+          "best_threshold": 0.78,
+          "positive_count": 230,
+          "negative_count": 690
+        },
+        {
+          "score_name": "unknown_product",
+          "positive_label": "insufficient",
+          "auroc": 0.8151039697542533,
+          "auprc": 0.5539050141031002,
+          "best_f1": 0.6214285714285714,
+          "best_threshold": 0.5832,
+          "positive_count": 230,
+          "negative_count": 690
+        }
+      ],
+      "comparisons": [
+        {
+          "positive_label": "insufficient",
+          "reference": "m_theta",
+          "rival": "mean_unknown",
+          "auroc_reference": 0.8152614996849403,
+          "auroc_rival": 0.8201480781348456,
+          "observed_delta": -0.0048865784499052545,
+          "ci_low": -0.02260310548800537,
+          "ci_high": 0.012629566912972123,
+          "p_value": 0.5752,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        },
+        {
+          "positive_label": "insufficient",
+          "reference": "m_theta",
+          "rival": "min_unknown",
+          "auroc_reference": 0.8152614996849403,
+          "auroc_rival": 0.8182199117832388,
+          "observed_delta": -0.002958412098298502,
+          "ci_low": -0.013774580335731534,
+          "ci_high": 0.0076714909754224125,
+          "p_value": 0.5964,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        },
+        {
+          "positive_label": "insufficient",
+          "reference": "m_theta",
+          "rival": "unknown_product",
+          "auroc_reference": 0.8152614996849403,
+          "auroc_rival": 0.8151039697542533,
+          "observed_delta": 0.00015752993068707255,
+          "ci_low": -0.00118542626587681,
+          "ci_high": 0.0015778672655462067,
+          "p_value": 0.8072,
+          "n_resamples": 5000,
+          "seed": 42,
+          "sample_count": 920
+        }
+      ]
+    }
+  },
+  "conflict_auroc_by_document_count": [
+    {
+      "document_count": 1,
+      "claims": 157,
+      "conflicting": 11,
+      "k_doc": 0.5,
+      "sr_std": 0.5,
+      "max_product": 0.7450186799501868
+    },
+    {
+      "document_count": 2,
+      "claims": 285,
+      "conflicting": 40,
+      "k_doc": 0.7352551020408163,
+      "sr_std": 0.6653571428571428,
+      "max_product": 0.7357142857142855
+    },
+    {
+      "document_count": 3,
+      "claims": 200,
+      "conflicting": 57,
+      "k_doc": 0.7138387927861612,
+      "sr_std": 0.6837811311495521,
+      "max_product": 0.7114464482885535
+    },
+    {
+      "document_count": 4,
+      "claims": 128,
+      "conflicting": 50,
+      "k_doc": 0.7012820512820512,
+      "sr_std": 0.6065384615384615,
+      "max_product": 0.6597435897435897
+    },
+    {
+      "document_count": 5,
+      "claims": 63,
+      "conflicting": 31,
+      "k_doc": 0.6376008064516129,
+      "sr_std": 0.5272177419354839,
+      "max_product": 0.6421370967741936
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+{
+  "dataset_name": "rag-ds-climate-fever-balanced-v2",
+  "method": "llm_judge",
+  "provider": "deepseek",
+  "requested_model": "deepseek-flash",
+  "effort": "default",
+  "fallbacks_enabled": false,
+  "prompt_sha256": "aee9a7ccf00d8fbcba9bf39a88cd1b44a9cd18fff5968d2b81d03e5fd7869598",
+  "is_subset": false,
+  "claim_count": 616,
+  "report": {
+    "method": "llm_judge",
+    "accuracy": 0.4788961038961039,
+    "macro_f1": 0.4555173510287426,
+    "macro_labels": [
+      "supported",
+      "refuted",
+      "insufficient",
+      "conflicting"
+    ],
+    "per_class": [
+      {
+        "label": "supported",
+        "precision": 0.5604395604395604,
+        "recall": 0.33116883116883117,
+        "f1": 0.4163265306122449,
+        "support": 154
+      },
+      {
+        "label": "refuted",
+        "precision": 0.6611570247933884,
+        "recall": 0.5194805194805194,
+        "f1": 0.5818181818181818,
+        "support": 154
+      },
+      {
+        "label": "insufficient",
+        "precision": 0.3732590529247911,
+        "recall": 0.8701298701298701,
+        "f1": 0.5224171539961013,
+        "support": 154
+      },
+      {
+        "label": "conflicting",
+        "precision": 0.6666666666666666,
+        "recall": 0.19480519480519481,
+        "f1": 0.3015075376884422,
+        "support": 154
+      },
+      {
+        "label": "undetermined",
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    ],
+    "labels": [
+      "supported",
+      "refuted",
+      "insufficient",
+      "conflicting",
+      "undetermined"
+    ],
+    "matrix": [
+      [
+        51,
+        7,
+        86,
+        10,
+        0
+      ],
+      [
+        4,
+        80,
+        66,
+        4,
+        0
+      ],
+      [
+        8,
+        11,
+        134,
+        1,
+        0
+      ],
+      [
+        28,
+        23,
+        73,
+        30,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "sample_count": 616
+  },
+  "interval": {
+    "method": "llm_judge",
+    "metric": "macro_f1",
+    "observed": 0.4555173510287426,
+    "ci_low": 0.41496219998011624,
+    "ci_high": 0.4948146243360416,
+    "n_resamples": 5000,
+    "seed": 42,
+    "sample_count": 616
+  },
+  "predicted_label_counts": {
+    "insufficient": 359,
+    "refuted": 121,
+    "supported": 91,
+    "conflicting": 45
+  },
+  "refusals": 0,
+  "served_models": {
+    "deepseek-flash": 616
+  },
+  "input_tokens": 311892,
+  "output_tokens": 874013,
+  "compared_with": "outputs\\metrics\\cross_validation_deepseek_flash_controls\\cv_predictions.csv",
+  "comparisons": [
+    {
+      "method_a": "llm_judge",
+      "method_b": "conflict_aware",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.31865842033583924,
+      "observed_delta": 0.13685893069290334,
+      "ci_low": 0.09425325291543629,
+      "ci_high": 0.1786258503620453,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "ds",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.5052754097108599,
+      "observed_delta": -0.049758058682117356,
+      "ci_low": -0.09012023127654034,
+      "ci_high": -0.0082111225117798,
+      "p_value": 0.0196,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "majority_vote",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.21708376033340165,
+      "observed_delta": 0.23843359069534092,
+      "ci_low": 0.19785497228285343,
+      "ci_high": 0.2780483860325124,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "single_evaluator",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.2153112094842721,
+      "observed_delta": 0.24020614154447048,
+      "ci_low": 0.19947749813049698,
+      "ci_high": 0.2801466016564178,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_max_product",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.5275710243286679,
+      "observed_delta": -0.07205367329992529,
+      "ci_low": -0.10917065703325446,
+      "ci_high": -0.03414202433965774,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_max_product_uprod",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.5186786747356809,
+      "observed_delta": -0.06316132370693828,
+      "ci_low": -0.10141724573028765,
+      "ci_high": -0.024511910735359688,
+      "p_value": 0.0032,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_sr_std",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.46178524034560936,
+      "observed_delta": -0.0062678893168667815,
+      "ci_low": -0.047939252516731534,
+      "ci_high": 0.03551196459291939,
+      "p_value": 0.7772,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "stat_gate_sr_std_uprod",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.4536244720783385,
+      "observed_delta": 0.0018928789504040755,
+      "ci_low": -0.04057396752544229,
+      "ci_high": 0.046039267324751165,
+      "p_value": 0.9292,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    },
+    {
+      "method_a": "llm_judge",
+      "method_b": "weighted_average",
+      "metric": "macro_f1",
+      "observed_a": 0.4555173510287426,
+      "observed_b": 0.2153112094842721,
+      "observed_delta": 0.24020614154447048,
+      "ci_low": 0.19947749813049698,
+      "ci_high": 0.2801466016564178,
+      "p_value": 0.0,
+      "n_resamples": 5000,
+      "seed": 42,
+      "sample_count": 616
+    }
+  ]
+}

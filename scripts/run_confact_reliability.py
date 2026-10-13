@@ -323,13 +323,13 @@ def _analyse(args: argparse.Namespace) -> int:
             print(f"    {condition:<14}{method:<20}{m['accuracy']:>10.4f}{m['macro_f1']:>10.4f}"
                   f"{m['auroc']:>8.4f}{m['undetermined']:>6}{m['ds_undefined']:>12}")
     print()
-    print(f"    {'比较（前者 − 后者）':<52}{'ΔMacro-F1':>10}{'95% CI':>20}{'ΔAUROC':>9}{'95% CI':>20}")
+    print(f"    {'比较（前者 - 后者）':<52}{'ΔMacro-F1':>10}{'95% CI':>20}{'ΔAUROC':>9}{'95% CI':>20}")
     for item in comparisons:
         f1, auroc = item["macro_f1"], item["auroc"]
         f1_ci = f"[{f1['ci_low']:+.3f},{f1['ci_high']:+.3f}]{'*' if item['macro_f1_significant'] else ' '}"
         auroc_ci = (f"[{auroc['ci_low']:+.3f},{auroc['ci_high']:+.3f}]"
                     f"{'*' if item['auroc_significant'] else ' '}")
-        print(f"    {item['a'] + ' − ' + item['b']:<52}{f1['observed_delta']:>+10.4f}{f1_ci:>20}"
+        print(f"    {item['a'] + ' - ' + item['b']:<52}{f1['observed_delta']:>+10.4f}{f1_ci:>20}"
               f"{auroc['observed_delta']:>+9.4f}{auroc_ci:>20}")
     print("    * = 95% 区间不跨 0")
     print()
